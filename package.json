@@ -1,0 +1,28 @@
+{
+  "name": "node-home",
+  "version": "1.0.0",
+  "description": "Smarthome for NodeJS",
+  "main": "bin/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.jukn.de/juliankern.com/node-home.git"
+  },
+  "keywords": [
+    "nodejs",
+    "smarthome",
+    "heater"
+  ],
+  "author": "Julian Kern <mail@juliankern.com> (http://juliankern.com)",
+  "license": "MIT",
+  "dependencies": {
+    "bonjour": "^3.5.0",
+    "chalk": "^2.0.1",
+    "cli": "^1.0.1",
+    "homekit": "0.0.3",
+    "portfinder": "^1.0.13",
+    "socket.io": "^2.0.3"
+  }
+}
