@@ -19,35 +19,42 @@ if (!options.config) {
 
 const config = global.req(options.config);
 
-global.log('Starting search for master server...');
+storage.initSync({
+    dir: `storage/client/${config.type}/${config.room}`
+});
 
-let browser = bonjour.find({ type: 'node-home' });
-browser.on('up', (service) => {
-    let address = service.addresses[0].includes('::') ? service.addresses[1] : service.addresses[0];
+(async () => {
+    global.log('Starting search for master server...');
 
-    global.success('Found an Node-Home server:', `http://${address}:${service.port}`);
+    let browser = bonjour.find({ type: 'node-home' });
+    browser.on('up', (service) => {
+        let address = service.addresses[0].includes('::') ? service.addresses[1] : service.addresses[0];
 
-    const socket = require('socket.io-client')(`http://${address}:${service.port}`);
-    
-    socket.on('connect', () => {
-        global.success('Connected to server! Own ID:', socket.id);
+        global.success('Found an Node-Home server:', `http://${address}:${service.port}`);
 
-        socket.emit('register', { 
-            type: config.type,
-            room: config.room
-        }, (d) => {
-            global.muted('Registered successfully!');
+        const socket = require('socket.io-client')(`http://${address}:${service.port}`);
+        
+        socket.on('connect', () => {
+            global.success('Connected to server! Own ID:', socket.id);
+
+            socket.emit('register', { 
+                type: config.type,
+                room: config.room
+            }, (d) => {
+                global.muted('Registered successfully!');
+                loadLibrary(config.type);
+            });
+        });
+
+        socket.on('disconnect', (reason) => {
+            global.warn('Server disconnected! Reason:', reason);
+
+            global.log('Starting search for master server...');
+            browser.start();
         });
     });
 
-    socket.on('disconnect', (reason) => {
-        global.warn('Server disconnected! Reason:', reason);
-
-        global.log('Starting search for master server...');
-        browser.start();
-    });
-
-    // service.on('down', () => {
-    //     console.log('service down?');
-    // });
-});
+    function loadLibrary(type) {
+        let lib = global.req(`libs/${type}.client.js`);
+    }
+})();

@@ -3,9 +3,10 @@ global.log('');
 const pkg = global.req('package.json');
 
 const fs = require('fs');
-const bonjour = require('bonjour')();
-const portfinder = require('portfinder');
+const storage = require('node-persist');
 const cli = require('cli');
+const portfinder = require('portfinder');
+const bonjour = require('bonjour')();
 cli.enable('version');
 cli.setApp(pkg.name, pkg.version)
 const options = cli.parse({
@@ -18,7 +19,9 @@ const app = require('http').createServer((req, res) => {
 });
 const io = require('socket.io')(app);
 
-const clients = {};
+storage.initSync({
+    dir: 'storage/server'
+});
 
 (async () => {
     let port = options.port || await portfinder.getPortPromise();
@@ -33,9 +36,12 @@ const clients = {};
         global.log('Client connected');
 
         socket.on('register', (data, cb) => {
+            let clients = await storage.getItem('clients');
             clients[socket.client.id] = {};
             clients[socket.client.id].room = data.room;
             clients[socket.client.id].type = data.type;
+            
+            await storage.setItem('clients', clients);
 
             global.success('Client registered! ID: ', socket.client.id, data);
 
