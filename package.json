@@ -4,7 +4,9 @@
   "description": "Smarthome for NodeJS",
   "main": "bin/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon -e js --ignore bin/client.js bin/server.js",
+    "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
   "repository": {
     "type": "git",
@@ -23,7 +25,7 @@
     "cli": "^1.0.1",
     "homekit": "0.0.3",
     "node-persist": "^2.1.0",
-    "portfinder": "^1.0.13",
+    "nodemon": "^1.11.0",
     "socket.io": "^2.0.3"
   }
 }
