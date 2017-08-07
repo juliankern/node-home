@@ -7,23 +7,24 @@ const storage = require('node-persist');
 const cli = require('cli');
 const bonjour = require('bonjour')();
 
-cli.enable('version');
-cli.setApp(pkg.name, pkg.version)
-const options = cli.parse({
-    port: [ 'p', 'A port to use instead of autodiscover', 'int', null ]
-});
-
 const app = require('http').createServer((req, res) => {
     res.writeHead(200);
     res.end('Hello World');
 });
 const io = require('socket.io')(app);
 
+cli.enable('version');
+cli.setApp(pkg.name, pkg.version);
+
+const options = cli.parse({
+    port: [ 'p', 'A port to use instead of autodiscover', 'int', null ]
+});
+
 storage.initSync({
     dir: 'storage/server'
 });
 
-storage.setItemSync('clients', {});
+let clients = {};
 
 (async () => {
     let port = options.port || (await findPort());
@@ -38,12 +39,9 @@ storage.setItemSync('clients', {});
         global.log('Client connected');
 
         socket.on('register', async (data, cb) => {
-            let clients = await storage.getItem('clients');
             clients[socket.client.id] = {};
             clients[socket.client.id].room = data.room;
             clients[socket.client.id].type = data.type;
-            
-            await storage.setItem('clients', clients);
 
             global.success('Client registered! ID: ', socket.client.id, data);
 
@@ -56,10 +54,7 @@ storage.setItemSync('clients', {});
 
         socket.on('disconnect', async (reason) => {
             global.warn('Client disconnected! ID:', socket.client.id, reason);
-            let clients = await storage.getItem('clients');
             delete clients[socket.client.id];
-            
-            await storage.setItem('clients', clients);
 
             global.muted('Clientlist: ', clients);
         });
@@ -68,14 +63,19 @@ storage.setItemSync('clients', {});
             global.success(`Client ${socket.client.id} has loaded it's plugin`);
 
             //> TODO start loading own server plugins, announce as accessory etc
+            _loadPlugin(socket);
 
-            let clients = await storage.getItem('clients');
             clients[socket.client.id].loaded = true;
             
             await storage.setItem('clients', clients);
         })
     });
 })();
+
+async function _loadPlugin(socket) {
+    plugin = require(`node-home-${clients[socket.client.id].type}`).Server(clients[socket.client.id], storage);
+    return plugin.load(socket);
+}
 
 function findPort(start) {
     var portrange = start || 8000;
