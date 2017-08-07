@@ -64,10 +64,10 @@ storage.setItemSync('clients', {});
             global.muted('Clientlist: ', clients);
         });
 
-        socket.on('libloaded', async () => {
-            global.success(`Client ${socket.client.id} has loaded it's library`);
+        socket.on('pluginloaded', async () => {
+            global.success(`Client ${socket.client.id} has loaded it's plugin`);
 
-            //> TODO start loading own server libs, announce as accessory etc
+            //> TODO start loading own server plugins, announce as accessory etc
 
             let clients = await storage.getItem('clients');
             clients[socket.client.id].loaded = true;

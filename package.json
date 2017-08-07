@@ -24,6 +24,7 @@
     "chalk": "^2.0.1",
     "cli": "^1.0.1",
     "homekit": "0.0.3",
+    "node-home-heater": "file:../node-home-heater",
     "node-persist": "^2.1.0",
     "nodemon": "^1.11.0",
     "socket.io": "^2.0.3"

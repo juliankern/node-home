@@ -26,7 +26,7 @@ storage.initSync({
     dir: `storage/client/${config.type}/${config.room}`
 });
 
-let library;
+let plugin;
 
 (async () => {
     let searchTime = Date.now();
@@ -52,13 +52,13 @@ let library;
                 room: config.room
             }, (d) => {
                 global.muted('Registered successfully!');
-                loadLibrary(config.type, socket);
+                loadPlugin(config.type, socket);
             });
         });
 
         socket.on('disconnect', (reason) => {
             global.warn('Server disconnected! Reason:', reason);
-            unloadLibrary(socket);
+            unloadPlugin(socket);
 
             searchTime = Date.now();
             global.log('Starting search for master server...');
@@ -67,11 +67,11 @@ let library;
     });
 })();
 
-function loadLibrary(type, socket) {
-    library = global.req(`libs/${type}.client.js`);
-    return library.load(socket);
+function loadPlugin(type, socket) {
+    plugin = require(`node-home-${type}`).Client(config);
+    return plugin.load(socket);
 }
 
-function unloadLibrary() {
-    return library.unload();
+function unloadPlugin() {
+    return plugin.unload();
 }
