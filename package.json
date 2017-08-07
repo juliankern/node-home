@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://git.jukn.de/juliankern.com/node-smartnode.git"
+    "url": "git+https://github.com/juliankern/node-smartnode.git"
   },
   "keywords": [
     "nodejs",
