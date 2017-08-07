@@ -5,6 +5,7 @@
   "main": "bin/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run server",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
@@ -35,9 +36,9 @@
     "cli": "^1.0.1",
     "homekit": "0.0.3",
     "moment": "^2.18.1",
-    "node-home-heater": "file:../node-home-heater",
     "node-persist": "^2.1.0",
     "nodemon": "^1.11.0",
+    "smartnode-thermostat": "file:../smartnode-thermostat",
     "socket.io": "^2.0.3"
   }
 }

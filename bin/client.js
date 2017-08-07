@@ -1,3 +1,5 @@
+moment = require('moment');
+
 require('../util/global.js');
 global.log('');
 const pkg = global.req('package.json');
@@ -5,7 +7,6 @@ const pkg = global.req('package.json');
 const storage = require('node-persist');
 const bonjour = require('bonjour')();
 const cli = require('cli');
-const moment = require('moment');
 
 cli.enable('version');
 cli.setApp(pkg.name, pkg.version);
@@ -32,14 +33,14 @@ let plugin;
     let searchTime = +moment();
     global.log('Starting search for master server...');
 
-    let browser = bonjour.find({ type: 'node-home' });
+    let browser = bonjour.find({ type: 'smartnode' });
     browser.on('up', (service) => {
         global.muted(`Time to find master server: ${+moment() - searchTime}ms`);
         searchTime = +moment();
 
         let address = service.addresses[0].includes('::') ? service.addresses[1] : service.addresses[0];
 
-        global.success('Found an Node-Home server:', `http://${address}:${service.port}`);
+        global.success('Found an SmartNode server:', `http://${address}:${service.port}`);
 
         const socket = require('socket.io-client')(`http://${address}:${service.port}`);
         
@@ -68,7 +69,13 @@ let plugin;
 })();
 
 async function _loadPlugin(type, socket) {
-    plugin = await require(`node-home-${type}`).Client(config);
+    try {
+        plugin = await require(`smartnode-${type}`).Client(config);
+    } catch(e) {
+        global.error(`Plugin "smartnode-${type}" not found - you need to install it via "npm install smartnode-${type}" first!`);
+        global.muted('Debug', e);
+        process.exit(1);
+    }
     return plugin.load(socket);
 }
 

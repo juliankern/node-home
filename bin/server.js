@@ -27,16 +27,16 @@ storage.initSync({
 let clients = {};
 
 (async () => {
-    let port = options.port || (await findPort());
+    let port = options.port || (await _findPort());
 
     app.listen(port, () => {
-        bonjour.publish({ name: 'node-home Server', type: 'node-home', port: port });
+        bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
 
-        global.success(`Home server up and running, broadcasting via bonjour on port ${port}`);
+        global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
     });
     
     io.on('connection', (socket) => {
-        global.log('Client connected');
+        global.log('Client connected:', socket.client.id);
 
         socket.on('register', async (data, cb) => {
             clients[socket.client.id] = {};
@@ -63,7 +63,7 @@ let clients = {};
             global.success(`Client ${socket.client.id} has loaded it's plugin`);
 
             //> TODO start loading own server plugins, announce as accessory etc
-            _loadPlugin(socket);
+            _loadPlugin(socket, clients[socket.client.id]);
 
             clients[socket.client.id].loaded = true;
             
@@ -72,12 +72,28 @@ let clients = {};
     });
 })();
 
-async function _loadPlugin(socket) {
-    plugin = require(`node-home-${clients[socket.client.id].type}`).Server(clients[socket.client.id], storage);
+async function _loadPlugin(socket, cfg) {
+    try {
+        plugin = await require(`smartnode-${clients[socket.client.id].type}`).Server(clients[socket.client.id], {
+            storage: {
+                get: async (key) => {
+                    return await storage.getItem(`${cfg.room}.${key}`);
+                },
+                set: async (key, value) => {
+                    return await storage.setItem(`${cfg.room}.${key}`, value);
+                }
+            }
+        });
+    } catch(e) {
+        global.error(`Plugin "smartnode-${type}" not found - you need to install it via "npm install smartnode-${type}" first!`);
+        global.muted('Debug', e);
+        process.exit(1);
+    }
+
     return plugin.load(socket);
 }
 
-function findPort(start) {
+function _findPort(start) {
     var portrange = start || 8000;
 
     function find(cb) {
@@ -111,7 +127,7 @@ function exitHandler(options, err) {
     io.close();
 
     bonjour.unpublishAll(() => {
-        global.success('Bonjour service unpublished!');
+        global.warn('Bonjour service unpublished!');
 
         if (options.cleanup) {
 
