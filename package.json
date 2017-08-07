@@ -1,6 +1,6 @@
 {
   "name": "smartnode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
   "scripts": {
