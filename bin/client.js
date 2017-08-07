@@ -24,10 +24,11 @@ if (!options.config) {
 const config = global.req(options.config);
 
 storage.initSync({
-    dir: `storage/client/${config.type}/${config.room}`
+    dir: `storage/client/${config.room}/${config.type}`
 });
 
 let plugin;
+let loaded;
 
 (async () => {
     let searchTime = +moment();
@@ -50,16 +51,17 @@ let plugin;
 
             socket.emit('register', { 
                 type: config.type,
-                room: config.room
+                room: config.room,
+                loaded
             }, async (d) => {
                 global.muted('Registered successfully!');
-                await _loadPlugin(config.type, socket);
+                if ((await _loadPlugin(config.type, socket))) loaded = true;
             });
         });
 
-        socket.on('disconnect', (reason) => {
+        socket.on('disconnect', async (reason) => {
             global.warn('Server disconnected! Reason:', reason);
-            _unloadPlugin(socket);
+            if ((await _unloadPlugin(socket))) loaded = false;
 
             searchTime = +moment();
             global.log('Starting search for master server...');
@@ -70,15 +72,24 @@ let plugin;
 
 async function _loadPlugin(type, socket) {
     try {
-        plugin = await require(`smartnode-${type}`).Client(config);
+        plugin = await require(`smartnode-${type}`).Client(config, {
+            storage: {
+                get: async (key) => {
+                    return await storage.getItem(`${key}`);
+                },
+                set: async (key, value) => {
+                    return await storage.setItem(`${key}`, value);
+                }
+            }
+        });
     } catch(e) {
-        global.error(`Plugin "smartnode-${type}" not found - you need to install it via "npm install smartnode-${type}" first!`);
+        global.error(`Could not load plugin "smartnode-${type}" - you probably need to install it via "npm install smartnode-${type}" first!`);
         global.muted('Debug', e);
         process.exit(1);
     }
-    return plugin.load(socket);
+    return await plugin.load(socket);
 }
 
-function _unloadPlugin(socket) {
-    return plugin.unload(socket);
+async function _unloadPlugin(socket) {
+    return await plugin.unload(socket);
 }

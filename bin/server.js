@@ -27,7 +27,7 @@ storage.initSync({
 let clients = {};
 
 (async () => {
-    let port = options.port || (await _findPort());
+    let port = options.port || (await findPort());
 
     app.listen(port, () => {
         bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
@@ -50,6 +50,11 @@ let clients = {};
             global.muted('Clientlist: ', clients);
 
             cb(Object.assign(data, { success: true }));
+            
+            if (data.loaded) {
+                // server reconnected - plugin on client side is already loaded
+                _pluginLoaded(socket);
+            }
         });
 
         socket.on('disconnect', async (reason) => {
@@ -60,29 +65,32 @@ let clients = {};
         });
 
         socket.on('pluginloaded', async () => {
-            global.success(`Client ${socket.client.id} has loaded it's plugin`);
-
-            //> TODO start loading own server plugins, announce as accessory etc
-            _loadPlugin(socket, clients[socket.client.id]);
-
-            clients[socket.client.id].loaded = true;
-            
-            await storage.setItem('clients', clients);
+            _pluginLoaded(socket);
         })
     });
 })();
+
+async function _pluginLoaded(socket) {
+    global.success(`Client ${socket.client.id} has loaded it's plugin`);
+
+    //> TODO start loading own server plugins, announce as accessory etc
+    await _loadPlugin(socket, clients[socket.client.id]);
+
+    clients[socket.client.id].loaded = true;
+}
 
 async function _loadPlugin(socket, cfg) {
     try {
         plugin = await require(`smartnode-${clients[socket.client.id].type}`).Server(clients[socket.client.id], {
             storage: {
                 get: async (key) => {
-                    return await storage.getItem(`${cfg.room}.${key}`);
+                    return await storage.getItem(`${cfg.room}.${cfg.type}.${key}`);
                 },
                 set: async (key, value) => {
-                    return await storage.setItem(`${cfg.room}.${key}`, value);
+                    return await storage.setItem(`${cfg.room}.${cfg.type}.${key}`, value);
                 }
-            }
+            },
+            findPort
         });
     } catch(e) {
         global.error(`Plugin "smartnode-${type}" not found - you need to install it via "npm install smartnode-${type}" first!`);
@@ -93,7 +101,7 @@ async function _loadPlugin(socket, cfg) {
     return plugin.load(socket);
 }
 
-function _findPort(start) {
+function findPort(start) {
     var portrange = start || 8000;
 
     function find(cb) {
