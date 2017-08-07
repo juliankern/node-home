@@ -20,7 +20,8 @@
     "framework",
     "cluster",
     "server",
-    "client"
+    "client",
+    "smartnode"
   ],
   "author": "Julian Kern <mail@juliankern.com> (http://juliankern.com)",
   "license": "MIT",
