@@ -1,7 +1,7 @@
 {
-  "name": "node-home",
+  "name": "smartnode",
   "version": "1.0.0",
-  "description": "Smarthome for NodeJS",
+  "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,15 +10,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://git.jukn.de/juliankern.com/node-home.git"
+    "url": "http://git.jukn.de/juliankern.com/node-smartnode.git"
   },
   "keywords": [
     "nodejs",
     "smarthome",
-    "heater"
+    "heater",
+    "nodes",
+    "framework",
+    "cluster",
+    "server",
+    "client"
   ],
   "author": "Julian Kern <mail@juliankern.com> (http://juliankern.com)",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/juliankern/node-smartnode/issues"
+  },
+  "homepage": "https://github.com/juliankern/node-smartnode#readme",
   "dependencies": {
     "bonjour": "^3.5.0",
     "chalk": "^2.0.1",
