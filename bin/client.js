@@ -36,6 +36,7 @@ let loaded;
 
     let browser = bonjour.find({ type: 'smartnode' });
     browser.on('up', (service) => {
+        browser.stop();
         global.muted(`Time to find master server: ${+moment() - searchTime}ms`);
         searchTime = +moment();
 

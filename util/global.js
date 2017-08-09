@@ -27,5 +27,10 @@ Object.assign(global, {
     muted: (arg1, ...args) => {
         // custom error logger with gray color
         console.log(chalk.gray(arg1), ...args);
+    },
+    debug: (arg1, ...args) => {
+        // custom error logger with gray color
+        // TODO add DEBUG flag here
+        console.log(chalk.gray(arg1), ...args);
     }
 });

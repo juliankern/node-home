@@ -2,6 +2,9 @@
     "type": "statusdisplay",
     "room": "livingroom",
     "button": 15,
+    "lines": [
+        "{{room.temperature.current}}{{room.temperature.unit}} > {{room.temperature.target}}{{room.temperature.unit}}"
+    ],
     "display": {
         "backlight": 16,
         "timeout": 5,
