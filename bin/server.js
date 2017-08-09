@@ -26,7 +26,7 @@ storage.initSync({
 });
 
 let clients = {};
-let globalValues = {
+let globalVariables = {
     global: {}
 };
 
@@ -53,9 +53,18 @@ class SmartNodePlugin extends EventEmitter {
 
     getGlobals() { 
         return { 
-            global: globalValues.global,
-            room: globalValues[this.config.room] 
+            global: globalVariables.global,
+            room: globalVariables[this.room] 
         } 
+    }
+    
+    setGlobals(g, room) {
+        Object.assign(globalVariables.global, g);
+        globalVariables[this.room] = Object.assign({}, globalVariables[this.room], room);
+        
+        Object.keys(clients).forEach((id) => {
+            if (id !== this.id) clients[id].emit('globalsChanged', globalVariables);
+        });
     }
 };
 
@@ -147,42 +156,33 @@ async function _loadPlugin(id) {
         process.exit(1);
     }
 
-    // save the plugin globals locally
-    Object.assign(globalValues.global, plugin.exports.global);
-    globalValues[adapter.room] = Object.assign(globalValues[adapter.room] || {}, plugin.exports.room);
-
-    console.log('globalValues', globalValues);
-
     adapter.unload = plugin.unload;
 
-    Object.keys(clients).forEach((id) => {
-        if (id !== adapter.id) {
-            adapter.emit('globalsChanged');
-        }
-    });
-
-    plugin.load(adapter.socket);
+    plugin.load();
 
     return true;
 }
 
 function findPort(start) {
-    var portrange = start || 8000;
+    var port = start || 8000;
 
     function find(cb) {
-        var port = portrange;
-        portrange += 1;
+        port++;
 
         var server = require('http').createServer();
-        server.listen(port, (err) => {
-            server.once('close', () => {
-                cb(port);
+        try {
+            server.listen(port, (err) => {
+                server.once('close', () => {
+                    cb(port);
+                });
+                server.close();
             });
-            server.close();
-        });
-        server.on('error', (err) => {
+            server.on('error', (err) => {
+                find(cb);
+            });
+        } catch (e) {
             find(cb);
-        });
+        }
     }
 
     return new Promise((resolve, reject) => {
@@ -215,11 +215,5 @@ function exitHandler(err) {
 
 //do something when app is closing
 process.on('exit', exitHandler);
-
-process.on('restart', () => { console.log('RESTART CAUGHT!!!'); }); 
-
-//catches ctrl+c event
 process.on('SIGINT', exitHandler);
-
-//catches uncaught exceptions
 process.on('uncaughtException', exitHandler);
