@@ -1,20 +1,16 @@
-moment = require('moment');
-
 require('../util/global.js');
-global.log('');
+
+const SmartNodeClientPlugin = global.req('classes/SmartNodeClientPlugin.class.js');
+
 const pkg = global.req('package.json');
 
-const storage = require('node-persist');
+const moment = require('moment');
 const bonjour = require('bonjour')();
-const cli = require('cli');
 
+const cli = require('cli');
 cli.enable('version');
 cli.setApp(pkg.name, pkg.version);
-const options = cli.parse({
-    config: [ 'c', 'A config file to use', 'file', false ]
-});
-
-cli.enable('version');
+const options = cli.parse({ config: [ 'c', 'A config file to use', 'file', false ] });
 
 if (!options.config) {
     global.error('You need to provide a valid config file!');
@@ -23,22 +19,27 @@ if (!options.config) {
 
 const config = global.req(options.config);
 
-storage.initSync({
-    dir: `storage/client/${config.room}/${config.type}`
-});
+const storage = require('node-persist');
+storage.initSync({ dir: `storage/client/${config.room}/${config.type}` });
 
-let plugin;
-let loaded;
+//////////////////////////////////////////////////////////
 
-(async () => {
+let adapter = {};
+
+//////////////////////////////////////////////////////////
+
+init().catch((e) => { global.error('Client init error', e) });
+
+//////////////////////////////////////////////////////////
+
+async function init() {
     let searchTime = +moment();
     global.log('Starting search for master server...');
 
     let browser = bonjour.find({ type: 'smartnode' });
     browser.on('up', (service) => {
         browser.stop();
-        global.muted(`Time to find master server: ${+moment() - searchTime}ms`);
-        searchTime = +moment();
+        global.muted(`Time to find master server: ${+moment() - searchTime}ms`); searchTime = +moment();
 
         let address = service.addresses[0].includes('::') ? service.addresses[1] : service.addresses[0];
 
@@ -47,50 +48,56 @@ let loaded;
         const socket = require('socket.io-client')(`http://${address}:${service.port}`);
         
         socket.on('connect', () => {
-            global.muted(`Time to connect master socket: ${+moment()-searchTime}ms`);
+            global.muted(`Time to connect master server: ${+moment()-searchTime}ms`);
             global.success('Connected to server! Own ID:', socket.id);
 
             socket.emit('register', { 
                 type: config.type,
                 room: config.room,
-                loaded
+                loaded: adapter.loaded
             }, async (d) => {
+                adapter = new SmartNodeClientPlugin({
+                    socket,
+                    id: socket.id,
+                    config
+                });
+
                 global.muted('Registered successfully!');
-                if ((await _loadPlugin(config.type, socket))) loaded = true;
+                _loadPlugin();
             });
         });
 
         socket.on('disconnect', async (reason) => {
             global.warn('Server disconnected! Reason:', reason);
-            if ((await _unloadPlugin(socket))) loaded = false;
+            _unloadPlugin();
 
-            searchTime = +moment();
-            global.log('Starting search for master server...');
+            global.log('Starting search for master server...'); searchTime = +moment();
             browser.start();
         });
     });
-})();
+}
 
-async function _loadPlugin(type, socket) {
+async function _loadPlugin() {
+    let plugin;
+
     try {
-        plugin = await require(`smartnode-${type}`).Client(config, {
-            storage: {
-                get: async (key) => {
-                    return await storage.getItem(`${key}`);
-                },
-                set: async (key, value) => {
-                    return await storage.setItem(`${key}`, value);
-                }
-            }
-        });
+        plugin = await require(`smartnode-${adapter.type}`)
+            .Client(adapter)
+            .catch((e) => { global.error('Client load plugin error', e) });
     } catch(e) {
-        global.error(`Could not load plugin "smartnode-${type}" - you probably need to install it via "npm install smartnode-${type}" first!`);
+        global.error(`Could not load plugin "smartnode-${adapter.type}" - you probably need to install it via "npm install smartnode-${adapter.type}" first!`);
         global.muted('Debug', e);
         process.exit(1);
     }
-    return await plugin.load(socket);
+
+    adapter.unload = plugin.unload;
+
+    return plugin.load().then((loaded) => {
+        if (loaded) adapter.loaded = true;
+    });
 }
 
-async function _unloadPlugin(socket) {
-    return await plugin.unload(socket);
+async function _unloadPlugin() {
+    adapter.loaded = false;
+    return adapter.unload();
 }

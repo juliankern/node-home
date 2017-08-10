@@ -1,78 +1,42 @@
 require('../util/global.js');
-global.log('');
+
 const pkg = global.req('package.json');
 
-const fs = require('fs');
-const EventEmitter = require('events');
-const storage = require('node-persist');
-const cli = require('cli');
 const bonjour = require('bonjour')();
+const fs = require('fs');
+const utils = global.req('util');
+const storage = require('node-persist');
+storage.initSync({ dir: 'storage/server' });
 
-const app = require('http').createServer((req, res) => {
-    res.writeHead(200);
-    res.end('Hello World');
-});
+const app = require('http').createServer((req, res) => { res.writeHead(200); res.end('Hello World'); });
 const io = require('socket.io')(app);
 
+const cli = require('cli');
 cli.enable('version');
 cli.setApp(pkg.name, pkg.version);
+const cliOptions = cli.parse({ port: [ 'p', 'A port to use instead of autodiscover', 'int', null ]});
 
-const options = cli.parse({
-    port: [ 'p', 'A port to use instead of autodiscover', 'int', null ]
-});
-
-storage.initSync({
-    dir: 'storage/server'
-});
+//////////////////////////////////////////////////////////
 
 let clients = {};
 let globalVariables = {
     global: {}
 };
 
-class SmartNodePlugin extends EventEmitter {
-    constructor(data) {
-        super();
+//////////////////////////////////////////////////////////
 
-        this.id = data.id;
-        this.socket = data.socket;
-        this.config = data.config;
-        this.room = data.config.room;
-        this.type = data.config.type;
-        this.findPort = findPort;
+const SmartNodeServerPlugin = global.req('classes/SmartNodeServerPlugin.class.js')({ storage, globalVariables, clients });
 
-        this.storage = {
-            get: async (key) => {
-                return await storage.getItem(`${this.config.room}.${this.config.type}.${key}`);
-            },
-            set: async (key, value) => {
-                return await storage.setItem(`${this.config.room}.${this.config.type}.${key}`, value);
-            }
-        };
-    }
+init().catch((e) => { global.error('Server init error', e) });
 
-    getGlobals() { 
-        return { 
-            global: globalVariables.global,
-            room: globalVariables[this.room] 
-        } 
-    }
-    
-    setGlobals(g, room) {
-        Object.assign(globalVariables.global, g);
-        globalVariables[this.room] = Object.assign({}, globalVariables[this.room], room);
-        
-        Object.keys(clients).forEach((id) => {
-            if (id !== this.id) clients[id].emit('globalsChanged', globalVariables);
-        });
-    }
-};
+//////////////////////////////////////////////////////////
 
-(async () => {
-    let port = options.port || (await findPort());
+async function init() {
+    let port = cliOptions.port || (await utils.findPort());
 
     app.listen(port, () => {
         bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
+        bonjour.published = true;
 
         global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
     });
@@ -81,7 +45,7 @@ class SmartNodePlugin extends EventEmitter {
         global.log('Client connected:', socket.client.id);
 
         socket.on('register', async (data, cb) => {
-            clients[socket.client.id] = new SmartNodePlugin({ 
+            clients[socket.client.id] = new SmartNodeServerPlugin({ 
                 socket,
                 id: socket.client.id, 
                 config: data
@@ -114,7 +78,7 @@ class SmartNodePlugin extends EventEmitter {
             _clientPluginLoaded(socket.client.id, true).catch((e) => { global.error('Server load plugin error (4)', e) });;
         })
     });
-})().catch((e) => { global.error('Server init error', e) });
+}
 
 async function _clientPluginLoaded(id, viaEvent) {
     if (viaEvent) global.debug('Plugin loading was initiaded via "pluginloaded" event.');
@@ -163,35 +127,6 @@ async function _loadPlugin(id) {
     return true;
 }
 
-function findPort(start) {
-    var port = start || 8000;
-
-    function find(cb) {
-        port++;
-
-        var server = require('http').createServer();
-        try {
-            server.listen(port, (err) => {
-                server.once('close', () => {
-                    cb(port);
-                });
-                server.close();
-            });
-            server.on('error', (err) => {
-                find(cb);
-            });
-        } catch (e) {
-            find(cb);
-        }
-    }
-
-    return new Promise((resolve, reject) => {
-        find((port) => {
-            resolve(port);
-        })
-    });
-}
-
 function exitHandler(err) {
     global.log('SmartNode exiting...');
 
@@ -201,16 +136,24 @@ function exitHandler(err) {
 
     io.close();
 
-    bonjour.unpublishAll(() => {
-        global.warn('Bonjour service unpublished!');
+    if (err) global.error(err.stack);
 
+    if(bonjour.published) {
+        bonjour.published = false;
+        bonjour.unpublishAll(() => {
+            global.warn('Bonjour service unpublished!');
+
+            Object.keys(clients).forEach((id) => { if (clients[id].loaded) _unloadPlugin(id); });
+
+            process.exit();
+        });
+    } else {
         Object.keys(clients).forEach((id) => { if (clients[id].loaded) _unloadPlugin(id); });
 
         process.exit();
-    });
+    }
 
 
-    if (err) global.error(err.stack);
 }
 
 //do something when app is closing

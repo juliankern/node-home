@@ -34,3 +34,5 @@ Object.assign(global, {
         console.log(chalk.gray(arg1), ...args);
     }
 });
+
+global.log('');
