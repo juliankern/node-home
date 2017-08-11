@@ -25,7 +25,7 @@ let globalVariables = {
 
 //////////////////////////////////////////////////////////
 
-const SmartNodeServerPlugin = global.req('classes/SmartNodeServerPlugin.class.js')({ storage, globalVariables, clients });
+const SmartNodeServerPlugin = global.req('classes/SmartNodeServerPlugin.class.js')({ storage, globalVariables, globalsChanged });
 
 init().catch((e) => { global.error('Server init error', e) });
 
@@ -127,6 +127,12 @@ async function _loadPlugin(id) {
     return true;
 }
 
+function globalsChanged() {
+    Object.keys(clients).forEach((id) => {
+        if (id !== this.id) clients[id].emit('globalsChanged', globalVariables);
+    });
+}
+
 function exitHandler(err) {
     global.log('SmartNode exiting...');
 
@@ -152,8 +158,6 @@ function exitHandler(err) {
 
         process.exit();
     }
-
-
 }
 
 //do something when app is closing

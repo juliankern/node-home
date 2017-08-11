@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 
-module.exports = ({ storage, globalVariables, clients }) => {
+module.exports = ({ storage, globalVariables, globalsChanged }) => {
     return class SmartNodeServerPlugin extends EventEmitter {
         constructor(data) {
             super();
@@ -10,6 +10,12 @@ module.exports = ({ storage, globalVariables, clients }) => {
             this.config = data.config;
             this.room = data.config.room;
             this.type = data.config.type;
+
+            // which global variables the plugin will be using, to watch them
+            this.globals = { 
+                global: [],
+                room: []
+            };
 
             this.storage = {
                 get: (key) => {
@@ -29,12 +35,24 @@ module.exports = ({ storage, globalVariables, clients }) => {
         }
         
         setGlobals(g, room) {
+            if (!this.globals.global.length && !this.globals.room.length) {
+                throw 'The plugin doesn\'t define it\'s variables. Please contact the author.';
+            }
+
+            if(g && Object.keys(g).length > 0 && !this.globals.global.length) {
+                throw 'The plugin doesn\'t define it\'s global variables. Please contact the author.'
+            }
+
+            if(room && Object.keys(room).length > 0 && !this.globals.room.length) {
+                throw 'The plugin doesn\'t define it\'s room variables. Please contact the author.'
+            }
+
+            if (g)
+
             Object.assign(globalVariables.global, g);
             globalVariables[this.room] = Object.assign({}, globalVariables[this.room], room);
             
-            Object.keys(clients).forEach((id) => {
-                if (id !== this.id) clients[id].emit('globalsChanged', globalVariables);
-            });
+            globalsChanged();
         }
     }
 }

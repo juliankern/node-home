@@ -34,5 +34,24 @@ module.exports = {
                 resolve(port);
             })
         });
+    },
+    object2pathlist: (data) => {
+        var pathlist = {};
+
+        getKeysForVar(pathlist, null, data)
+
+        return pathlist;
+        
+        function getKeysForVar(pathlist, currentKey, data) {
+            for (var key in data) {
+                if (data[key] === Object(data[key])) {
+                    getKeysForVar(pathlist, (currentKey ? currentKey + '.' : '') + key, data[key])
+                } else {
+                    pathlist[(currentKey ? currentKey + '.' : '') + key] = data[key];
+                }
+            }
+
+            return pathlist;
+        }
     }
 }
