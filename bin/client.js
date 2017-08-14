@@ -1,6 +1,6 @@
 require('../util/global.js');
 
-const SmartNodeClientPlugin = global.req('classes/SmartNodeClientPlugin.class.js');
+const SmartNodeClientPlugin = global.req('classes/SmartNodePlugin.class.js').Client();
 
 const pkg = global.req('package.json');
 
@@ -35,18 +35,18 @@ init().catch((e) => { global.error('Client init error', e) });
 /**
  * init function
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  */
 async function init() {
     let searchTime = +moment();
     global.log('Starting search for master server...');
 
     let browser = bonjour.find({ type: 'smartnode' });
+    
     browser.on('up', (service) => {
-        browser.stop();
         global.muted(`Time to find master server: ${+moment() - searchTime}ms`); searchTime = +moment();
 
-        let address = service.addresses[0].includes('::') ? service.addresses[1] : service.addresses[0];
+        let address = service.addresses[0].includes(':') ? service.addresses[1] : service.addresses[0];
 
         global.success('Found an SmartNode server:', `http://${address}:${service.port}`);
 
@@ -74,10 +74,9 @@ async function init() {
 
         socket.on('disconnect', async (reason) => {
             global.warn('Server disconnected! Reason:', reason);
-            _unloadPlugin();
+            _unloadPlugin(socket);
 
             global.log('Starting search for master server...'); searchTime = +moment();
-            browser.start();
         });
     });
 }
@@ -85,7 +84,7 @@ async function init() {
 /**
  * load client plugin
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @return {[type]} returns true if loaded
  */
@@ -112,9 +111,10 @@ async function _loadPlugin() {
 /**
  * unloads plugin and cleans up
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  */
-async function _unloadPlugin() {
+async function _unloadPlugin(socket) {
     adapter.loaded = false;
+    socket.close();
     return adapter.unload();
 }

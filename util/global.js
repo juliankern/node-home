@@ -7,7 +7,7 @@ Object.assign(global, {
     /**
      * require() wrapper for requires always based on approot
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string} modulepath path to module
      *
@@ -20,7 +20,7 @@ Object.assign(global, {
     /**
      * output function for success
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined
@@ -32,7 +32,7 @@ Object.assign(global, {
     /**
      * output function for log
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined
@@ -44,7 +44,7 @@ Object.assign(global, {
     /**
      * output function for warnings
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined
@@ -56,7 +56,7 @@ Object.assign(global, {
     /**
      * output function for errors
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined
@@ -68,7 +68,7 @@ Object.assign(global, {
     /**
      * output function for muted messages
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined
@@ -80,7 +80,7 @@ Object.assign(global, {
     /**
      * output function for debug messages
      *
-     * @author Julian Kern <julian.kern@dmc.de>
+     * @author Julian Kern <mail@juliankern.com>
      *
      * @param  {string}    arg1 Words for message
      * @param  {...object} args parameters which should be examined

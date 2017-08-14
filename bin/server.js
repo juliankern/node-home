@@ -25,7 +25,7 @@ let globalVariables = {
 
 //////////////////////////////////////////////////////////
 
-const SmartNodeServerPlugin = global.req('classes/SmartNodeServerPlugin.class.js')({ storage, globalVariables, globalsChanged });
+const SmartNodeServerPlugin = global.req('classes/SmartNodePlugin.class.js').Server({ storage, globalVariables, globalsChanged });
 
 init().catch((e) => { global.error('Server init error', e) });
 
@@ -34,7 +34,7 @@ init().catch((e) => { global.error('Server init error', e) });
 /**
  * init function
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  */
 async function init() {
     let port = cliOptions.port || (await utils.findPort());
@@ -88,7 +88,7 @@ async function init() {
 /**
  * checks if the client plugin is already loaded, and loads it if neccessary
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @param  {string} id       id of the client
  */
@@ -109,7 +109,7 @@ async function _clientPluginLoaded(id) {
 /**
  * unloads server plugin
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @param  {string} id client ID
  */
@@ -122,7 +122,7 @@ function _unloadPlugin(id) {
 /**
  * loads server plugin
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @param  {string} id  Client ID
  *
@@ -158,7 +158,7 @@ async function _loadPlugin(id) {
 /**
  * notifies every server plugin exept the initiator about globals changed
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @param  {string} clientId Client ID
  * @param  {object} changed  array of variable paths that got changed
@@ -176,7 +176,7 @@ function globalsChanged(clientId, changed) {
 /**
  * exit handler for cleanup and stuff
  *
- * @author Julian Kern <julian.kern@dmc.de>
+ * @author Julian Kern <mail@juliankern.com>
  *
  * @param  {object} err Holding the error messages
  */
