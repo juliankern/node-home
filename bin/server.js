@@ -104,6 +104,7 @@ function _unloadPlugin(id) {
 async function _loadPlugin(id) {
     // load the plugin mathing to the client
     let adapter = clients[id];
+    let plugin;
 
     // try to load the plugin and check if it's installed
     try {
@@ -127,9 +128,18 @@ async function _loadPlugin(id) {
     return true;
 }
 
-function globalsChanged() {
+function globalsChanged(client, glo, room) {
     Object.keys(clients).forEach((id) => {
-        if (id !== this.id) clients[id].emit('globalsChanged', globalVariables);
+        if (id !== client.id) clients[id].emit('globalsChanged', { 
+            globals: {
+                global: globalVariables.global,
+                room: globalVariables[client.room]
+            },
+            changed: {
+                global: glo,
+                room
+            }
+        });
     });
 }
 

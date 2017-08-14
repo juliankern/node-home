@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const utils = global.req('util');
 
 module.exports = ({ storage, globalVariables, globalsChanged }) => {
     return class SmartNodeServerPlugin extends EventEmitter {
@@ -16,6 +17,8 @@ module.exports = ({ storage, globalVariables, globalsChanged }) => {
                 global: [],
                 room: []
             };
+            
+            if (!globalVariables[this.room]) globalVariables[this.room] = {};
 
             this.storage = {
                 get: (key) => {
@@ -34,12 +37,12 @@ module.exports = ({ storage, globalVariables, globalsChanged }) => {
             } 
         }
         
-        setGlobals(g, room) {
+        setGlobals(glo, room) {
             if (!this.globals.global.length && !this.globals.room.length) {
                 throw 'The plugin doesn\'t define it\'s variables. Please contact the author.';
             }
 
-            if(g && Object.keys(g).length > 0 && !this.globals.global.length) {
+            if(glo && Object.keys(glo).length > 0 && !this.globals.global.length) {
                 throw 'The plugin doesn\'t define it\'s global variables. Please contact the author.'
             }
 
@@ -47,12 +50,42 @@ module.exports = ({ storage, globalVariables, globalsChanged }) => {
                 throw 'The plugin doesn\'t define it\'s room variables. Please contact the author.'
             }
 
-            if (g)
+            let globalPaths = utils.getObjectPaths(glo);
+            let roomPaths = utils.getObjectPaths(room);
 
-            Object.assign(globalVariables.global, g);
-            globalVariables[this.room] = Object.assign({}, globalVariables[this.room], room);
+            globalPaths.forEach((key) => {
+                if (!this.globals.global.includes(key)) {
+                    throw `The plugin tries to change a not previously defined global variable (${key}). Please contact the author.`
+                }
+                
+                if (utils.getValueByPath(globalVariables.global, key) === utils.getValueByPath(glo, key)) {
+                    // value didn't change at all
+                    delete globalPaths[key];
+                    utils.deleteByPath(glo, key);
+                } else {
+                    utils.setValueByPath(globalVariables.global, key, utils.getValueByPath(glo, key));
+                }
+            });
             
-            globalsChanged();
+            roomPaths.forEach((key) => {
+                if (!this.globals.room.includes(key)) {
+                    throw `The plugin tries to change a not previously defined room variable (${key}). Please contact the author.`
+                }
+                
+                if (utils.getValueByPath(globalVariables[this.room], key) === utils.getValueByPath(room, key)) {
+                    // value didn't change at all
+                    delete roomPaths[key];
+                    utils.deleteByPath(room, key);
+                } else {
+                    utils.setValueByPath(globalVariables[this.room], key, utils.getValueByPath(room, key));
+                }
+            });
+                        
+            globalsChanged(
+                this,
+                globalPaths, 
+                roomPaths
+            );
         }
     }
 }
