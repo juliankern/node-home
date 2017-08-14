@@ -1,5 +1,8 @@
 const EventEmitter = require('events');
 
+/**
+ * SmartNodeClientPlugin class
+ */
 module.exports = class SmartNodeClientPlugin extends EventEmitter {
     constructor(data) {
         super();

@@ -32,6 +32,11 @@ init().catch((e) => { global.error('Client init error', e) });
 
 //////////////////////////////////////////////////////////
 
+/**
+ * init function
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ */
 async function init() {
     let searchTime = +moment();
     global.log('Starting search for master server...');
@@ -77,6 +82,13 @@ async function init() {
     });
 }
 
+/**
+ * load client plugin
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @return {[type]} returns true if loaded
+ */
 async function _loadPlugin() {
     let plugin;
 
@@ -97,6 +109,11 @@ async function _loadPlugin() {
     });
 }
 
+/**
+ * unloads plugin and cleans up
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ */
 async function _unloadPlugin() {
     adapter.loaded = false;
     return adapter.unload();

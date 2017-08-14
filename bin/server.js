@@ -31,6 +31,11 @@ init().catch((e) => { global.error('Server init error', e) });
 
 //////////////////////////////////////////////////////////
 
+/**
+ * init function
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ */
 async function init() {
     let port = cliOptions.port || (await utils.findPort());
 
@@ -80,8 +85,14 @@ async function init() {
     });
 }
 
-async function _clientPluginLoaded(id, viaEvent) {
-    if (viaEvent) global.debug('Plugin loading was initiaded via "pluginloaded" event.');
+/**
+ * checks if the client plugin is already loaded, and loads it if neccessary
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @param  {string} id       id of the client
+ */
+async function _clientPluginLoaded(id) {
     if (clients[id].loaded) {
         // plugin already loaded
         global.debug('Client plugin already loaded and therefore skipped for ', id);
@@ -95,12 +106,28 @@ async function _clientPluginLoaded(id, viaEvent) {
     clients[id].loaded = true;
 }
 
+/**
+ * unloads server plugin
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @param  {string} id client ID
+ */
 function _unloadPlugin(id) {
     global.warn('Unloaded plugin for client', id);
     clients[id].loaded = false;
     clients[id].unload();
 }
 
+/**
+ * loads server plugin
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @param  {string} id  Client ID
+ *
+ * @return {bool}       true if every worked
+ */
 async function _loadPlugin(id) {
     // load the plugin mathing to the client
     let adapter = clients[id];
@@ -128,21 +155,31 @@ async function _loadPlugin(id) {
     return true;
 }
 
-function globalsChanged(client, glo, room) {
-    Object.keys(clients).forEach((id) => {
-        if (id !== client.id) clients[id].emit('globalsChanged', { 
-            globals: {
-                global: globalVariables.global,
-                room: globalVariables[client.room]
-            },
-            changed: {
-                global: glo,
-                room
-            }
+/**
+ * notifies every server plugin exept the initiator about globals changed
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @param  {string} clientId Client ID
+ * @param  {object} changed  array of variable paths that got changed
+ */
+function globalsChanged(clientId, changed) {
+    Object.keys(clients).filter((id) => {
+        return id !== clientId;
+    }).forEach((id) => {
+        clients[id].emit('globalsChanged', { 
+            changed
         });
     });
 }
 
+/**
+ * exit handler for cleanup and stuff
+ *
+ * @author Julian Kern <julian.kern@dmc.de>
+ *
+ * @param  {object} err Holding the error messages
+ */
 function exitHandler(err) {
     global.log('SmartNode exiting...');
 
