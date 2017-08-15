@@ -28,10 +28,15 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 //////////////////////////////////////////////////////////
 
+const SmartNodeServerClientConnector = global.req('classes/SmartNodeServerClientConnector.class.js')();
+const ServerClientConnector = new SmartNodeServerClientConnector();
+
 const SmartNodeServer = new (global.req('classes/SmartNodeServer.class.js'))();
 const SmartNodeRouter = global.req('classes/SmartNodeRouter.class.js')(SmartNodeServer);
 
-init().catch((e) => { global.error('Server init error', e) });
+const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
+
+init(ServerClientConnector, socketEventHandlers).catch((e) => { global.error('Server init error', e) });
 
 //////////////////////////////////////////////////////////
 
@@ -40,7 +45,7 @@ init().catch((e) => { global.error('Server init error', e) });
  *
  * @author Julian Kern <mail@juliankern.com>
  */
-async function init() {
+async function init(Connector, getEventHandlersForSocketFn) {
     let port = cliOptions.port || (await utils.findPort());
 
     server.listen(port, () => {
@@ -51,32 +56,25 @@ async function init() {
     });
 
     new SmartNodeRouter(app);
-    
+
     io.on('connection', (socket) => {
         global.log('Client connected:', socket.client.id);
 
-        socket.on('register', async (data, cb) => {
-            SmartNodeServer.addClient(socket.client.id, {
-                socket,
-                id: socket.client.id, 
-                config: data
-            });
+        let connectionId = Connector.register(socket);
 
-            socket.join(data.room);
+        if (connectionId === false) {
+            global.log('ERROR! Failed to register connection for new Client', socket.client.id);
 
-            cb(Object.assign({}, data, { success: true }));
-        });
+        } else {
+            let handlers = getEventHandlersForSocketFn(Connector, socket);
 
-        socket.on('disconnect', async (reason) => {
-            SmartNodeServer.unloadServerPlugin(socket.client.id);
+            global.log('Registering handlers for', connectionId);
 
-            global.warn('Client disconnected! ID:', socket.client.id, reason);
-        });
+            for (var [name, handler] of Object.entries(handlers)) {
+                Connector.addHandler(connectionId, name, handler);
+            }
 
-        socket.on('pluginloaded', async () => {
-            SmartNodeServer.clientPluginLoaded(socket.client.id, true)
-                .catch((e) => { global.error('Server load plugin error (4)', e) });;
-        })
+        }
     });
 }
 
