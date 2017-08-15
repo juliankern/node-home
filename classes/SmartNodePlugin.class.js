@@ -49,7 +49,7 @@ module.exports = {
                 this.displayData = [];
             }
 
-            saveDisplayData(key, data) {
+            addDisplayData(key, data) {
                 this.displayData.push({ key, data });
             }
 
