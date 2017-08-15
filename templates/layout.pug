@@ -1,0 +1,17 @@
+doctype html
+html 
+    head
+        title= (headline ? headline + ' - ' : '') + 'SmartNode'
+        link(href="/css/style.css", rel="stylesheet" type="text/css")
+
+    body
+        main
+            h1 SmartNode
+            
+            include navigation
+                        
+            h2= headline
+
+            include messages
+
+            block content

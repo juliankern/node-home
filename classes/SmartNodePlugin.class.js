@@ -27,7 +27,7 @@ module.exports = {
                 this.socket = data.socket;
                 this.config = data.config;
                 this.room = data.config.room;
-                this.type = data.config.type;
+                this.module = data.config.module;
 
                 // which global variables the plugin will be using, to watch them
                 this.globals = { 
@@ -39,12 +39,22 @@ module.exports = {
 
                 this.storage = {
                     get: (key) => {
-                        return storage.getItemSync(`${this.config.room}.${this.config.type}.${key}`);
+                        return storage.getItemSync(`${this.config.room}.${this.config.module}.${key}`);
                     },
                     set: (key, value) => {
-                        return storage.setItemSync(`${this.config.room}.${this.config.type}.${key}`, value);
+                        return storage.setItemSync(`${this.config.room}.${this.config.module}.${key}`, value);
                     }
                 };
+
+                this.displayData = [];
+            }
+
+            saveDisplayData(key, data) {
+                this.displayData.push({ key, data });
+            }
+
+            getDisplayData(key) {
+                return this.displayData.filter((d) => { return d.key === key; });
             }
 
             /**
@@ -132,7 +142,7 @@ module.exports = {
                 this.socket = data.socket;
                 this.config = data.config;
                 this.room = data.config.room;
-                this.type = data.config.type;
+                this.module = data.config.module;
 
                 this.loaded = false;
 

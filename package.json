@@ -5,7 +5,9 @@
   "main": "bin/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run server",
+    "build-sass": "node-sass public/sass/style.scss public/css/style.css",
+    "watch-scss": "nodemon --config nodemon_scss.json",
+    "start": "npm run server & npm run watch-scss",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
@@ -31,13 +33,19 @@
   },
   "homepage": "https://github.com/juliankern/node-smartnode#readme",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "bonjour": "^3.5.0",
     "chalk": "^2.0.1",
     "cli": "^1.0.1",
+    "connect-flash": "^0.1.1",
+    "express": "^4.15.4",
+    "express-session": "^1.15.5",
     "homekit": "0.0.3",
     "moment": "^2.18.1",
     "node-persist": "^2.1.0",
+    "node-sass": "^4.5.3",
     "nodemon": "^1.11.0",
+    "pug": "^2.0.0-rc.3",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
     "socket.io": "^2.0.3"

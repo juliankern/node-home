@@ -8,8 +8,9 @@ const utils = global.req('util');
 const storage = require('node-persist');
 storage.initSync({ dir: 'storage/server' });
 
-const app = require('http').createServer((req, res) => { res.writeHead(200); res.end('Hello World'); });
-const io = require('socket.io')(app);
+const app = require('express')();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 const cli = require('cli');
 cli.enable('version');
@@ -23,9 +24,20 @@ let globalVariables = {
     global: {}
 };
 
+if (process.title === 'npm' && require('os').type().includes('Windows')) {
+    global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
+    global.log('');
+}
+
+if (+process.version.replace('v', '').split('.')[0] < 8) {
+    global.error('You need to upgrade to NodeJS 8 to run this application!');
+    process.exit(1);
+}
+
 //////////////////////////////////////////////////////////
 
 const SmartNodeServerPlugin = global.req('classes/SmartNodePlugin.class.js').Server({ storage, globalVariables, globalsChanged });
+const SmartNodeRouter = global.req('classes/SmartNodeRouter.class.js')({ clients, globalVariables });
 
 init().catch((e) => { global.error('Server init error', e) });
 
@@ -39,12 +51,14 @@ init().catch((e) => { global.error('Server init error', e) });
 async function init() {
     let port = cliOptions.port || (await utils.findPort());
 
-    app.listen(port, () => {
+    server.listen(port, () => {
         bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
         bonjour.published = true;
 
         global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
     });
+
+    new SmartNodeRouter(app);
     
     io.on('connection', (socket) => {
         global.log('Client connected:', socket.client.id);
@@ -138,12 +152,12 @@ async function _loadPlugin(id) {
         // apparently the plugin is installed
         // => load the server side
         // => hand over client id and useful functions
-        plugin = await require(`smartnode-${adapter.type}`)
+        plugin = await require(`${adapter.module}`)
             .Server(adapter)
             .catch((e) => { global.error('Server load plugin error', e) });
     } catch(e) {
         // nope, the plugin isn't installed on server side yet - die()
-        global.error(`Plugin "smartnode-${adapter.type}" not found - you need to install it via "npm install smartnode-${adapter.type}" first!`);
+        global.error(`Plugin "${adapter.module}" not found - you need to install it via "npm install ${adapter.module}" first!`);
         global.muted('Debug', e);
         process.exit(1);
     }

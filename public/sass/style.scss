@@ -1,0 +1,51 @@
+@import "settings";
+@import "mixins";
+
+@import "reboot";
+
+main {
+    width: 90vw;
+    margin: 0 auto;
+}
+
+.msg {
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    
+    &.msg-error {
+        border-color: red;
+        background: rgba(red, 0.2);
+    }
+
+    &.msg-success {
+        border-color: green;
+        background: rgba(green, 0.2);
+    }
+} 
+
+.input-invalid {
+    border: 1px solid red;
+    background: rgba(red, 0.2);
+}
+
+.pull {
+    &-right {
+        float: right;
+    }
+    
+    &-left {
+        float: left;
+    }
+}
+
+@import "grid";
+@import "flex";
+@import "form";
+@import "button";
+@import "table";
+@import "nav";
+@import "image";
+
+@import "views";

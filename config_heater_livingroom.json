@@ -1,5 +1,5 @@
 {
-    "type": "thermostat",
+    "module": "smartnode-thermostat",
     "room": "livingroom",
     "sensor": {
         "model": "ds1820",

@@ -1,0 +1,8 @@
+{
+    "watch": [
+        "public/sass/*"
+    ],
+    "ignore": ["public/sass/views.scss"],
+    "ext": "*scss",
+    "exec": "npm run build-sass"
+}

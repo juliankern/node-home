@@ -1,0 +1,28 @@
+@mixin global-focus {
+    transition: box-shadow .5s;
+    box-shadow: 0 0 0 transparent;
+
+    &:focus {
+        outline: 0;
+        box-shadow: 0 0 5px color(primary);
+    }
+}
+
+@mixin contrastText($color) {
+    @if (lightness($color) > 70) {
+        color: #000; // Lighter backgorund, return dark color
+    } @else {
+        color: #fff; // Darker background, return light color
+    }
+}
+
+@mixin hover-focus {
+    &:focus,
+    &:hover {
+        @content;
+    }
+}
+
+@mixin hover {
+    &:hover { @content; }
+}

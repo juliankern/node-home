@@ -20,7 +20,7 @@ if (!options.config) {
 const config = global.req(options.config);
 
 const storage = require('node-persist');
-storage.initSync({ dir: `storage/client/${config.room}/${config.type}` });
+storage.initSync({ dir: `storage/client/${config.room}/${config.module}` });
 
 //////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ async function init() {
             global.success('Connected to server! Own ID:', socket.id);
 
             socket.emit('register', { 
-                type: config.type,
+                module: config.module,
                 room: config.room,
                 loaded: adapter.loaded
             }, async (d) => {
@@ -92,11 +92,11 @@ async function _loadPlugin() {
     let plugin;
 
     try {
-        plugin = await require(`smartnode-${adapter.type}`)
+        plugin = await require(`${adapter.module}`)
             .Client(adapter)
             .catch((e) => { global.error('Client load plugin error', e) });
     } catch(e) {
-        global.error(`Could not load plugin "smartnode-${adapter.type}" - you probably need to install it via "npm install smartnode-${adapter.type}" first!`);
+        global.error(`Could not load plugin "${adapter.module}" - you probably need to install it via "npm install ${adapter.module}" first!`);
         global.muted('Debug', e);
         process.exit(1);
     }
