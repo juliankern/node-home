@@ -2,7 +2,7 @@
 const utils = global.req('util');
 
 
-module.exports = ({ clients, globalVariables }) => {
+module.exports = (SmartNodeServer) => {
     // return class SmartNodeRouter extends EventEmitter {
     return class SmartNodeRouter {
         /**
@@ -14,9 +14,7 @@ module.exports = ({ clients, globalVariables }) => {
          */
         constructor(app) {
             // super();
-
             this.app = app;
-
 
             this.app.use(require('express-session')({
                 secret: 'keyboard cat',
@@ -66,7 +64,7 @@ module.exports = ({ clients, globalVariables }) => {
                 req.flash('form', req.body);
             }
 
-            res.locals.clients = clients;
+            res.locals.clients = SmartNodeServer.getClientList();
 
             // add error fields to templates
             if (res.locals.messages.error && res.locals.messages.error.length > 0) {

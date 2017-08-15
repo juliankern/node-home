@@ -11,7 +11,7 @@ const utils = global.req('util');
  * @param  {function} options.globalsChanged    function to be called when globals get changed => triggers events on all other plugins
  */
 module.exports = {
-    Server: ({ storage, globalVariables, globalsChanged }) => {
+    Server: (SmartNodeServer) => {
         return class SmartNodeServerPlugin extends EventEmitter {
             /**
              * SmartNodeServerPlugin contructor
@@ -35,14 +35,14 @@ module.exports = {
                     room: []
                 };
                 
-                if (!globalVariables[this.room]) globalVariables[this.room] = {};
+                SmartNodeServer.globalsInitRoom(this.room);
 
                 this.storage = {
                     get: (key) => {
-                        return storage.getItemSync(`${this.config.room}.${this.config.module}.${key}`);
+                        return SmartNodeServer.storage.getItemSync(`${this.config.room}.${this.config.module}.${key}`);
                     },
                     set: (key, value) => {
-                        return storage.setItemSync(`${this.config.room}.${this.config.module}.${key}`, value);
+                        return SmartNodeServer.storage.setItemSync(`${this.config.room}.${this.config.module}.${key}`, value);
                     }
                 };
 
@@ -66,8 +66,8 @@ module.exports = {
              */
             getGlobals() { 
                 return { 
-                    global: globalVariables.global,
-                    room: globalVariables[this.room] 
+                    global: SmartNodeServer.globalsGetGlobals(),
+                    room: SmartNodeServer.globalsGetRoom(this.room) 
                 } 
             }
             
@@ -100,12 +100,12 @@ module.exports = {
                         throw `The plugin tries to change a not previously defined global variable (${key}). Please contact the author.`
                     }
                     
-                    if (utils.getValueByPath(globalVariables.global, key) === utils.getValueByPath(glo, key)) {
+                    if (utils.getValueByPath(SmartNodeServer.globalsGetGlobals(), key) === utils.getValueByPath(glo, key)) {
                         // value didn't change at all
                         delete globalPaths[key];
                         utils.deleteByPath(glo, key);
                     } else {
-                        utils.setValueByPath(globalVariables.global, key, utils.getValueByPath(glo, key));
+                        utils.setValueByPath(SmartNodeServer.globalsGetGlobals(), key, utils.getValueByPath(glo, key));
                     }
                 });
                 
@@ -114,16 +114,16 @@ module.exports = {
                         throw `The plugin tries to change a not previously defined room variable (${key}). Please contact the author.`
                     }
                     
-                    if (utils.getValueByPath(globalVariables[this.room], key) === utils.getValueByPath(room, key)) {
+                    if (utils.getValueByPath(SmartNodeServer.globalsGetRoom(this.room), key) === utils.getValueByPath(room, key)) {
                         // value didn't change at all
                         delete roomPaths[key];
                         utils.deleteByPath(room, key);
                     } else {
-                        utils.setValueByPath(globalVariables[this.room], key, utils.getValueByPath(room, key));
+                        utils.setValueByPath(SmartNodeServer.globalsGetRoom(this.room), key, utils.getValueByPath(room, key));
                     }
                 });
                             
-                globalsChanged(
+                SmartNodeServer.globalsChanged(
                     this.id,
                     {
                         global: glo,
@@ -148,10 +148,10 @@ module.exports = {
 
                 this.storage = {
                     get: (key) => {
-                        return storage.getItemSync(`${key}`);
+                        return SmartNodeServer.storage.getItemSync(`${key}`);
                     },
                     set: (key, value) => {
-                        return storage.setItemSync(`${key}`, value);
+                        return SmartNodeServer.storage.setItemSync(`${key}`, value);
                     }
                 };
             }
