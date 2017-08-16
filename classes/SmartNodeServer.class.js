@@ -72,6 +72,30 @@ module.exports = class SmartNodeServer {
         });
     }
 
+    close(callback) {
+        this.io.close();
+
+
+        if(this.bonjour.published) {
+            this.bonjour.published = false;
+            this.bonjour.unpublishAll(() => {
+                global.warn('Bonjour service unpublished!');
+
+                this.getClientIdList().forEach((id) => { 
+                    if (this.getClientById(id).loaded) this.unloadServerPlugin(id); 
+                });
+
+                callback();
+            });
+        } else {
+            this.getClientIdList().forEach((id) => { 
+                if (this.getClientById(id).loaded) this.unloadServerPlugin(id); 
+            });
+
+            callback();
+        }
+    }
+
     globalsInitRoom(room) {
         if (!this.globals[room]) this.globals[room] = {};
     }

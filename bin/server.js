@@ -39,28 +39,7 @@ function exitHandler(err) {
         global.error('System error!', err);
     }
 
-    SmartNodeServer.io.close();
-
-    if (err) global.error(err.stack);
-
-    if(SmartNodeServer.bonjour.published) {
-        SmartNodeServer.bonjour.published = false;
-        SmartNodeServer.bonjour.unpublishAll(() => {
-            global.warn('Bonjour service unpublished!');
-
-            SmartNodeServer.getClientIdList().forEach((id) => { 
-                if (SmartNodeServer.getClientById(id).loaded) SmartNodeServer.unloadServerPlugin(id); 
-            });
-
-            process.exit();
-        });
-    } else {
-        SmartNodeServer.getClientIdList().forEach((id) => { 
-            if (SmartNodeServer.getClientById(id).loaded) SmartNodeServer.unloadServerPlugin(id); 
-        });
-
-        process.exit();
-    }
+    SmartNodeServer.close(process.exit);
 }
 
 //do something when app is closing
