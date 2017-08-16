@@ -93,3 +93,17 @@ Object.assign(global, {
 });
 
 global.log('');
+
+//////////////////////////////////////////////////////////
+// System checks
+
+
+if (process.title === 'npm' && require('os').type().includes('Windows')) {
+    global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
+    global.log('');
+}
+
+if (+process.version.replace('v', '').split('.')[0] < 8) {
+    global.error('You need to upgrade to NodeJS 8 to run this application!');
+    process.exit(1);
+}
