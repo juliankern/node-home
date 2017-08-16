@@ -1,0 +1,67 @@
+// const EventEmitter = require('events');
+const HomeKit = global.req('lib/homekit');
+
+module.exports = class SmartNodeHomeKit {
+    /**
+     * SmartNodeHomeKit contructor
+     *
+     * @author Julian Kern <mail@juliankern.com>
+     *
+     * @param  {object} data holds the data needed to init the plugin
+     */
+    constructor({ 
+        id, 
+        deviceName,
+        model,
+        service,
+        serial = 'A0000001',
+        manufacturer = 'juliankern.com'
+    }) {
+        // super();
+
+        let uuid = HomeKit.uuid.generate(`homekit:${id}`);
+        this.accessory = new HomeKit.Accessory(deviceName, uuid);
+
+        this.accessory.getService(HomeKit.Service.AccessoryInformation)
+            .setCharacteristic(HomeKit.Characteristic.Manufacturer, manufacturer)
+            .setCharacteristic(HomeKit.Characteristic.Model, model)
+            .setCharacteristic(HomeKit.Characteristic.SerialNumber, serial);
+
+        this.service = service;
+        this.accessory.addService(HomeKit.Service[service], deviceName);
+
+        this.Characteristic = HomeKit.Characteristic;
+    }
+
+    onIdentify(callback) {
+        this.accessory.on('identify', callback);
+    }
+
+    on(method, characteristic, callback) {
+        this.accessory.getService(HomeKit.Service[this.service])
+            .getCharacteristic(HomeKit.Characteristic[characteristic])
+            .on(method, callback);
+    }
+
+    onBoth(characteristic, getCallback, setCallback) {
+        this.on(characteristic, 'get', getCallback);
+        this.on(characteristic, 'set', setCallback);
+    }
+
+    set(characteristic, value) {
+        this.accessory.getService(HomeKit.Service[this.service])
+            .setCharacteristic(HomeKit.Characteristic[characteristic], value);
+    }
+
+    publish(properties) {
+        this.accessory.publish(properties);
+    }
+
+    destroy() {
+        this.accessory.destroy();
+    }
+    
+    static get Characteristic() {
+        return HomeKit.Characteristic;
+    }
+}
