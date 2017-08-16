@@ -1,9 +1,16 @@
 // const EventEmitter = require('events');
+
+const bonjour = require('bonjour');
+const app = require('express')();
+const http = require('http');
+const socketio = require('socket.io');
+
 const utils = global.req('util');
 const storage = require('node-persist');
 storage.initSync({ dir: 'storage/server' });
 
 const SmartNodePlugin = global.req('classes/SmartNodePlugin.class.js');
+const SmartNodeRouter = global.req('classes/SmartNodeRouter.class.js');
 
 module.exports = class SmartNodeServer {
     /**
@@ -14,6 +21,10 @@ module.exports = class SmartNodeServer {
      * @param  {object} data holds the data needed to init the plugin
      */
     constructor() {
+        this.server = http.Server(app);
+        this.io = socketio(this.server);
+        this.bonjour = bonjour();
+
         this.storage = storage;
 
         this.globals = {
@@ -21,6 +32,44 @@ module.exports = class SmartNodeServer {
         }
 
         this.clients = {};
+    }
+
+    /**
+     * init function
+     *
+     * @author Julian Kern <mail@juliankern.com>
+     */
+    async init(port, Connector, getEventHandlersForSocketFn) {
+        port = port || (await utils.findPort());
+
+        this.server.listen(port, () => {
+            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
+            this.bonjour.published = true;
+
+            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
+        });
+
+        new (SmartNodeRouter(this))(app);
+
+        this.io.on('connection', (socket) => {
+            global.log('Client connected:', socket.client.id);
+
+            let connectionId = Connector.register(socket);
+
+            if (connectionId === false) {
+                global.log('ERROR! Failed to register connection for new Client', socket.client.id);
+
+            } else {
+                let handlers = getEventHandlersForSocketFn(Connector, socket);
+
+                global.log('Registering handlers for', connectionId);
+
+                for (var [name, handler] of Object.entries(handlers)) {
+                    Connector.addHandler(connectionId, name, handler);
+                }
+
+            }
+        });
     }
 
     globalsInitRoom(room) {
