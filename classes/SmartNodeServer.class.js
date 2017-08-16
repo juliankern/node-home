@@ -14,17 +14,14 @@ const SmartNodeRouter = global.req('classes/SmartNodeRouter.class.js');
 
 module.exports = class SmartNodeServer {
     /**
-     * SmartNodeServerPlugin contructor
+     * SmartNodeServer contructor
      *
      * @author Julian Kern <mail@juliankern.com>
-     *
-     * @param  {object} data holds the data needed to init the plugin
      */
     constructor() {
         this.server = http.Server(app);
         this.io = socketio(this.server);
         this.bonjour = bonjour();
-
         this.storage = storage;
 
         this.globals = {

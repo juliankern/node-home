@@ -1,11 +1,6 @@
 require('../util/global.js');
 
-const SmartNodeClientPlugin = global.req('classes/SmartNodePlugin.class.js').Client();
-
 const pkg = global.req('package.json');
-
-const moment = require('moment');
-const bonjour = require('bonjour')();
 
 const cli = require('cli');
 cli.enable('version');
@@ -19,102 +14,11 @@ if (!options.config) {
 
 const config = global.req(options.config);
 
-const storage = require('node-persist');
-storage.initSync({ dir: `storage/client/${config.room}/${config.module}` });
+//////////////////////////////////////////////////////////
+
+const SmartNodeClient = global.req('classes/SmartNodeClient.class');
+const client = new SmartNodeClient(config);
 
 //////////////////////////////////////////////////////////
 
-let adapter = {};
-
-//////////////////////////////////////////////////////////
-
-init().catch((e) => { global.error('Client init error', e) });
-
-//////////////////////////////////////////////////////////
-
-/**
- * init function
- *
- * @author Julian Kern <mail@juliankern.com>
- */
-async function init() {
-    let searchTime = +moment();
-    global.log('Starting search for master server...');
-
-    let browser = bonjour.find({ type: 'smartnode' });
-    
-    browser.on('up', (service) => {
-        global.muted(`Time to find master server: ${+moment() - searchTime}ms`); searchTime = +moment();
-
-        let address = service.addresses[0].includes(':') ? service.addresses[1] : service.addresses[0];
-
-        global.success('Found an SmartNode server:', `http://${address}:${service.port}`);
-
-        const socket = require('socket.io-client')(`http://${address}:${service.port}`);
-        
-        socket.on('connect', () => {
-            global.muted(`Time to connect master server: ${+moment()-searchTime}ms`);
-            global.success('Connected to server! Own ID:', socket.id);
-
-            socket.emit('register', { 
-                module: config.module,
-                room: config.room,
-                loaded: adapter.loaded
-            }, async (d) => {
-                adapter = new SmartNodeClientPlugin({
-                    socket,
-                    id: socket.id,
-                    config
-                });
-
-                global.muted('Registered successfully!');
-                _loadPlugin();
-            });
-        });
-
-        socket.on('disconnect', async (reason) => {
-            global.warn('Server disconnected! Reason:', reason);
-            _unloadPlugin(socket);
-
-            global.log('Starting search for master server...'); searchTime = +moment();
-        });
-    });
-}
-
-/**
- * load client plugin
- *
- * @author Julian Kern <mail@juliankern.com>
- *
- * @return {[type]} returns true if loaded
- */
-async function _loadPlugin() {
-    let plugin;
-
-    try {
-        plugin = await require(`${adapter.module}`)
-            .Client(adapter)
-            .catch((e) => { global.error('Client load plugin error', e) });
-    } catch(e) {
-        global.error(`Could not load plugin "${adapter.module}" - you probably need to install it via "npm install ${adapter.module}" first!`);
-        global.muted('Debug', e);
-        process.exit(1);
-    }
-
-    adapter.unload = plugin.unload;
-
-    return plugin.load().then((loaded) => {
-        if (loaded) adapter.loaded = true;
-    });
-}
-
-/**
- * unloads plugin and cleans up
- *
- * @author Julian Kern <mail@juliankern.com>
- */
-async function _unloadPlugin(socket) {
-    adapter.loaded = false;
-    socket.close();
-    return adapter.unload();
-}
+client.init().catch((e) => { global.error('Client init error', e) });
