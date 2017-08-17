@@ -1,0 +1,43 @@
+extends ../templates/layout
+
+block content
+    h2 Configuration of ID #{id}
+
+    .form--field
+        label Room
+        select.form--element
+            option Select a room...
+            if rooms
+                each room in rooms
+                    option(value= room)= room
+            option(value="-1") New room
+
+    each prop, key in format
+        .form--field
+            label= prop.description
+
+            if prop.type === 'number'
+                input(type="number", value= config ? config[prop] : prop.default ? prop.default : "").form--element
+            if prop.type === 'string'
+                input(type="text", value= config ? config[prop] : prop.default ? prop.default : "").form--element
+            if prop.type === 'select'
+                select.form--element
+                    each opt in prop.values
+                        option(value= opt)= opt
+
+            if prop.type === 'object'
+                each subprop in prop.properties
+                    .form--field--sub
+                        label= subprop.description
+
+                        if subprop.type === 'number'
+                            input(type="number", value= config ? config[prop][subprop] : subprop.default ? subprop.default : "").form--element
+                        if subprop.type === 'string'
+                            input(type="text", value= config ? config[prop][subprop] : subprop.default ? subprop.default : "").form--element
+                        if subprop.type === 'select'
+                            select.form--element
+                                each opt in subprop.values
+                                    option(value= opt, checked=config ? config[prop][subprop] === opt : subprop.default ? subprop.default === opt : false)= opt
+
+    button(type="submit").btn__primary= config ? 'Update Configuration' : 'Complete Setup'
+

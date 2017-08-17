@@ -7,17 +7,33 @@ module.exports = (SmartNodeServer) => {
     return function(SmartNodeServerClientConnector, socket) {
         const socketEventHandlers = {};
 
-        socketEventHandlers.register = async (data, cb) => {
-            SmartNodeServer.addClient(socket.client.id, {
-                socket,
+        socketEventHandlers.register = async ({ configuration, configurationFormat, plugin }, cb) => {
+            let clientData ={
                 id: socket.client.id, 
-                config: data
-            });
+                format: configurationFormat,
+                plugin
+            };
 
-            socket.join(data.room);
+            // check if configuration already exists and if its valid
+            if (configuration && SmartNodeServer.validConfiguration(configuration, configurationFormat)) {
+                // valid configuration exists
+                // => continue with loading
+                clientData.socket = socket;
+                clientData.config = configuration;
 
-            cb(Object.assign({}, data, { success: true }));
-        };
+                socket.join(configuration.room);
+            } else {
+                // no configuration exists or it's not valid anymore
+                // => stop here, and wait for configuration via web interface
+
+                global.muted('Client has no configuration yet, waiting for web configuration');
+            }
+
+            SmartNodeServer.addClient(clientData);
+
+
+            cb(Object.assign({}, clientData, { success: true }));
+        }
 
         socketEventHandlers.disconnect = async (reason) => {
             SmartNodeServer.unloadServerPlugin(socket.client.id);

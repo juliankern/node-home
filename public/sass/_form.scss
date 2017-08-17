@@ -17,6 +17,12 @@
                 content: none
             }
         }
+
+        &--sub {
+            @extend .form--field;
+            
+            padding-left: 2rem;
+        }
     }
 
     &--image {

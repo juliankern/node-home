@@ -140,9 +140,9 @@ module.exports = {
 
                 this.id = data.id;
                 this.socket = data.socket;
-                this.config = data.config;
-                this.room = data.config.room;
-                this.module = data.config.module;
+                this.config = data.config || {};
+                this.room = this.config.room;
+                this.module = this.config.module ;
 
                 this.loaded = false;
 

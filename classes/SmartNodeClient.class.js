@@ -13,13 +13,12 @@ module.exports = class SmartNodeClient {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor(config) {
-        storage.initSync({ dir: `storage/client/${config.room}/${config.module}` });
-        
+    constructor(pluginName) {
         this.bonjour = bonjour();
         this.storage = storage;
+        this.storage.initSync({ dir: `storage/client/${pluginName}` });
 
-        this.config = config;
+        this.pluginName = pluginName;
         this.adapter = {};
         this.socket = {};
     }
@@ -30,47 +29,78 @@ module.exports = class SmartNodeClient {
      * @author Julian Kern <mail@juliankern.com>
      */
     async init() {
-        let searchTime = +moment();
         global.log('Starting search for master server...');
 
         let browser = this.bonjour.find({ type: 'smartnode' });
         
         browser.on('up', (service) => {
-            global.muted(`Time to find master server: ${+moment() - searchTime}ms`); searchTime = +moment();
-
             let address = service.addresses[0].includes(':') ? service.addresses[1] : service.addresses[0];
 
             global.success('Found an SmartNode server:', `http://${address}:${service.port}`);
 
             this.socket = socketio(`http://${address}:${service.port}`);
             
-            this.socket.on('connect', () => {
-                global.muted(`Time to connect master server: ${+moment()-searchTime}ms`);
-                global.success('Connected to server! Own ID:', this.socket.id);
-
-                this.socket.emit('register', { 
-                    module: this.config.module,
-                    room: this.config.room,
-                    loaded: this.adapter.loaded
-                }, async (d) => {
-                    this.adapter = new SmartNodeClientPlugin({
-                        socket: this.socket,
-                        id: this.socket.id,
-                        config: this.config
-                    });
-
-                    global.muted('Registered successfully!');
-                    this._loadPlugin();
-                });
-            });
-
-            this.socket.on('disconnect', async (reason) => {
-                global.warn('Server disconnected! Reason:', reason);
-                this._unloadPlugin();
-
-                global.log('Starting search for master server...'); searchTime = +moment();
-            });
+            this.socket.on('connect', async () => { await this.onConnect(); });
+            this.socket.on('disconnect', async () => { await this.onDisconnect(); });
         });
+    }
+
+    async onConnect() {
+        global.success('Connected to server! Own ID:', this.socket.id);
+
+        this.adapter = new SmartNodeClientPlugin({
+            socket: this.socket,
+            id: this.socket.id,
+            config: this.config
+        });
+
+        let plugin = await this._getPlugin();
+        let [configurationFormat, callback] = plugin.init();
+
+        this.socket.emit('register', { 
+            plugin: this.pluginName,
+            configurationFormat,
+            configuration: this.storage.get('configuration')
+        }, (data) => {
+            global.muted('Registered successfully!');
+
+            if (data.config) {
+                this._loadPlugin();
+            } else {
+                this.socket.on('setup', this.onSetup);
+                global.muted('Waiting for setup to complete...');
+            }
+
+        });
+    }
+
+    async onSetup(configuration) {
+        this.storage.set('configuration', configuration);
+
+        this._loadPlugin();
+    }
+
+    async onDisconnect(reason) {
+        global.warn('Server disconnected! Reason:', reason);
+        this._unloadPlugin();
+
+        global.log('Starting search for master server...');
+    }
+
+    async _getPlugin() {
+        let plugin;
+
+        try {
+            plugin = await require(`${this.pluginName}`)
+                .Client(this.adapter)
+                .catch((e) => { global.error('Client load plugin error', e) });
+        } catch(e) {
+            global.error(`Could not load plugin "${this.pluginName}" - you probably need to install it via "npm install ${this.pluginName}" first!`);
+            global.muted('Debug', e);
+            process.exit(1);
+        }
+
+        return plugin;
     }
 
     /**
@@ -81,18 +111,7 @@ module.exports = class SmartNodeClient {
      * @return {[type]} returns true if loaded
      */
     async _loadPlugin() {
-        let plugin;
-
-        try {
-            plugin = await require(`${this.adapter.module}`)
-                .Client(this.adapter)
-                .catch((e) => { global.error('Client load plugin error', e) });
-        } catch(e) {
-            global.error(`Could not load plugin "${this.adapter.module}" - you probably need to install it via "npm install ${this.adapter.module}" first!`);
-            global.muted('Debug', e);
-            process.exit(1);
-        }
-
+        let plugin = await this._getPlugin();
         this.adapter.unload = plugin.unload;
 
         return plugin.load().then((loaded) => {
@@ -106,8 +125,8 @@ module.exports = class SmartNodeClient {
      * @author Julian Kern <mail@juliankern.com>
      */
     async _unloadPlugin() {
+        if (this.adapter.loaded) this.adapter.unload();
         this.adapter.loaded = false;
         this.socket.close();
-        return this.adapter.unload();
     }
 }

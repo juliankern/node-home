@@ -5,13 +5,23 @@ block content
 
     h3 Connected clients: #{Object.keys(clients).length}
     each c, id in clients
-        ul 
-            li.client--id ID: #{c.id}
-            li.client--module Module: #{c.module}
-            li.client--room Room: #{c.room}
+        div.client
+            ul 
+                li.client--id ID: #{c.id}
+                li.client--module Plugin: #{c.plugin}
 
-            each d, key in c.displayData
-                li(class="client--" + d.data.type)= d.data.description + ': ' + d.data.value
-                //- != JSON.stringify(d)
+            if c.config
+                ul
+                    li.client--room Room: #{c.room}
+            else
+                p Client isn't configured yet. Please do this in order to use the client.
+
+            a(href="/config/" + c.id) Configure
+
+            if c.displayData
+                ul
+                    each d, key in c.displayData
+                        li(class="client--" + d.data.type)= d.data.description + ': ' + d.data.value
+                        //- != JSON.stringify(d)
     else
         p No clients connected yet

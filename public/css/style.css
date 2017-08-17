@@ -408,16 +408,18 @@ main {
     .flex-grid__12 .flex--item {
       flex-basis: 8.33333%; }
 
-.form--field {
+.form--field, .form--field--sub {
   padding: .5rem 0; }
-  .form--field label {
+  .form--field label, .form--field--sub label {
     display: block; }
-    .form--field label::after {
+    .form--field label::after, .form--field--sub label::after {
       content: ":"; }
-  .form--field input + label {
+  .form--field input + label, .form--field--sub input + label {
     display: inline-block; }
-    .form--field input + label::after {
+    .form--field input + label::after, .form--field--sub input + label::after {
       content: none; }
+  .form--field--sub {
+    padding-left: 2rem; }
 
 .form--image {
   max-width: 100%; }

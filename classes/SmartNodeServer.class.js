@@ -93,6 +93,75 @@ module.exports = class SmartNodeServer {
         }
     }
 
+    validConfiguration(config, format) {
+        let error = false;
+
+        parse(config, format);
+
+
+        return !error;
+
+        function parse(config, format) {
+            // if both have the same amount of base values
+            if (Object.keys(config).length !== Object.keys(format).length) {
+                error = true; return false;
+            }
+
+            // if both have the same base value names
+            if (!utils.arraysEqual(Object.keys(config).sort(), Object.keys(format).sort())) {
+                error = true; return false;
+            }
+
+            // check every field individually
+            for (let k in format) {
+                // check if every field in the format has a description
+                if (!format[k].description || format[k].description.length === 0) {
+                    error = true; break;
+                }
+
+                // check if required properties are set
+                if (
+                    (format[k].type !== 'number' && format[k].required && !config[k]) ||
+                    (format[k].type === 'number' && format[k].required && config[k] !== '')
+                ) {
+                    error = true; break;
+                }
+
+                // check if property is string
+                if (format[k].type === 'string' && typeof config[k] !== 'string') {
+                    error = true; break;
+                }
+
+                // check if property is number
+                if (format[k].type === 'number' && typeof config[k] !== 'number') {
+                    error = true; break;
+                }
+
+                // check if property is object and has subproperties
+                if (format[k].type === 'object' && !(typeof config[k] === 'object' && Object.ks(config[k]).length > 0)) {
+                    error = true; break;
+                } else {
+                    // check if subproperties are also valid
+                    parse(config[k], format[k].properties);
+                }
+
+                if (format[k].type === 'select' && !(config[k].values && config[k].values.length > 0)) {
+                    error = true; break;
+                }
+
+                if (format[k].type === 'array' && !format[k].length) {
+                    error = true; break;
+                }
+
+                if (format[k].type === 'array' && (typeof config[k] === 'object' && config[k].length === format[k].length)) {
+                    error = true; break;
+                }
+            }
+
+            return true;
+        }
+    }
+
     globalsInitRoom(room) {
         if (!this.globals[room]) this.globals[room] = {};
     }
@@ -105,10 +174,14 @@ module.exports = class SmartNodeServer {
         return this.globals[room];
     }
 
-    addClient(id, data) {
-        this.clients[id] = new (SmartNodePlugin.Server(this))(data);
+    addClient(data) {
+        if (data.config) {
+            this.clients[data.id] = new (SmartNodePlugin.Server(this))(data);
+        } else {
+            this.clients[data.id] = data;
+        }
 
-        return this.clients[id];
+        return this.clients[data.id];
     }
 
     getClientIdList() {
@@ -196,9 +269,10 @@ module.exports = class SmartNodeServer {
      * @param  {string} id client ID
      */
     unloadServerPlugin(id) {
+        let client = this.getClientById(id);
         global.warn('Unloaded plugin for client', id);
 
-        this.getClientById(id).unload();
+        if (client.loaded) client.unload();
         this.removeClient(id);
     }
 

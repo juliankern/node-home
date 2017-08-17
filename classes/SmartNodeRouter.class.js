@@ -38,6 +38,14 @@ module.exports = (SmartNodeServer) => {
             this.app.get('/', function (req, res) {
                 res.render('index', {});
             });
+
+            this.app.get('/config/:clientId', this.configRoute);
+        }
+
+        configRoute(req, res) {
+            console.log(SmartNodeServer.getClientById(req.params.clientId));
+
+            res.render('config', SmartNodeServer.getClientById(req.params.clientId));
         }
 
         handler(req, res, next) {

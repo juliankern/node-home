@@ -5,19 +5,17 @@ const pkg = global.req('package.json');
 const cli = require('cli');
 cli.enable('version');
 cli.setApp(pkg.name, pkg.version);
-const options = cli.parse({ config: [ 'c', 'A config file to use', 'file', false ] });
+const options = cli.parse({ plugin: [ 'p', 'The plugin which should be used', 'string', false ] });
 
-if (!options.config) {
-    global.error('You need to provide a valid config file!');
+if (!options.plugin) {
+    global.error('You need to provide a plugin name!');
     process.exit(1);
 }
-
-const config = global.req(options.config);
 
 //////////////////////////////////////////////////////////
 
 const SmartNodeClient = global.req('classes/SmartNodeClient.class');
-const client = new SmartNodeClient(config);
+const client = new SmartNodeClient(options.plugin);
 
 //////////////////////////////////////////////////////////
 
