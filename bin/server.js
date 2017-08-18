@@ -16,11 +16,11 @@ const SmartNodeServerClientConnector = global.req('classes/SmartNodeServerClient
 const ServerClientConnector = new SmartNodeServerClientConnector();
 const SmartNodeServer = new (global.req('classes/SmartNodeServer.class.js'))();
 
-const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
+const SocketEventHandlersProvider = new (global.req('classes/SocketEventHandlersProvider.class.js')(SmartNodeServer));
 
 //////////////////////////////////////////////////////////
 
-SmartNodeServer.init(cliOptions.port, ServerClientConnector, socketEventHandlers)
+SmartNodeServer.init(cliOptions.port, ServerClientConnector, SocketEventHandlersProvider)
     .catch((e) => { global.error('Server init error', e) });
 
 //////////////////////////////////////////////////////////

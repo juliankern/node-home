@@ -36,9 +36,10 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    async init(port, Connector, getEventHandlersForSocketFn) {
+    async init(port, Connector, SocketEventHandlersProvider) {
         port = port || (await utils.findPort());
 
+        global.debug('Setup Port...');
         this.server.listen(port, () => {
             this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
             this.bonjour.published = true;
@@ -46,7 +47,10 @@ module.exports = class SmartNodeServer {
             global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
         });
 
+        global.debug('Setup Router...');
         new (SmartNodeRouter(this))(app);
+
+        global.debug('Setup connection listener...');
 
         this.io.on('connection', (socket) => {
             global.log('Client connected:', socket.client.id);
@@ -57,7 +61,7 @@ module.exports = class SmartNodeServer {
                 global.log('ERROR! Failed to register connection for new Client', socket.client.id);
 
             } else {
-                let handlers = getEventHandlersForSocketFn(Connector, socket);
+                let handlers = SocketEventHandlersProvider.provideHandlers(Connector, socket);
 
                 global.log('Registering handlers for', connectionId);
 
