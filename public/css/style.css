@@ -292,6 +292,9 @@ main {
 .pull-left {
   float: left; }
 
+.hidden {
+  display: none; }
+
 .grid {
   display: grid;
   grid-gap: 1rem;

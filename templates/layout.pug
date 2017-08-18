@@ -4,6 +4,12 @@ html
         title= (headline ? headline + ' - ' : '') + 'SmartNode'
         link(href="/css/style.css", rel="stylesheet" type="text/css")
 
+        block scripts
+            script(src="/js/global.js")
+
+            if scripts
+                each s in scripts
+                    != s
     body
         main
             h1 SmartNode

@@ -40,6 +40,10 @@ main {
     }
 }
 
+.hidden {
+    display: none;
+}
+
 @import "grid";
 @import "flex";
 @import "form";

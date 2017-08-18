@@ -1,6 +1,7 @@
 // const EventEmitter = require('events');
 const utils = global.req('util');
 
+const SmartNodeClient = global.req('classes/SmartNodeClient.class');
 
 module.exports = (SmartNodeServer) => {
     // return class SmartNodeRouter extends EventEmitter {
@@ -39,13 +40,19 @@ module.exports = (SmartNodeServer) => {
                 res.render('index', {});
             });
 
-            this.app.get('/config/:clientId', this.configRoute);
+            this.configRoute(this.app.route('/config/:clientId'));
         }
 
-        configRoute(req, res) {
-            console.log(SmartNodeServer.getClientById(req.params.clientId));
+        configRoute(route) {
+            route
+            .get((req, res) => {
+                res.render('config', SmartNodeServer.getClientById(req.params.clientId));
+            })
+            .post((req, res) => {
+                SmartNodeClient.validateConfig(SmartNodeServer.getClientById(req.params.clientId), req.body);
 
-            res.render('config', SmartNodeServer.getClientById(req.params.clientId));
+                res.redirect('/config/' + req.params.clientId)
+            })
         }
 
         handler(req, res, next) {

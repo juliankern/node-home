@@ -46,7 +46,7 @@ module.exports = class SmartNodeClient {
     }
 
     async onConnect() {
-        global.success('Connected to server! Own ID:', this.socket.id);
+        global.success('Connected to server! Own socket-ID:', this.socket.id);
 
         this.adapter = new SmartNodeClientPlugin({
             socket: this.socket,
@@ -60,7 +60,7 @@ module.exports = class SmartNodeClient {
         this.socket.emit('register', { 
             plugin: this.pluginName,
             configurationFormat,
-            configuration: this.storage.get('configuration')
+            id: this.storage.get('clientid')
         }, (data) => {
             global.muted('Registered successfully!');
 
@@ -74,10 +74,11 @@ module.exports = class SmartNodeClient {
         });
     }
 
-    async onSetup(configuration) {
-        this.storage.set('configuration', configuration);
+    async onSetup(data) {
+        console.log('setup completed', data);
+        // this.storage.set('configuration', configuration);
 
-        this._loadPlugin();
+        // this._loadPlugin();
     }
 
     async onDisconnect(reason) {
@@ -85,6 +86,35 @@ module.exports = class SmartNodeClient {
         this._unloadPlugin();
 
         global.log('Starting search for master server...');
+    }
+
+    static validateConfig(client, data) {
+        let format = client.format;
+        let error = false;
+
+        if (!data.room || data.room === '0') {
+            return false;
+        }
+
+        if (data.room === '-1' && !data.newroom) {
+            return false;
+        }
+
+        for (let key in format) {
+            // rquired data is there
+            if (format[key].required && !data[key]) {
+                error = true;
+            }
+
+            // expected number is number
+            if (format[key].type === 'number' && isNaN(+data[key])) {
+                error = true;
+            } 
+        }
+
+        return error ? false : newData;
+
+        console.log('validateConfig', format, data);
     }
 
     async _getPlugin() {

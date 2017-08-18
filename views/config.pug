@@ -1,5 +1,8 @@
 extends ../templates/layout
 
+block append scripts
+    script(src="/js/config.js")
+
 block content
     h2 Configuration of ID #{id}
 
@@ -7,11 +10,14 @@ block content
         .form--field
             label Room
             select(name="room").form--element
-                option Select a room...
+                option(value="0") Select a room...
                 if rooms
                     each room in rooms
                         option(value= room)= room
                 option(value="-1") New room
+        .form--field.newroom.hidden
+            label New room name
+            input(type="text", name="newroom").form--element
 
         each prop, key in format
             .form--field
@@ -20,7 +26,7 @@ block content
                 if prop.type === 'number'
                     input(name= key, type="number", value= config ? config[prop] : prop.default ? prop.default : "").form--element
                 if prop.type === 'string'
-                    input(tname= key, ype="text", value= config ? config[prop] : prop.default ? prop.default : "").form--element
+                    input(tname= key, type="text", value= config ? config[prop] : prop.default ? prop.default : "").form--element
                 if prop.type === 'select'
                     select(name= key).form--element
                         each opt in prop.values
