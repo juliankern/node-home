@@ -7,7 +7,8 @@ cli.enable('version');
 cli.setApp(pkg.name, pkg.version);
 
 const cliOptions = cli.parse({ 
-    port: [ 'p', 'A port to use instead of autodiscover', 'int', null ]
+    port: [ 'p', 'Websocket port to use instead of autodiscover', 'int', null ],
+    web: [ 'w', 'Port for the website to use', 'int', null ]
 });
 
 //////////////////////////////////////////////////////////
@@ -20,7 +21,7 @@ const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
 //////////////////////////////////////////////////////////
 
-SmartNodeServer.init(cliOptions.port, ServerClientConnector, socketEventHandlers)
+SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web}, ServerClientConnector, socketEventHandlers)
     .catch((e) => { global.error('Server init error', e) });
 
 //////////////////////////////////////////////////////////

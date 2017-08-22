@@ -26,27 +26,35 @@ module.exports = {
                 this.id = data.id;
                 this.socket = data.socket;
                 this.config = data.config;
-                this.room = data.config.room;
-                this.module = data.config.module;
+                this.configurationFormat = data.configurationFormat;
+                this.plugin = data.plugin;
 
                 // which global variables the plugin will be using, to watch them
                 this.globals = { 
                     global: [],
                     room: []
                 };
+
+                this.init();
                 
-                SmartNodeServer.globalsInitRoom(this.room);
-
-                this.storage = {
-                    get: (key) => {
-                        return SmartNodeServer.storage.getItemSync(`${this.config.room}.${this.config.module}.${key}`);
-                    },
-                    set: (key, value) => {
-                        return SmartNodeServer.storage.setItemSync(`${this.config.room}.${this.config.module}.${key}`, value);
-                    }
-                };
-
                 this.displayData = [];
+            }
+
+            init() {
+                if (this.config) {
+                    this.room = this.config.room;
+
+                    SmartNodeServer.globalsInitRoom(this.room);
+                    
+                    this.storage = {
+                        get: (key) => {
+                            return SmartNodeServer.storage.getItemSync(`${this.config.room}.${this.config.plugin}.${key}`);
+                        },
+                        set: (key, value) => {
+                            return SmartNodeServer.storage.setItemSync(`${this.config.room}.${this.config.plugin}.${key}`, value);
+                        }
+                    };
+                }
             }
 
             addDisplayData(key, data) {
@@ -133,7 +141,7 @@ module.exports = {
             }
         }
     },
-    Client: () => {
+    Client: (SmartNodeClient) => {
         return class SmartNodeClientPlugin extends EventEmitter {
             constructor(data) {
                 super();
@@ -142,16 +150,16 @@ module.exports = {
                 this.socket = data.socket;
                 this.config = data.config || {};
                 this.room = this.config.room;
-                this.module = this.config.module ;
+                this.plugin = this.config.plugin ;
 
                 this.loaded = false;
 
                 this.storage = {
                     get: (key) => {
-                        return SmartNodeServer.storage.getItemSync(`${key}`);
+                        return SmartNodeClient.storage.getItemSync(`${key}`);
                     },
                     set: (key, value) => {
-                        return SmartNodeServer.storage.setItemSync(`${key}`, value);
+                        return SmartNodeClient.storage.setItemSync(`${key}`, value);
                     }
                 };
             }

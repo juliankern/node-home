@@ -46,10 +46,52 @@ module.exports = (SmartNodeServer) => {
         configRoute(route) {
             route
             .get((req, res) => {
-                res.render('config', SmartNodeServer.getClientById(req.params.clientId));
+                let client = SmartNodeServer.getClientById(req.params.clientId);
+
+                res.render('config', {
+                    config: client.config,
+                    configurationFormat: client.configurationFormat,
+                    rooms: SmartNodeServer.storage.get('rooms')
+                });
             })
             .post((req, res) => {
-                SmartNodeClient.validateConfig(SmartNodeServer.getClientById(req.params.clientId), req.body);
+                let clients = SmartNodeServer.storage.get('clients');
+                let hasConfig = !!clients[req.params.clientId].config;
+                let errors = SmartNodeServer.validConfiguration(req.body, SmartNodeServer.getClientById(req.params.clientId).configurationFormat);
+
+                if (errors) {
+                    req.arrayFlash(errors, 'error');
+                } else {
+                    let config = {};
+                    let rooms = SmartNodeServer.storage.get('rooms') || [];
+                    let room;
+                    // no validation errors, save config and trigger onSetup
+                    
+                    for (let k in req.body) {
+                        if (k === 'room' || k === 'newroom') continue;
+                        utils.setValueByPath(config, k, req.body[k]);
+                    }
+
+                    if (req.body.room === '-1') {
+                        config.room = req.body.newroom;
+                        rooms.push(config.room);
+                        SmartNodeServer.storage.set('rooms', rooms);
+                    } else {
+                        config.room = req.body.room;
+                    }
+
+                    clients[req.params.clientId].config = config;
+
+                    SmartNodeServer.updateClient(req.params.clientId, { config: config });
+                    SmartNodeServer.getClientById(req.params.clientId).init();
+                    SmartNodeServer.storage.set('clients', clients);
+
+                    if (!hasConfig) {
+                        req.flash('success', { message: 'The client was setup successfully.' });
+                    } else {
+                        req.flash('success', { message: 'The client was updated successfully.' });
+                    }
+                }
 
                 res.redirect('/config/' + req.params.clientId)
             })

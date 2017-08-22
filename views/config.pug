@@ -4,47 +4,54 @@ block append scripts
     script(src="/js/config.js")
 
 block content
-    h2 Configuration of ID #{id}
+    if config
+        h2 Configuration of ID #{id}
+    else
+        h2 Setup of ID #{id}
+
+    if !formdata
+        - formdata = {};
 
     form(action="", method="post")
         .form--field
             label Room
-            select(name="room").form--element
-                option(value="0") Select a room...
+            select(name="room", class=hasErrors && fields.includes('room') ? 'input-invalid' : '').form--element
+                option(value="0", selected= formdata.room ? formdata.room === '0' : false) Select a room...
                 if rooms
                     each room in rooms
-                        option(value= room)= room
-                option(value="-1") New room
+                        option(value= room, selected= formdata.room ? formdata.room === room : config ? config.room : false)= room
+                option(value="-1", selected= formdata.room ? formdata.room === '-1' : false) New room
         .form--field.newroom.hidden
             label New room name
-            input(type="text", name="newroom").form--element
+            input(type="text", name="newroom", value= formdata.newroom, class=hasErrors && fields.includes('newroom') ? 'input-invalid' : '').form--element
 
-        each prop, key in format
-            .form--field
-                label= prop.description
+        if configurationFormat
+            each prop, key in configurationFormat
+                .form--field
+                    label= prop.description
 
-                if prop.type === 'number'
-                    input(name= key, type="number", value= config ? config[prop] : prop.default ? prop.default : "").form--element
-                if prop.type === 'string'
-                    input(tname= key, type="text", value= config ? config[prop] : prop.default ? prop.default : "").form--element
-                if prop.type === 'select'
-                    select(name= key).form--element
-                        each opt in prop.values
-                            option(value= opt)= opt
+                    if prop.type === 'number'
+                        input(name= key, type="number", value= formdata[key] ? formdata[key] : config ? config[key] : prop.default ? prop.default : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                    if prop.type === 'string'
+                        input(name= key, type="text", value= formdata[key] ? formdata[key] : config ? config[key] : prop.default ? prop.default : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                    if prop.type === 'select'
+                        select(name= key, class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                            each opt in prop.values
+                                option(value= opt, selected= formdata[key] ? formdata[key] === opt : config ? config[key] === opt : prop.default ? prop.default === opt : false)= opt
 
-                if prop.type === 'object'
-                    each subprop, subkey in prop.properties
-                        .form--field--sub
-                            label= subprop.description
+                    if prop.type === 'object'
+                        each subprop, subkey in prop.properties
+                            .form--field--sub
+                                label= subprop.description
 
-                            if subprop.type === 'number'
-                                input(name= key +'.'+ subkey, type="number", value= config ? config[prop][subprop] : subprop.default ? subprop.default : "").form--element
-                            if subprop.type === 'string'
-                                input(name= key +'.'+ subkey, type="text", value= config ? config[prop][subprop] : subprop.default ? subprop.default : "").form--element
-                            if subprop.type === 'select'
-                                select(name= key +'.'+ subkey).form--element
-                                    each opt in subprop.values
-                                        option(value= opt, checked=config ? config[prop][subprop] === opt : subprop.default ? subprop.default === opt : false)= opt
+                                if subprop.type === 'number'
+                                    input(name= key +'.'+ subkey, type="number", value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : config && config[key] ? config[key][subkey] : subprop.default ? subprop.default : "", class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                if subprop.type === 'string'
+                                    input(name= key +'.'+ subkey, type="text", value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : config && config[key] ? config[key][subkey] : subprop.default ? subprop.default : "", class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                if subprop.type === 'select'
+                                    select(name= key +'.'+ subkey, class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                        each opt in subprop.values
+                                            option(value= opt, selected= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] === opt : config && config[key] ? config[key][subkey] === opt : subprop.default ? subprop.default === opt : false)= opt
 
         button(type="submit").btn__primary= config ? 'Update Configuration' : 'Complete Setup'
 

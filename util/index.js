@@ -1,12 +1,26 @@
+const randomstring = require('randomstring');
+
 module.exports = {
     arraysEqual,
     getValueByPath,
     setValueByPath,
     deleteByPath,
     findPort,
+    findClientId,
     object2pathlist,
     getObjectPaths,
     randomInt
+}
+
+function findClientId(clients) {
+    let id;
+
+    while(true) {
+        id = randomstring.generate({ length: 12, readable: true });
+        if (!clients[id]) { break; }
+    }
+
+    return id;
 }
 
 function randomInt(min, max) {

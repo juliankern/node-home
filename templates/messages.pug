@@ -1,20 +1,16 @@
+p msg
+
 if messages.error.length > 0
     - hasErrors = true
     .msg.msg-error
-        strong= __('global.error:Error')
+        strong Error
         ul
             each msg in messages.error
-                if msg.message 
-                    li!= msg.message
-                if msg.messageTranslate
-                    li!= __(msg.messageTranslate)
+                li!= msg.message
 
 if messages.success.length > 0
     .msg.msg-success
-        strong= __('global.success:Erfolg')
+        strong Erfolg
         ul
             each msg in messages.success
-                if msg.message 
-                    li!= msg.message
-                if msg.messageTranslate
-                    li!= __(msg.messageTranslate)
+                li!= msg.message

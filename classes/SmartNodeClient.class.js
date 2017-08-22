@@ -5,7 +5,7 @@ const socketio = require('socket.io-client');
 
 const storage = require('node-persist');
 
-const SmartNodeClientPlugin = global.req('classes/SmartNodePlugin.class.js').Client();
+const SmartNodePlugin = global.req('classes/SmartNodePlugin.class.js');
 
 module.exports = class SmartNodeClient {
     /**
@@ -46,31 +46,48 @@ module.exports = class SmartNodeClient {
     }
 
     async onConnect() {
-        global.success('Connected to server! Own socket-ID:', this.socket.id);
 
-        this.adapter = new SmartNodeClientPlugin({
+        this.adapter = new (SmartNodePlugin.Client(this))({
             socket: this.socket,
             id: this.socket.id,
             config: this.config
         });
 
+        let clientId = this.adapter.storage.get('clientid');
+
+        global.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
+
         let plugin = await this._getPlugin();
         let [configurationFormat, callback] = plugin.init();
 
-        this.socket.emit('register', { 
+        this.socket.emit('connected', { 
             plugin: this.pluginName,
             configurationFormat,
-            id: this.storage.get('clientid')
+            id: clientId
+        }, (data) => {
+            global.muted('Connected!', data);
+
+            this.adapter.storage.set('clientid', data.id);
+
+            this.register();
+        });
+
+    }
+
+    register() {
+        this.socket.emit('register', { 
+            id: this.adapter.storage.get('clientid')
         }, (data) => {
             global.muted('Registered successfully!');
 
             if (data.config) {
+                this.adapter.config = data.config;
                 this._loadPlugin();
+                global.muted('Setup already done, loading plugin...');
             } else {
                 this.socket.on('setup', this.onSetup);
                 global.muted('Waiting for setup to complete...');
             }
-
         });
     }
 
@@ -86,35 +103,6 @@ module.exports = class SmartNodeClient {
         this._unloadPlugin();
 
         global.log('Starting search for master server...');
-    }
-
-    static validateConfig(client, data) {
-        let format = client.format;
-        let error = false;
-
-        if (!data.room || data.room === '0') {
-            return false;
-        }
-
-        if (data.room === '-1' && !data.newroom) {
-            return false;
-        }
-
-        for (let key in format) {
-            // rquired data is there
-            if (format[key].required && !data[key]) {
-                error = true;
-            }
-
-            // expected number is number
-            if (format[key].type === 'number' && isNaN(+data[key])) {
-                error = true;
-            } 
-        }
-
-        return error ? false : newData;
-
-        console.log('validateConfig', format, data);
     }
 
     async _getPlugin() {
