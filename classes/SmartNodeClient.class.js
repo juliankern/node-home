@@ -50,7 +50,6 @@ module.exports = class SmartNodeClient {
         this.adapter = new (SmartNodePlugin.Client(this))({
             socket: this.socket,
             id: this.socket.id,
-            config: this.config
         });
 
         let clientId = this.adapter.storage.get('clientid');
