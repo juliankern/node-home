@@ -34,6 +34,59 @@
         
         @include global-focus;
     }
+    
+    &--switch {
+        position: relative;
+        display: inline-block;
+        width: 2rem;
+        height: 1rem;
+        margin-top: .125rem;
+        margin-bottom: -.125rem;
+
+        input {display:none;}
+    }
+    
+    &--slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+
+        &.round {
+            border-radius: 1rem;
+
+            &::before {
+                border-radius: 50%;
+            }
+        }
+
+        &::before {
+            position: absolute;
+            content: "";
+            height: .75rem;
+            width: .75rem;
+            left: .125rem;
+            bottom: .125rem;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+
+            input:checked + & {
+                -webkit-transform: translateX(1rem);
+                -ms-transform: translateX(1rem);
+                transform: translateX(1rem);
+            }
+        }
+
+        input:checked + & {
+            background-color: #2196F3;
+        }
+    }
 }
 
 input[type="text"],

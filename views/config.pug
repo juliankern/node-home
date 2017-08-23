@@ -4,7 +4,7 @@ block append scripts
     script(src="/js/config.js")
 
 block content
-    h2 #{plugin} #{config ? '@ ' + config.room : ''} 
+    h2 #{displayName} #{config ? '@ ' + config.room : ''} 
         small.text-muted ID #{id}
 
     if !formdata

@@ -8,13 +8,22 @@ block content
         each c, id in clients
             .client.card.flex--item
                 .card-body
-                    h4.card-title #{c.plugin} #{c.config ? '@ ' + c.config.room : ''}
-                    ul.list-unstyled
-                        li.client--id ID: #{c.id}
+                    h4.card-title #{c.displayName} #{c.config ? '@ ' + c.config.room : ''}
+                    ul.list-unstyled.client--list
+                        li.client--id ID:
+                            span.value= c.id
 
                         if c.displayData
                             each d, key in c.displayData
-                                li(class="client--" + d.data.type)= d.data.description + ': ' + d.data.value
+                                if d.data.type === 'boolean'
+                                    li(class="client--" + d.data.type)= d.data.description + ': '
+                                        span.value
+                                            label.form--switch
+                                                input(type="checkbox", checked= d.data.value, disabled)
+                                                span.form--slider.round
+                                else
+                                    li(class="client--" + d.data.type)= d.data.description + ': '
+                                        span.value= d.data.value
 
                     //- != JSON.stringify(c.config)
                     

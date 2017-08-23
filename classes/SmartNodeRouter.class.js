@@ -52,6 +52,7 @@ module.exports = (SmartNodeServer) => {
                     config: client.config,
                     plugin: client.plugin,
                     id: client.id,
+                    displayName: client.displayName,
                     configurationFormat: client.configurationFormat,
                     rooms: SmartNodeServer.storage.get('rooms')
                 });

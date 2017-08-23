@@ -57,11 +57,12 @@ module.exports = class SmartNodeClient {
         global.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
 
         let plugin = await this._getPlugin();
-        let [configurationFormat, callback] = plugin.init();
+        let [pkg, callback] = plugin.init();
 
         this.socket.emit('connected', { 
             plugin: this.pluginName,
-            configurationFormat,
+            configurationFormat: pkg.configurationFormat,
+            displayName:  pkg.displayName,
             id: clientId
         }, (data) => {
             global.muted('Connected!', data);

@@ -28,6 +28,7 @@ module.exports = {
                 this.config = data.config;
                 this.configurationFormat = data.configurationFormat;
                 this.plugin = data.plugin;
+                this.displayName = data.displayName;
 
                 // which global variables the plugin will be using, to watch them
                 this.globals = { 
@@ -59,6 +60,10 @@ module.exports = {
 
             addDisplayData(key, data) {
                 this.displayData.push({ key, data });
+            }
+
+            updateDisplayData(key, data) {
+                Object.assign(this.displayData.find((d) => { return d.key === key; }).data, data);
             }
 
             getDisplayData(key) {

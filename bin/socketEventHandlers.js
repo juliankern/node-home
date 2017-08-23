@@ -9,7 +9,7 @@ module.exports = (SmartNodeServer) => {
     return function(SmartNodeServerClientConnector, socket) {
         const socketEventHandlers = {};
 
-        socketEventHandlers.connected = async ({ plugin, configurationFormat, id}, cb) => {
+        socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id}, cb) => {
             global.muted('Client connected with ID:', id);
 
             let clients = SmartNodeServer.storage.get('clients');
@@ -21,7 +21,8 @@ module.exports = (SmartNodeServer) => {
                     id: clientId,
                     socket,
                     plugin,
-                    configurationFormat
+                    configurationFormat,
+                    displayName
                 });
 
                 cb({ id: clientId });
@@ -31,7 +32,8 @@ module.exports = (SmartNodeServer) => {
                     id,
                     socket,
                     plugin,
-                    configurationFormat
+                    configurationFormat,
+                    displayName
                 }, { config: clients[id].config }));
 
                 let client = SmartNodeServer.getClientById(id);

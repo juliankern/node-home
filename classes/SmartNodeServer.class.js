@@ -123,6 +123,7 @@ module.exports = class SmartNodeServer {
             id: data.id,
             plugin: data.plugin,
             configurationFormat: data.configurationFormat,
+            displayName: data.displayName,
             config: {}
         };
 
