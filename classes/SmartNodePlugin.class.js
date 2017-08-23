@@ -66,6 +66,15 @@ module.exports = {
                 Object.assign(this.displayData.find((d) => { return d.key === key; }).data, data);
             }
 
+            removeDisplayData(key) {
+                delete this.displayData.find((d) => { return d.key === key; });
+            }
+
+
+            removeAllDisplayData() {
+                this.displayData = [];
+            }
+
             getDisplayData(key) {
                 return this.displayData.filter((d) => { return d.key === key; });
             }
@@ -84,6 +93,16 @@ module.exports = {
                 } 
             }
             
+            removeGlobals() {
+                this.globals.global.forEach((path) => {
+                    utils.deleteByPath(SmartNodeServer.globalsGetGlobals(), path);
+                });
+
+                this.globals.room.forEach((path) => {
+                    utils.deleteByPath(SmartNodeServer.globalsGetRoom(this.room), path);
+                });
+            }
+
             /**
              * Function to set new globals
              *
@@ -155,7 +174,7 @@ module.exports = {
                 this.socket = data.socket;
                 this.config = data.config || {};
                 this.room = this.config.room;
-                this.plugin = this.config.plugin ;
+                this.plugin = this.config.plugin;
 
                 this.loaded = false;
 

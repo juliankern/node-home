@@ -59,8 +59,9 @@ module.exports = (SmartNodeServer) => {
             })
             .post((req, res) => {
                 let clients = SmartNodeServer.storage.get('clients');
-                let hasConfig = !!clients[req.params.clientId].config;
-                let errors = SmartNodeServer.validConfiguration(req.body, SmartNodeServer.getClientById(req.params.clientId).configurationFormat);
+                let client = SmartNodeServer.getClientById(req.params.clientId);
+                let hasConfig = clients[req.params.clientId].config && Object.keys(clients[req.params.clientId].config).length;
+                let errors = SmartNodeServer.validConfiguration(req.body, client.configurationFormat);
 
                 if (errors) {
                     req.arrayFlash(errors, 'error');
@@ -86,10 +87,12 @@ module.exports = (SmartNodeServer) => {
                     clients[req.params.clientId].config = config;
 
                     SmartNodeServer.updateClient(req.params.clientId, { config: config });
-                    SmartNodeServer.getClientById(req.params.clientId).init();
+                    client.init();
                     SmartNodeServer.storage.set('clients', clients);
 
                     if (!hasConfig) {
+                        client.socket.emit('setup', { config });
+                        global.muted('Setup completed - waiting for client to load plugin...');
                         req.flash('success', { message: 'The client was setup successfully.' });
                     } else {
                         req.flash('success', { message: 'The client was updated successfully.' });

@@ -116,7 +116,6 @@ module.exports = class SmartNodeServer {
     }
 
     registerClient(data) {
-        console.log('registerClient called', data)
         let savedClients = this.storage.get('clients');
 
         savedClients[data.id] = {

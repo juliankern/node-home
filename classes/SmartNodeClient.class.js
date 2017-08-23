@@ -65,8 +65,6 @@ module.exports = class SmartNodeClient {
             displayName:  pkg.displayName,
             id: clientId
         }, (data) => {
-            global.muted('Connected!', data);
-
             this.adapter.storage.set('clientid', data.id);
 
             this.register();
@@ -80,22 +78,25 @@ module.exports = class SmartNodeClient {
         }, (data) => {
             global.muted('Registered successfully!');
 
-            if (data.config) {
+            this.adapter.plugin = this.pluginName;
+
+            if (data && data.config) {
                 this.adapter.config = data.config;
                 this._loadPlugin();
                 global.muted('Setup already done, loading plugin...');
             } else {
-                this.socket.on('setup', this.onSetup);
+                this.socket.on('setup', (data, cb) => { this.onSetup(data, cb); });
                 global.muted('Waiting for setup to complete...');
             }
         });
     }
 
     async onSetup(data) {
-        console.log('setup completed', data);
-        // this.storage.set('configuration', configuration);
+        global.muted('Setup completed - loading plugin...');
+        this.adapter.config = data.config;
+        this.adapter.room = data.config.room;
 
-        // this._loadPlugin();
+        this._loadPlugin();
     }
 
     async onDisconnect(reason) {
@@ -145,6 +146,6 @@ module.exports = class SmartNodeClient {
     async _unloadPlugin() {
         if (this.adapter.loaded) this.adapter.unload();
         this.adapter.loaded = false;
-        this.socket.close();
+        this.adapter.socket.close();
     }
 }
