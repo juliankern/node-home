@@ -677,8 +677,8 @@ nav {
     margin-right: 2rem;
     display: inline-block; }
     .nav--brand small {
-      font-family: font-family-base;
-      font-weight: 200; }
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300; }
 
 .img, .img__small, .img__medium, .img__large {
   max-width: 100%; }
