@@ -21,6 +21,7 @@ module.exports = class SmartNodeClient {
         this.pluginName = pluginName;
         this.adapter = {};
         this.socket = {};
+        this.service = {};
     }
 
     /**
@@ -34,19 +35,25 @@ module.exports = class SmartNodeClient {
         let browser = this.bonjour.find({ type: 'smartnode' });
         
         browser.on('up', (service) => {
-            let address = service.addresses[0].includes(':') ? service.addresses[1] : service.addresses[0];
-
-            global.success('Found an SmartNode server:', `http://${address}:${service.port}`);
-
-            this.socket = socketio(`http://${address}:${service.port}`);
+            this.service = service;
             
-            this.socket.on('connect', async () => { await this.onConnect(); });
-            this.socket.on('disconnect', async () => { await this.onDisconnect(); });
+            this.onFoundMaster();
         });
     }
 
-    async onConnect() {
+    onFoundMaster() {
+        let address = this.service.addresses[0].includes(':') ? this.service.addresses[1] : this.service.addresses[0];
 
+        global.success('Found an SmartNode server:', `http://${address}:${this.service.port}`);
+
+        this.socket = socketio(`http://${address}:${this.service.port}`);
+        
+        this.socket.on('connect', async () => { await this.onConnect(); });
+        this.socket.on('unpair', async () => { await this.onUnpair(); });
+        this.socket.on('disconnect', async () => { await this.onDisconnect(); });
+    }
+
+    async onConnect() {
         this.adapter = new (SmartNodePlugin.Client(this))({
             socket: this.socket,
             id: this.socket.id,
@@ -69,7 +76,15 @@ module.exports = class SmartNodeClient {
 
             this.register();
         });
-
+    }
+    
+    onUnpair() {
+        this.adapter.storage.set('clientid', undefined);
+        this.adapter.unpair();
+        this._unloadPlugin();
+        delete this.adapter;
+        
+        this.onFoundMaster();
     }
 
     register() {
@@ -132,6 +147,7 @@ module.exports = class SmartNodeClient {
     async _loadPlugin() {
         let plugin = await this._getPlugin();
         this.adapter.unload = plugin.unload;
+        this.adapter.unpair = plugin.unpair;
 
         return plugin.load().then((loaded) => {
             if (loaded) this.adapter.loaded = true;

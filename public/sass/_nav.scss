@@ -5,6 +5,7 @@ nav {
 
 .nav {
     border-bottom: $border-width solid color(accent1);
+    border-top: $border-width solid color(accent1);
     background: color(dark);
     color: color(light);
     padding: .5rem 0;

@@ -274,6 +274,30 @@ main,
   margin: 0 auto;
   overflow: hidden; }
 
+.homekitpin {
+  margin: 10px 0;
+  border: 1px solid #adb5bd;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: row; }
+  .homekitpin::before {
+    content: "";
+    background-image: url(/img/add-to-homekit.png);
+    background-size: contain;
+    width: 50px;
+    height: 50px; }
+  .homekitpin .pin {
+    margin-left: 5px;
+    border: 2px solid #000;
+    height: 50px;
+    padding: 0 10px;
+    line-height: 46px;
+    font-size: 20px;
+    font-family: monospace;
+    flex-grow: 1;
+    text-align: center; }
+
 .msg {
   border: 1px solid black;
   border-radius: 5px;
@@ -501,7 +525,7 @@ select.form--element {
   border-radius: 2px;
   padding: 5px; }
 
-.btn, .btn__block, .btn__primary {
+.btn, .btn__block, .btn__primary, .btn__danger {
   padding: .5rem 1rem;
   border: 1px solid #94ffd4;
   border-radius: 0.25rem;
@@ -509,32 +533,33 @@ select.form--element {
   cursor: pointer;
   text-align: center;
   color: #000; }
-  a.btn:hover, a.btn__block:hover, a.btn__primary:hover {
+  a.btn:hover, a.btn__block:hover, a.btn__primary:hover, a.btn__danger:hover {
     text-decoration: none;
     color: #000; }
-  .btn:focus, .btn__block:focus, .btn__primary:focus {
+  .btn:focus, .btn__block:focus, .btn__primary:focus, .btn__danger:focus {
     transition: box-shadow .5s;
     box-shadow: 0 0 0 transparent; }
-    .btn:focus:focus, .btn__block:focus:focus, .btn__primary:focus:focus {
+    .btn:focus:focus, .btn__block:focus:focus, .btn__primary:focus:focus, .btn__danger:focus:focus {
       outline: 0;
       box-shadow: 0 0 5px #3c91e6; }
   .btn__block {
     display: block;
     width: 100%; }
-  .btn:active, .btn__block:active, .btn__primary:active, .btn--group input[type="checkbox"]:checked + label.btn, .btn--group__block input[type="checkbox"]:checked + label.btn, .btn--group input[type="checkbox"]:checked + label.btn__block, .btn--group__block input[type="checkbox"]:checked + label.btn__block, .btn--group input[type="checkbox"]:checked + label.btn__primary, .btn--group__block input[type="checkbox"]:checked + label.btn__primary,
+  .btn:active, .btn__block:active, .btn__primary:active, .btn__danger:active, .btn--group input[type="checkbox"]:checked + label.btn, .btn--group__block input[type="checkbox"]:checked + label.btn, .btn--group input[type="checkbox"]:checked + label.btn__block, .btn--group__block input[type="checkbox"]:checked + label.btn__block, .btn--group input[type="checkbox"]:checked + label.btn__primary, .btn--group__block input[type="checkbox"]:checked + label.btn__primary, .btn--group input[type="checkbox"]:checked + label.btn__danger, .btn--group__block input[type="checkbox"]:checked + label.btn__danger,
   .btn--group input[type="radio"]:checked + label.btn, .btn--group__block input[type="radio"]:checked + label.btn,
   .btn--group input[type="radio"]:checked + label.btn__block, .btn--group__block input[type="radio"]:checked + label.btn__block,
-  .btn--group input[type="radio"]:checked + label.btn__primary, .btn--group__block input[type="radio"]:checked + label.btn__primary {
+  .btn--group input[type="radio"]:checked + label.btn__primary, .btn--group__block input[type="radio"]:checked + label.btn__primary,
+  .btn--group input[type="radio"]:checked + label.btn__danger, .btn--group__block input[type="radio"]:checked + label.btn__danger {
     border-color: #48ffb6;
     background: #aeffde;
     color: #000; }
-  .btn--group .btn, .btn--group__block .btn, .btn--group .btn__block, .btn--group__block .btn__block, .btn--group .btn__primary, .btn--group__block .btn__primary {
+  .btn--group .btn, .btn--group__block .btn, .btn--group .btn__block, .btn--group__block .btn__block, .btn--group .btn__primary, .btn--group__block .btn__primary, .btn--group .btn__danger, .btn--group__block .btn__danger {
     border-radius: 0;
     border-right-width: 0; }
-    .btn--group .btn:nth-of-type(1), .btn--group__block .btn:nth-of-type(1), .btn--group .btn__block:nth-of-type(1), .btn--group__block .btn__block:nth-of-type(1), .btn--group .btn__primary:nth-of-type(1), .btn--group__block .btn__primary:nth-of-type(1) {
+    .btn--group .btn:nth-of-type(1), .btn--group__block .btn:nth-of-type(1), .btn--group .btn__block:nth-of-type(1), .btn--group__block .btn__block:nth-of-type(1), .btn--group .btn__primary:nth-of-type(1), .btn--group__block .btn__primary:nth-of-type(1), .btn--group .btn__danger:nth-of-type(1), .btn--group__block .btn__danger:nth-of-type(1) {
       border-top-left-radius: 3px;
       border-bottom-left-radius: 3px; }
-    .btn--group .btn:nth-last-of-type(1), .btn--group__block .btn:nth-last-of-type(1), .btn--group .btn__block:nth-last-of-type(1), .btn--group__block .btn__block:nth-last-of-type(1), .btn--group .btn__primary:nth-last-of-type(1), .btn--group__block .btn__primary:nth-last-of-type(1) {
+    .btn--group .btn:nth-last-of-type(1), .btn--group__block .btn:nth-last-of-type(1), .btn--group .btn__block:nth-last-of-type(1), .btn--group__block .btn__block:nth-last-of-type(1), .btn--group .btn__primary:nth-last-of-type(1), .btn--group__block .btn__primary:nth-last-of-type(1), .btn--group .btn__danger:nth-last-of-type(1), .btn--group__block .btn__danger:nth-last-of-type(1) {
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
       border-right-width: 1px; }
@@ -548,6 +573,17 @@ select.form--element {
     .btn__primary:active {
       border-color: #125190;
       background: #2584e3;
+      color: #fff; }
+  .btn__danger {
+    border-color: #a71515;
+    background: #e63c3c;
+    color: #fff; }
+    a.btn__danger:hover {
+      text-decoration: none;
+      color: #fff; }
+    .btn__danger:active {
+      border-color: #901212;
+      background: #e32525;
       color: #fff; }
   .btn--group input[type="checkbox"], .btn--group__block input[type="checkbox"],
   .btn--group input[type="radio"], .btn--group__block input[type="radio"] {
@@ -686,6 +722,7 @@ nav {
 
 .nav {
   border-bottom: 1px solid #fa824c;
+  border-top: 1px solid #fa824c;
   background: #342e37;
   color: #fafffd;
   padding: .5rem 0; }

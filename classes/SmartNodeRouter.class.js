@@ -66,40 +66,50 @@ module.exports = (SmartNodeServer) => {
                 if (errors) {
                     req.arrayFlash(errors, 'error');
                 } else {
-                    let config = {};
-                    let rooms = SmartNodeServer.storage.get('rooms') || [];
-                    let room;
-                    // no validation errors, save config and trigger onSetup
-                    
-                    for (let k in req.body) {
-                        if (k === 'room' || k === 'newroom') continue;
-                        utils.setValueByPath(config, k, req.body[k]);
-                    }
-
-                    if (req.body.room === '-1') {
-                        config.room = req.body.newroom;
-                        rooms.push(config.room);
-                        SmartNodeServer.storage.set('rooms', rooms);
+                    if ('reset' in req.body) {
+                        console.log('RESET PRESSED!!!');
+                        client.socket.emit('unpair');
+                        SmartNodeServer.removeClient(req.params.clientId);
+                        delete clients[req.params.clientId];
+                        SmartNodeServer.storage.set('clients', clients);
+                        
+                        return res.redirect('/');
                     } else {
-                        config.room = req.body.room;
-                    }
+                        let config = {};
+                        let rooms = SmartNodeServer.storage.get('rooms') || [];
+                        let room;
+                        // no validation errors, save config and trigger onSetup
+                        
+                        for (let k in req.body) {
+                            if (k === 'room' || k === 'newroom') continue;
+                            utils.setValueByPath(config, k, req.body[k]);
+                        }
 
-                    clients[req.params.clientId].config = config;
+                        if (req.body.room === '-1') {
+                            config.room = req.body.newroom;
+                            rooms.push(config.room);
+                            SmartNodeServer.storage.set('rooms', rooms);
+                        } else {
+                            config.room = req.body.room;
+                        }
 
-                    SmartNodeServer.updateClient(req.params.clientId, { config: config });
-                    client.init();
-                    SmartNodeServer.storage.set('clients', clients);
+                        clients[req.params.clientId].config = config;
 
-                    if (!hasConfig) {
-                        client.socket.emit('setup', { config });
-                        global.muted('Setup completed - waiting for client to load plugin...');
-                        req.flash('success', { message: 'The client was setup successfully.' });
-                    } else {
-                        req.flash('success', { message: 'The client was updated successfully.' });
+                        SmartNodeServer.storage.set('clients', clients);
+                        SmartNodeServer.updateClient(req.params.clientId, { config: config });
+                        client.init();
+
+                        if (!hasConfig) {
+                            client.socket.emit('setup', { config });
+                            global.muted('Setup completed - waiting for client to load plugin...');
+                            req.flash('success', { message: 'The client was setup successfully.' });
+                        } else {
+                            req.flash('success', { message: 'The client was updated successfully.' });
+                        }
                     }
                 }
 
-                res.redirect('/config/' + req.params.clientId)
+                return res.redirect('/config/' + req.params.clientId)
             })
         }
 

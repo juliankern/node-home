@@ -77,6 +77,26 @@
             @include contrastText($color);
         }
     }
+    
+    &__danger {
+        @extend .btn;
+        $color: adjust-hue(map-get($colors, primary), 150deg);
+
+        border-color: darken($color, 20%);
+        background: $color;
+
+        @include contrastText($color);
+        @include btn-link($color);
+
+        &:active {
+            $color: darken($color, 5%);
+
+            border-color: darken($color, 20%);
+            background: $color;
+
+            @include contrastText($color);
+        }
+    }
 
     &--group {
         input[type="checkbox"],

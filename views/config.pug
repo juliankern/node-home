@@ -54,4 +54,7 @@ block content
                                             option(value= opt, selected= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] === opt : hasConfig && config[key] ? config[key][subkey] === opt : subprop.default ? subprop.default === opt : false)= opt
 
         button(type="submit").btn__primary= hasConfig ? 'Update Configuration' : 'Complete Setup'
+    
+        if hasConfig
+            button(type="submit", name="reset", data-confirm="Are you sure that you want to unpair this accessory and delete it's configuration?").btn__danger.pull-right Unpair
 

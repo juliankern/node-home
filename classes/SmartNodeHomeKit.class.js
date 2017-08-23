@@ -31,6 +31,8 @@ module.exports = class SmartNodeHomeKit {
         this.accessory.addService(HomeKit.Service[service], deviceName);
 
         this.Characteristic = HomeKit.Characteristic;
+        
+        this.timetimerout;
     }
 
     onIdentify(callback) {
@@ -38,14 +40,18 @@ module.exports = class SmartNodeHomeKit {
     }
 
     on(method, characteristic, callback) {
-        this.accessory.getService(HomeKit.Service[this.service])
-            .getCharacteristic(HomeKit.Characteristic[characteristic])
-            .on(method, callback);
+        if (this.timer) clearTimeout(this.timer);
+
+        this.timer = setTimeout(() => {
+            this.accessory.getService(HomeKit.Service[this.service])
+                .getCharacteristic(HomeKit.Characteristic[characteristic])
+                .on(method, callback);
+        }, 100);
     }
 
     onBoth(characteristic, getCallback, setCallback) {
-        this.on(characteristic, 'get', getCallback);
-        this.on(characteristic, 'set', setCallback);
+        this.on('get', characteristic, getCallback);
+        this.on('set', characteristic, setCallback);
     }
 
     set(characteristic, value) {

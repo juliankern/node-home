@@ -26,6 +26,9 @@ block content
                                             label.form--switch
                                                 input(type="checkbox", checked= d.data.value, disabled)
                                                 span.form--slider.round
+                                    else if d.data.type === 'homekitpin'
+                                        .homekitpin
+                                            .pin= d.data.value
                                     else
                                         span.value= d.data.value
 
