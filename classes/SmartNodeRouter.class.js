@@ -50,6 +50,8 @@ module.exports = (SmartNodeServer) => {
 
                 res.render('config', {
                     config: client.config,
+                    plugin: client.plugin,
+                    id: client.id,
                     configurationFormat: client.configurationFormat,
                     rooms: SmartNodeServer.storage.get('rooms')
                 });
@@ -122,6 +124,8 @@ module.exports = (SmartNodeServer) => {
             }
 
             res.locals.clients = SmartNodeServer.getClientList();
+
+            // console.log('CLIENTLIST: #', res.locals.clients);
 
             // add error fields to templates
             if (res.locals.messages.error && res.locals.messages.error.length > 0) {

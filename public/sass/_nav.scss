@@ -1,20 +1,58 @@
 nav {
     overflow: hidden;
+    margin-bottom: 1rem;
 }
 
 .nav {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+    border-bottom: $border-width solid color(accent1);
+    background: color(dark);
+    color: color(light);
+    padding: .5rem 0;
+
+    &--list {
+        list-style-type: none;
+        padding: 0;
+        overflow: hidden;
+        margin: 0;
+        display: flex;
+        flex-direction: row;
+    }
 
     &--item {
         border-left: 1px solid #333;
-        float: left;
-        padding: 0 5px;
+
+        > a {
+            display: block;
+            padding: .5rem 5px;
+            color: color(light);
+
+            &:hover {
+                text-decoration: none;
+                color: lighten(color(primary), 20%);
+            }
+        }
 
         &:first-child {
             border: 0;
-            padding-left: 0;
+
+            > a {
+                padding-left: 0;
+            }
+        }
+    }
+
+    &--brand {
+        float: left;
+        font-family: $headings-font-family;
+        font-weight: $headings-font-weight;
+        line-height: $headings-line-height;
+        font-size: 2rem;
+        margin-right: 2rem;
+        display: inline-block;
+
+        small {
+            font-family: font-family-base;
+            font-weight: 200;
         }
     }
 }

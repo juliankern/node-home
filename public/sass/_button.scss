@@ -1,14 +1,26 @@
+@mixin btn-link($color) {
+    @at-root {
+        a#{&} {
+            &:hover {
+                text-decoration: none;
+                @include contrastText($color);
+            }
+        }
+    }
+}
+
 .btn {
-    $color: map-get($colors, default);
+    $color: color(light);
 
     padding: .5rem 1rem;
     border: 1px solid darken($color, 20%);
-    border-radius: 2px;
+    border-radius: $border-radius;
     background: $color;
     cursor: pointer;
     text-align: center;
 
     @include contrastText($color);
+    @include btn-link($color);
 
     &:focus {
         @include global-focus;
@@ -54,6 +66,7 @@
         background: $color;
 
         @include contrastText($color);
+        @include btn-link($color);
 
         &:active {
             $color: darken($color, 5%);

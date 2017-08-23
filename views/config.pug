@@ -4,10 +4,8 @@ block append scripts
     script(src="/js/config.js")
 
 block content
-    if config
-        h2 Configuration of ID #{id}
-    else
-        h2 Setup of ID #{id}
+    h2 #{plugin} #{config ? '@ ' + config.room : ''} 
+        small.text-muted ID #{id}
 
     if !formdata
         - formdata = {};

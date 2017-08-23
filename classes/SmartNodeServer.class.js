@@ -162,8 +162,6 @@ module.exports = class SmartNodeServer {
     }
 
     updateClient(id, data) {
-        console.log('update client', id, data);
-
         if (data.config) {
             let savedClients = this.storage.get('clients');
             savedClients[id].config = data.config;
@@ -173,12 +171,16 @@ module.exports = class SmartNodeServer {
         return Object.assign(this.clients[id], data);
     }
 
-    updateClientBySocket(id, data) {
+    updateClientBySocketId(id, data) {
         return this.updateClient(this.getClientBySocketId(id).id, data);
     }
 
     removeClient(id) {
         return delete this.clients[id];
+    }
+
+    removeClientBySocketId(id) {
+        return this.removeClient(this.getClientBySocketId(id).id);
     }
 
     deleteClient(id) {
@@ -205,7 +207,7 @@ module.exports = class SmartNodeServer {
 
         await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e) });
 
-        this.updateClientBySocket(id, { loaded: true });
+        this.updateClientBySocketId(id, { loaded: true });
     }
 
     /**
@@ -237,7 +239,7 @@ module.exports = class SmartNodeServer {
             process.exit(1);
         }
 
-        this.updateClientBySocket(id, { unload: plugin.unload });
+        this.updateClientBySocketId(id, { unload: plugin.unload });
 
         plugin.load();
 
@@ -252,11 +254,11 @@ module.exports = class SmartNodeServer {
      * @param  {string} id client ID
      */
     unloadServerPlugin(id) {
-        let client = this.getClientById(id);
+        let client = this.getClientBySocketId(id);
         global.warn('Unloaded plugin for client', id);
 
         if (client.loaded) client.unload();
-        this.removeClient(id);
+        this.removeClientBySocketId(id);
     }
 
     /**
@@ -281,8 +283,6 @@ module.exports = class SmartNodeServer {
         let errors = [];
 
         config = utils.object2pathlist(config);
-
-        console.log('check if config valid', config);
 
         parse(config, format);
 

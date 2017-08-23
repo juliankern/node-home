@@ -16,7 +16,7 @@
         @extend .table;
 
         tr {
-            border-bottom: 1px solid color(default);
+            border-bottom: 1px solid gray(400);
 
             &:last-child {
                 border: 0;
@@ -24,7 +24,7 @@
         }
 
         thead {
-            border-bottom: 1px solid darken(color(default), 10%);
+            border-bottom: 1px solid darken(gray(400), 10%);
         }
     }
 }

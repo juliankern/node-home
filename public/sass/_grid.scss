@@ -13,7 +13,7 @@
 
 .grid {
     display: grid;
-    grid-gap: 1rem;
+    grid-gap: $grid-gutter-width;
     padding: 1rem 0;
     justify-items: stretch;
     width: 100%;

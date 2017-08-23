@@ -15,7 +15,6 @@ module.exports = (SmartNodeServer) => {
             let clients = SmartNodeServer.storage.get('clients');
 
             if (!id || !clients[id]) {
-                console.log('register first');
                 let clientId = utils.findClientId(clients);
 
                 SmartNodeServer.registerClient({ 
@@ -27,12 +26,13 @@ module.exports = (SmartNodeServer) => {
 
                 cb({ id: clientId });
             } else {
+
                 SmartNodeServer.connectClient(Object.assign({ 
                     id,
                     socket,
                     plugin,
                     configurationFormat
-                }, { config: clients[id] }));
+                }, { config: clients[id].config }));
 
                 let client = SmartNodeServer.getClientById(id);
 
@@ -44,8 +44,6 @@ module.exports = (SmartNodeServer) => {
             let clientData = SmartNodeServer.storage.get('clients')[id];
             let configuration = clientData.config;
             let configurationFormat = clientData.configurationFormat;
-
-            console.log('!!configuration', !!configuration, !SmartNodeServer.validConfiguration(configuration, configurationFormat))
 
             // check if configuration already exists and if its valid
             if (configuration && !SmartNodeServer.validConfiguration(configuration, configurationFormat)) {
@@ -75,7 +73,6 @@ module.exports = (SmartNodeServer) => {
         };
 
         socketEventHandlers.pluginloaded = async () => {
-            global.log('got "pluginloaded"');
             SmartNodeServer.clientPluginLoaded(socket.client.id, true)
                 .catch((e) => { global.error('Server load plugin error (4)', e) });;
         };

@@ -1,27 +1,27 @@
 extends ../templates/layout
 
 block content
-    h2 Hello World!
+    h2 Dashboard
 
-    h3 Connected clients: #{Object.keys(clients).length}
-    each c, id in clients
-        div.client
-            ul 
-                li.client--id ID: #{c.id}
-                li.client--module Plugin: #{c.plugin}
+    p Connected clients: #{Object.keys(clients).length}
+    .flex-grid__3
+        each c, id in clients
+            .client.card.flex--item
+                .card-body
+                    h4.card-title #{c.plugin} #{c.config ? '@ ' + c.config.room : ''}
+                    ul.list-unstyled
+                        li.client--id ID: #{c.id}
 
-            if c.config
-                ul
-                    li.client--room Room: #{c.config.room}
-            else
-                p Client isn't configured yet. Please do this in order to use the client.
+                        if c.displayData
+                            each d, key in c.displayData
+                                li(class="client--" + d.data.type)= d.data.description + ': ' + d.data.value
 
-            a(href="/config/" + c.id) Configure
-
-            if c.displayData
-                ul
-                    each d, key in c.displayData
-                        li(class="client--" + d.data.type)= d.data.description + ': ' + d.data.value
-                        //- != JSON.stringify(d)
-    else
-        p No clients connected yet
+                    //- != JSON.stringify(c.config)
+                    
+                    if !c.config
+                        p Client isn't configured yet. Please set it up in order to use the client.
+                        a(href="/config/" + c.id).btn__primary Setup
+                    else
+                        a(href="/config/" + c.id).btn__primary Configure
+        else
+            p No clients connected yet
