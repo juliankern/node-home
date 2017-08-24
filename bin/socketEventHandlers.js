@@ -10,9 +10,10 @@ module.exports = (SmartNodeServer) => {
         const socketEventHandlers = {};
 
         socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id}, cb) => {
-            global.muted('Client connected with ID:', id);
+            global.muted(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
             let clients = SmartNodeServer.storage.get('clients');
+
 
             if (!id || !clients[id]) {
                 let clientId = utils.findClientId(clients);

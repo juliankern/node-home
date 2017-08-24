@@ -1,5 +1,15 @@
-.client--list {
-    .value {
-        float: right;
+.client {
+    height: 100%;
+    padding-bottom: 42px;
+
+    &--button {
+        position: absolute;
+        bottom: $card-spacer-x;
+    }
+
+    &--list {
+        .value {
+            float: right;
+        }
     }
 }

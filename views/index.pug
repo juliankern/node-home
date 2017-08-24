@@ -8,36 +8,37 @@ block content
         each c, id in clients
             - hasConfig = c.config && Object.keys(c.config).length;
 
-            .client.card.flex--item
-                .card-body
-                    h4.card-title #{c.displayName} #{hasConfig ? '@ ' + c.config.room : ''}
-                    ul.list-unstyled.client--list
-                        li.client--id ID:
-                            span.value= c.id
+            .flex--item
+                .client.card
+                    .card-body
+                        h4.card-title #{c.displayName} #{hasConfig ? '@ ' + c.config.room : ''}
+                        ul.list-unstyled.client--list
+                            li.client--id ID:
+                                span.value= c.id
+                            if !hasConfig
+                                li.client--plugin Plugin:
+                                    span.value= c.plugin
+
+                            if c.displayData
+                                each d, key in c.displayData
+                                    li(class="client--" + d.data.type)= d.data.description + ': '
+                                        if d.data.type === 'boolean'
+                                            span.value
+                                                label.form--switch
+                                                    input(type="checkbox", checked= d.data.value, disabled)
+                                                    span.form--slider.round
+                                        else if d.data.type === 'homekitpin'
+                                            .homekitpin
+                                                .pin= d.data.value
+                                        else
+                                            span.value= d.data.value
+
+                        //- != JSON.stringify(c.config)
+                        
                         if !hasConfig
-                            li.client--plugin Plugin:
-                                span.value= c.plugin
-
-                        if c.displayData
-                            each d, key in c.displayData
-                                li(class="client--" + d.data.type)= d.data.description + ': '
-                                    if d.data.type === 'boolean'
-                                        span.value
-                                            label.form--switch
-                                                input(type="checkbox", checked= d.data.value, disabled)
-                                                span.form--slider.round
-                                    else if d.data.type === 'homekitpin'
-                                        .homekitpin
-                                            .pin= d.data.value
-                                    else
-                                        span.value= d.data.value
-
-                    //- != JSON.stringify(c.config)
-                    
-                    if !hasConfig
-                        p Client isn't configured yet. Please set it up in order to use the client.
-                        a(href="/config/" + c.id).btn__primary Setup
-                    else
-                        a(href="/config/" + c.id).btn__primary Configure
+                            p Client isn't configured yet. Please set it up in order to use the client.
+                            a(href="/config/" + c.id).btn__primary.client--button Setup
+                        else
+                            a(href="/config/" + c.id).btn__primary.client--button Configure
         else
             p No clients connected yet

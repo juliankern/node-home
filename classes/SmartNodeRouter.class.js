@@ -58,10 +58,18 @@ module.exports = (SmartNodeServer) => {
                 });
             })
             .post((req, res) => {
+                let config = {};
                 let clients = SmartNodeServer.storage.get('clients');
                 let client = SmartNodeServer.getClientById(req.params.clientId);
                 let hasConfig = clients[req.params.clientId].config && Object.keys(clients[req.params.clientId].config).length;
-                let errors = SmartNodeServer.validConfiguration(req.body, client.configurationFormat);
+
+                for (let k in req.body) {
+                    if (k === 'room' || k === 'newroom') continue;
+                    utils.setValueByPath(config, k, req.body[k]);
+                }
+                
+                let errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
+                console.log('SAVE CONFIG', config);
 
                 if (errors) {
                     req.arrayFlash(errors, 'error');
@@ -75,15 +83,10 @@ module.exports = (SmartNodeServer) => {
                         req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
                         return res.redirect('/');
                     } else {
-                        let config = {};
                         let rooms = SmartNodeServer.storage.get('rooms') || [];
                         let room;
                         // no validation errors, save config and trigger onSetup
                         
-                        for (let k in req.body) {
-                            if (k === 'room' || k === 'newroom') continue;
-                            utils.setValueByPath(config, k, req.body[k]);
-                        }
 
                         if (req.body.room === '-1') {
                             config.room = req.body.newroom;

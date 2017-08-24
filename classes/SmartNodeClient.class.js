@@ -75,6 +75,7 @@ module.exports = class SmartNodeClient {
             this.adapter.storage.set('clientid', data.id);
 
             this.register();
+            callback({ id: clientId });
         });
     }
     
@@ -95,7 +96,7 @@ module.exports = class SmartNodeClient {
 
             this.adapter.plugin = this.pluginName;
 
-            if (data && data.config) {
+            if (data && data.config && Object.keys(data.config).length) {
                 this.adapter.config = data.config;
                 this._loadPlugin();
                 global.muted('Setup already done, loading plugin...');
@@ -131,6 +132,26 @@ module.exports = class SmartNodeClient {
         } catch(e) {
             global.error(`Could not load plugin "${this.pluginName}" - you probably need to install it via "npm install ${this.pluginName}" first!`);
             global.muted('Debug', e);
+            process.exit(1);
+        }
+
+        if (!('init' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "init()"-function on the client side. Please contact the author!`);
+            process.exit(1);
+        }
+
+        if (!('load' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "load()"-function on the client side. Please contact the author!`);
+            process.exit(1);
+        }
+
+        if (!('unload' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "unload()"-function on the client side. Please contact the author!`);
+            process.exit(1);
+        }
+
+        if (!('unpair' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "unpair()"-function on the client side. Please contact the author!`);
             process.exit(1);
         }
 

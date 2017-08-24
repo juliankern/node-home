@@ -52,7 +52,7 @@ module.exports = class SmartNodeServer {
         this.io.on('connection', (socket) => {
             global.log('Client connected:', socket.client.id);
 
-            let connectionId = Connector.register(socket);
+            let connectionId = Connector.register(socket); 
 
             if (connectionId === false) {
                 global.log('ERROR! Failed to register connection for new Client', socket.client.id);
@@ -247,6 +247,21 @@ module.exports = class SmartNodeServer {
             process.exit(1);
         }
 
+        if (!('load' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "load()"-function on the server side. Please contact the author!`);
+            process.exit(1);
+        }
+
+        if (!('unload' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "unload()"-function on the server side. Please contact the author!`);
+            process.exit(1);
+        }
+
+        if (!('unpair' in plugin)) {
+            global.error(`Plugin "${adapter.plugin}" does not provide a "unpair()"-function on the server side. Please contact the author!`);
+            process.exit(1);
+        }
+
         this.updateClientBySocketId(id, { 
             unload: plugin.unload,
             unpair: plugin.unpair
@@ -334,8 +349,9 @@ module.exports = class SmartNodeServer {
 
                 // check if required properties are set
                 if (
-                    (format[k].type !== 'number' && format[k].required && !config[parentkey ? parentkey+k : k]) ||
-                    (format[k].type === 'number' && format[k].required && config[parentkey ? parentkey+k : k] === '')
+                    (format[k].type === 'number' && format[k].required && config[parentkey ? parentkey+k : k] === '') ||
+                    (format[k].type === 'array' && format[k].required && !config[(parentkey ? parentkey+k : k) + '.0']) ||
+                    (format[k].type !== 'number' && format[k].type !== 'array' && format[k].required && !config[parentkey ? parentkey+k : k])
                 ) {
                     errors.push({ fields: [parentkey ? parentkey+k : k],  message: `The required field "${format[k].description}" isn't set!` });
                     break;

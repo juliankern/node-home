@@ -38,11 +38,14 @@ block content
                         select(name= key, class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
                             each opt in prop.values
                                 option(value= opt, selected= formdata[key] ? formdata[key] === opt : hasConfig ? config[key] === opt : prop.default ? prop.default === opt : false)= opt
+                    if prop.type === 'array'
+                        each val, index in (new Array(prop.length))
+                            input(name= key + '['+index+']', type="text", value= formdata[key] ? formdata[key][index] : hasConfig ? config[key][index] : prop.default ? prop.default[index] : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
 
                     if prop.type === 'object'
                         each subprop, subkey in prop.properties
                             .form--field--sub
-                                label= subprop.description
+                                label= subprop.description || subkey
 
                                 if subprop.type === 'number'
                                     input(name= key +'.'+ subkey, type="number", value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : hasConfig && config[key] ? config[key][subkey] : subprop.default ? subprop.default : "", class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
@@ -52,6 +55,9 @@ block content
                                     select(name= key +'.'+ subkey, class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
                                         each opt in subprop.values
                                             option(value= opt, selected= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] === opt : hasConfig && config[key] ? config[key][subkey] === opt : subprop.default ? subprop.default === opt : false)= opt
+                                if subprop.type === 'array'
+                                    each val, index in (new Array(subprop.length))
+                                        input(name= key +'.'+ subkey + '['+index+']', type="text", value= formdata[key+'.'+subkey] ? formdata[key][subkey][index] : hasConfig ? config[key][subkey][index] : subprop.default ? subprop.default[index] : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
 
         button(type="submit").btn__primary= hasConfig ? 'Update Configuration' : 'Complete Setup'
     

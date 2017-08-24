@@ -37,11 +37,20 @@ function getValueByPath(obj, path) {
 }
 
 function setValueByPath(obj, path, value) {
+    let arrayMatch, currPath;
     for (var i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
+        currPath = path[i];
         if (!curr) break;
-        if (!curr[path[i]]) curr[path[i]] = {};
-        if (i === path.length - 1) { curr[path[i]] = value; break; }
-        curr = curr[path[i]];
+        
+        if (arrayMatch = path[i].match(/\[(\d)+\]/)) {
+            currPath = path[i].replace(/\[(\d)+\]/, '');
+            if (!curr[currPath]) curr[currPath] = [];
+            curr[currPath][arrayMatch[1]] = value; 
+        } else {
+            if (!curr[path[i]]) curr[path[i]] = {};
+            if (i === path.length - 1) { curr[path[i]] = value; break; }
+            curr = curr[path[i]];
+        } 
     }   
 
     return obj;

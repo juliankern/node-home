@@ -275,7 +275,7 @@ main,
   overflow: hidden; }
 
 .homekitpin {
-  margin: 10px 0;
+  margin-top: 10px;
   border: 1px solid #adb5bd;
   border-radius: 5px;
   padding: 10px;
@@ -410,44 +410,46 @@ main,
   display: flex; }
   .flex--item {
     flex: 1 1 auto; }
-  .flex-grid .flex--item, .flex-grid__1 .flex--item, .flex-grid__2 .flex--item, .flex-grid__3 .flex--item, .flex-grid__4 .flex--item, .flex-grid__5 .flex--item, .flex-grid__6 .flex--item, .flex-grid__7 .flex--item, .flex-grid__8 .flex--item, .flex-grid__9 .flex--item, .flex-grid__10 .flex--item, .flex-grid__11 .flex--item, .flex-grid__12 .flex--item {
-    padding: .5rem; }
-  .flex-grid__1 .flex--item {
-    flex-basis: 100%;
-    max-width: 100%; }
-  .flex-grid__2 .flex--item {
-    flex-basis: 50%;
-    max-width: 50%; }
-  .flex-grid__3 .flex--item {
-    flex-basis: 33.33333%;
-    max-width: 33.33333%; }
-  .flex-grid__4 .flex--item {
-    flex-basis: 25%;
-    max-width: 25%; }
-  .flex-grid__5 .flex--item {
-    flex-basis: 20%;
-    max-width: 20%; }
-  .flex-grid__6 .flex--item {
-    flex-basis: 16.66667%;
-    max-width: 16.66667%; }
-  .flex-grid__7 .flex--item {
-    flex-basis: 14.28571%;
-    max-width: 14.28571%; }
-  .flex-grid__8 .flex--item {
-    flex-basis: 12.5%;
-    max-width: 12.5%; }
-  .flex-grid__9 .flex--item {
-    flex-basis: 11.11111%;
-    max-width: 11.11111%; }
-  .flex-grid__10 .flex--item {
-    flex-basis: 10%;
-    max-width: 10%; }
-  .flex-grid__11 .flex--item {
-    flex-basis: 9.09091%;
-    max-width: 9.09091%; }
-  .flex-grid__12 .flex--item {
-    flex-basis: 8.33333%;
-    max-width: 8.33333%; }
+  .flex-grid, .flex-grid__1, .flex-grid__2, .flex-grid__3, .flex-grid__4, .flex-grid__5, .flex-grid__6, .flex-grid__7, .flex-grid__8, .flex-grid__9, .flex-grid__10, .flex-grid__11, .flex-grid__12 {
+    margin: 0 -.5rem; }
+    .flex-grid .flex--item, .flex-grid__1 .flex--item, .flex-grid__2 .flex--item, .flex-grid__3 .flex--item, .flex-grid__4 .flex--item, .flex-grid__5 .flex--item, .flex-grid__6 .flex--item, .flex-grid__7 .flex--item, .flex-grid__8 .flex--item, .flex-grid__9 .flex--item, .flex-grid__10 .flex--item, .flex-grid__11 .flex--item, .flex-grid__12 .flex--item {
+      padding: .5rem; }
+    .flex-grid__1 .flex--item {
+      flex-basis: 100%;
+      max-width: 100%; }
+    .flex-grid__2 .flex--item {
+      flex-basis: 50%;
+      max-width: 50%; }
+    .flex-grid__3 .flex--item {
+      flex-basis: 33.33333%;
+      max-width: 33.33333%; }
+    .flex-grid__4 .flex--item {
+      flex-basis: 25%;
+      max-width: 25%; }
+    .flex-grid__5 .flex--item {
+      flex-basis: 20%;
+      max-width: 20%; }
+    .flex-grid__6 .flex--item {
+      flex-basis: 16.66667%;
+      max-width: 16.66667%; }
+    .flex-grid__7 .flex--item {
+      flex-basis: 14.28571%;
+      max-width: 14.28571%; }
+    .flex-grid__8 .flex--item {
+      flex-basis: 12.5%;
+      max-width: 12.5%; }
+    .flex-grid__9 .flex--item {
+      flex-basis: 11.11111%;
+      max-width: 11.11111%; }
+    .flex-grid__10 .flex--item {
+      flex-basis: 10%;
+      max-width: 10%; }
+    .flex-grid__11 .flex--item {
+      flex-basis: 9.09091%;
+      max-width: 9.09091%; }
+    .flex-grid__12 .flex--item {
+      flex-basis: 8.33333%;
+      max-width: 8.33333%; }
 
 .form--field, .form--field--sub {
   padding: .5rem 0; }
@@ -864,5 +866,11 @@ mark,
   .blockquote-footer::before {
     content: "\2014 \00A0"; }
 
-.client--list .value {
-  float: right; }
+.client {
+  height: 100%;
+  padding-bottom: 42px; }
+  .client--button {
+    position: absolute;
+    bottom: 1.25rem; }
+  .client--list .value {
+    float: right; }
