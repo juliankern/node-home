@@ -67,12 +67,12 @@ module.exports = (SmartNodeServer) => {
                     req.arrayFlash(errors, 'error');
                 } else {
                     if ('reset' in req.body) {
-                        console.log('RESET PRESSED!!!');
                         client.socket.emit('unpair');
-                        SmartNodeServer.removeClient(req.params.clientId);
+                        SmartNodeServer.unpairClient(req.params.clientId);
                         delete clients[req.params.clientId];
                         SmartNodeServer.storage.set('clients', clients);
                         
+                        req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
                         return res.redirect('/');
                     } else {
                         let config = {};

@@ -2,13 +2,13 @@ if messages.error.length > 0
     - hasErrors = true
     .msg.msg-error
         strong Error
-        ul
+        ul.list-unstyled
             each msg in messages.error
                 li!= msg.message
 
 if messages.success.length > 0
     .msg.msg-success
         strong Erfolg
-        ul
+        ul.list-unstyled
             each msg in messages.success
                 li!= msg.message

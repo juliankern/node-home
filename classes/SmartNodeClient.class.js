@@ -48,9 +48,9 @@ module.exports = class SmartNodeClient {
 
         this.socket = socketio(`http://${address}:${this.service.port}`);
         
-        this.socket.on('connect', async () => { await this.onConnect(); });
-        this.socket.on('unpair', async () => { await this.onUnpair(); });
-        this.socket.on('disconnect', async () => { await this.onDisconnect(); });
+        this.socket.on('connect', this.onConnect.bind(this));
+        this.socket.on('unpair', this.onUnpair.bind(this));
+        this.socket.on('disconnect', this.onDisconnect.bind(this));
     }
 
     async onConnect() {
@@ -100,7 +100,7 @@ module.exports = class SmartNodeClient {
                 this._loadPlugin();
                 global.muted('Setup already done, loading plugin...');
             } else {
-                this.socket.on('setup', (data, cb) => { this.onSetup(data, cb); });
+                this.socket.on('setup', this.onSetup.bind(this));
                 global.muted('Waiting for setup to complete...');
             }
         });

@@ -80,8 +80,8 @@ module.exports = class SmartNodeServer {
     }
 
     close(callback) {
+        let client;
         this.io.close();
-
 
         if(this.bonjour.published) {
             this.bonjour.published = false;
@@ -89,14 +89,18 @@ module.exports = class SmartNodeServer {
                 global.warn('Bonjour service unpublished!');
 
                 this.getClientIdList().forEach((id) => { 
-                    if (this.getClientById(id).loaded) this.unloadServerPlugin(id); 
+                    client = this.getClientById(id);
+                    console.log('close if called', id, client);
+                    if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
                 });
 
                 callback();
             });
         } else {
             this.getClientIdList().forEach((id) => { 
-                if (this.getClientById(id).loaded) this.unloadServerPlugin(id); 
+                client = this.getClientById(id);
+                console.log('close else called', id, client);
+                if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
             });
 
             callback();
@@ -189,6 +193,10 @@ module.exports = class SmartNodeServer {
         this.storage.set('clients', savedClients);
     }
 
+    unpairClient(id) {
+        return this.getClientById(id).unpair();
+    }
+
     /**
      * checks if the client plugin is already loaded, and loads it if neccessary
      *
@@ -239,7 +247,10 @@ module.exports = class SmartNodeServer {
             process.exit(1);
         }
 
-        this.updateClientBySocketId(id, { unload: plugin.unload });
+        this.updateClientBySocketId(id, { 
+            unload: plugin.unload,
+            unpair: plugin.unpair
+        });
 
         plugin.load();
 
@@ -255,7 +266,9 @@ module.exports = class SmartNodeServer {
      */
     unloadServerPlugin(id) {
         let client = this.getClientBySocketId(id);
-        global.warn('Unloaded plugin for client', id);
+        if (!client) client = this.getClientById(id);
+
+        global.warn('Unloaded plugin for client:', client.id);
 
         if (client.loaded) client.unload();
         this.removeClientBySocketId(id);
