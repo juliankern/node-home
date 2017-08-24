@@ -17,11 +17,17 @@ const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector
 const ServerClientConnector = new SmartNodeServerClientConnector();
 const SmartNodeServer = new (global.req('classes/Server.class.js'))();
 
+const SmartNodeSwissArmyKnife = new ((global.req('classes/SmartNodeSwissArmyKnife.class.js'))(global))();
+
 const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
 //////////////////////////////////////////////////////////
 
-SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web}, ServerClientConnector, socketEventHandlers)
+global.log('SmartNodeSwissArmyKnife', SmartNodeSwissArmyKnife);
+
+SmartNodeServer
+    .useSwissArmyKnife(SmartNodeSwissArmyKnife)
+    .init({ port: cliOptions.port, web: cliOptions.web}, ServerClientConnector, socketEventHandlers)
     .catch((e) => { global.error('Server init error', e) });
 
 //////////////////////////////////////////////////////////
