@@ -1,7 +1,7 @@
 // const EventEmitter = require('events');
 const utils = global.req('util');
 
-const SmartNodeClient = global.req('classes/SmartNodeClient.class');
+const SmartNodeClient = global.req('classes/Client.class');
 
 module.exports = (SmartNodeServer) => {
     // return class SmartNodeRouter extends EventEmitter {
