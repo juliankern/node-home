@@ -5,7 +5,7 @@ const socketio = require('socket.io-client');
 
 const storage = require('node-persist');
 
-const SmartNodePlugin = global.req('classes/SmartNodePlugin.class.js');
+const SmartNodePlugin = global.req('classes/Plugin.class');
 
 module.exports = class SmartNodeClient {
     /**

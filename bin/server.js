@@ -13,9 +13,9 @@ const cliOptions = cli.parse({
 
 //////////////////////////////////////////////////////////
 
-const SmartNodeServerClientConnector = global.req('classes/SmartNodeServerClientConnector.class.js')();
+const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js')();
 const ServerClientConnector = new SmartNodeServerClientConnector();
-const SmartNodeServer = new (global.req('classes/SmartNodeServer.class.js'))();
+const SmartNodeServer = new (global.req('classes/Server.class.js'))();
 
 const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 

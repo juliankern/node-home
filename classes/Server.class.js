@@ -11,8 +11,8 @@ storage.initSync({
     expiredInterval: 24 * 60 * 60 * 1000
 });
 
-const SmartNodePlugin = global.req('classes/SmartNodePlugin.class.js');
-const SmartNodeRouter = global.req('classes/SmartNodeRouter.class.js');
+const SmartNodePlugin = global.req('classes/Plugin.class');
+const SmartNodeRouter = global.req('classes/Router.class');
 
 module.exports = class SmartNodeServer {
     /**

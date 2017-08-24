@@ -14,7 +14,7 @@ if (!options.plugin) {
 
 //////////////////////////////////////////////////////////
 
-const SmartNodeClient = global.req('classes/SmartNodeClient.class');
+const SmartNodeClient = global.req('classes/Client.class');
 const client = new SmartNodeClient(options.plugin);
 
 //////////////////////////////////////////////////////////
