@@ -13,6 +13,7 @@ storage.initSync({
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
 const SmartNodeRouter = global.req('classes/Router.class');
+const ServerStorage = global.req('classes/Storage.class').Server;
 
 module.exports = class SmartNodeServer {
     /**
@@ -24,10 +25,7 @@ module.exports = class SmartNodeServer {
         this.app = express();
         this.io = socketio({});
         this.bonjour = bonjour();
-        this.storage = storage;
-
-        this.storage.get = this.storage.getItemSync;
-        this.storage.set = this.storage.setItemSync;
+        this.storage = new ServerStorage();
 
         if (!this.storage.get('clients')) this.storage.set('clients', {});
 

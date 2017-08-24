@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const utils = global.req('util');
 
+const Storage = global.req('classes/Storage.class');
+
 /**
  * SmartNodeServerPlugin class      
  *
@@ -36,7 +38,7 @@ module.exports = {
                     room: []
                 };
 
-                this.init();
+                this.init(); 
                 
                 this.displayData = [];
             }
@@ -47,14 +49,7 @@ module.exports = {
 
                     SmartNodeServer.globalsInitRoom(this.room);
                     
-                    this.storage = {
-                        get: (key) => {
-                            return SmartNodeServer.storage.getItemSync(`${this.config.room}.${this.config.plugin}.${key}`);
-                        },
-                        set: (key, value) => {
-                            return SmartNodeServer.storage.setItemSync(`${this.config.room}.${this.config.plugin}.${key}`, value);
-                        }
-                    };
+                    this.storage = new Storage.Server({ room: this.room, plugin: this.plugin });
                 }
             }
 
@@ -178,14 +173,7 @@ module.exports = {
 
                 this.loaded = false;
 
-                this.storage = {
-                    get: (key) => {
-                        return SmartNodeClient.storage.getItemSync(`${key}`);
-                    },
-                    set: (key, value) => {
-                        return SmartNodeClient.storage.setItemSync(`${key}`, value);
-                    }
-                };
+                this.storage = SmartNodeClient.storage;
             }
         }
     }

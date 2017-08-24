@@ -3,8 +3,7 @@ const moment = require('moment');
 const bonjour = require('bonjour');
 const socketio = require('socket.io-client');
 
-const storage = require('node-persist');
-
+const ClientStorage = global.req('classes/Storage.class').Client;
 const SmartNodePlugin = global.req('classes/Plugin.class');
 
 module.exports = class SmartNodeClient {
@@ -15,10 +14,10 @@ module.exports = class SmartNodeClient {
      */
     constructor(pluginName) {
         this.bonjour = bonjour();
-        this.storage = storage;
-        this.storage.initSync({ dir: `storage/client/${pluginName}` });
-
         this.pluginName = pluginName;
+        console.log('new SmartNodeClient:', pluginName);
+        this.storage = new ClientStorage(this.pluginName);
+
         this.adapter = {};
         this.socket = {};
         this.service = {};
