@@ -247,18 +247,13 @@ module.exports = class SmartNodeServer {
             process.exit(1);
         }
 
-        if (!('load' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "load()"-function on the server side. Please contact the author!`);
-            process.exit(1);
-        }
+        let functionError;
+        if (!('load' in plugin)) { functionError = "load"; }
+        if (!('unload' in plugin)) { functionError = "unload"; }
+        if (!('unpair' in plugin)) { functionError = "unpair"; }
 
-        if (!('unload' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "unload()"-function on the server side. Please contact the author!`);
-            process.exit(1);
-        }
-
-        if (!('unpair' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "unpair()"-function on the server side. Please contact the author!`);
+        if (functionError) {
+            throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the server side. Please contact the author!`;
             process.exit(1);
         }
 

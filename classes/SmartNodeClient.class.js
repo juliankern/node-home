@@ -135,23 +135,14 @@ module.exports = class SmartNodeClient {
             process.exit(1);
         }
 
-        if (!('init' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "init()"-function on the client side. Please contact the author!`);
-            process.exit(1);
-        }
+        let functionError;
+        if (!('init' in plugin)) { functionError = "init"; }
+        if (!('load' in plugin)) { functionError = "load"; }
+        if (!('unload' in plugin)) { functionError = "unload"; }
+        if (!('unpair' in plugin)) { functionError = "unpair"; }
 
-        if (!('load' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "load()"-function on the client side. Please contact the author!`);
-            process.exit(1);
-        }
-
-        if (!('unload' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "unload()"-function on the client side. Please contact the author!`);
-            process.exit(1);
-        }
-
-        if (!('unpair' in plugin)) {
-            global.error(`Plugin "${adapter.plugin}" does not provide a "unpair()"-function on the client side. Please contact the author!`);
+        if (functionError) {
+            throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the client side. Please contact the author!`;
             process.exit(1);
         }
 
