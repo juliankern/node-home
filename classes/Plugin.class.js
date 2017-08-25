@@ -58,11 +58,11 @@ module.exports = {
             }
 
             updateDisplayData(key, data) {
-                Object.assign(this.displayData.find((d) => { return d.key === key; }).data, data);
+                Object.assign(this.displayData.find((d) => d.key === key).data, data);
             }
 
             removeDisplayData(key) {
-                delete this.displayData.find((d) => { return d.key === key; });
+                delete this.displayData.find((d) => d.key === key);
             }
 
 
@@ -71,7 +71,7 @@ module.exports = {
             }
 
             getDisplayData(key) {
-                return this.displayData.filter((d) => { return d.key === key; });
+                return this.displayData.filter((d) => d.key === key);
             }
 
             /**

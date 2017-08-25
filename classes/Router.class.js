@@ -48,7 +48,11 @@ module.exports = (SmartNodeServer) => {
             .get((req, res) => {
                 let client = SmartNodeServer.getClientById(req.params.clientId);
 
-                res.render('config', {
+                if (!client) {
+                    return res.redirect('/'); 
+                }
+
+                return res.render('config', {
                     config: client.config,
                     plugin: client.plugin,
                     id: client.id,
