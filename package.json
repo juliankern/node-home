@@ -40,7 +40,6 @@
     "connect-flash": "^0.1.1",
     "express": "^4.15.4",
     "express-session": "^1.15.5",
-    "homekit": "0.0.3",
     "moment": "^2.18.1",
     "node-persist": "^2.1.0",
     "node-sass": "^4.5.3",
@@ -50,5 +49,8 @@
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
     "socket.io": "^2.0.3"
+  },
+  "optionalDependencies": {
+    "homekit": "0.0.3"
   }
 }
