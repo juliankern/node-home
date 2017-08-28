@@ -1,13 +1,15 @@
 const storage = require('node-persist');
 
-module.exports = {
+const tmpStore = require('node-persist');
+tmpStore.initSync({ dir: 'storage/server' });
+
+const fallbackStorage = {
     Server: class ServerStorage  {
         constructor({ room, plugin } = {}) {
             this._room = room;
             this._plugin = plugin;
             this._storage = storage;
             this._storage.initSync({ dir: 'storage/server' });
-            console.log('construct server storage', room, plugin);
         }
         
         get(key) {
@@ -22,7 +24,6 @@ module.exports = {
         constructor(pluginName) {
             this._storage = storage;
             this._storage.initSync({ dir: `storage/client/${pluginName}` });
-            console.log('construct client storage', pluginName);
         }
         
         get(key) {
@@ -34,3 +35,42 @@ module.exports = {
         }
     }
 }
+
+let pluginName = tmpStore.getItemSync('plugins.storage')[0];
+let plugin;
+
+if (pluginName) {
+    try {
+        plugin = require(pluginName.name);
+    } catch(e) {
+        global.warn(`Cannot load storage plugin "${pluginName.name}". Falling back to node-persist.`);
+    }
+    
+    if (plugin) {
+        if(!('Client' in plugin)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a "Client" part. Please contact the author.`)
+        }
+        
+        if(!('Server' in plugin)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a "Server" part. Please contact the author.`)
+        }
+        
+        if(!('get' in plugin.Client)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part. Please contact the author.`)
+        }
+        
+        if(!('get' in plugin.Server)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part. Please contact the author.`)
+        }
+        
+        if(!('set' in plugin.Client)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part. Please contact the author.`)
+        }
+        
+        if(!('set' in plugin.Server)) {
+            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part. Please contact the author.`)
+        }
+    }
+}
+
+module.exports = plugin || fallbackStorage;

@@ -4,7 +4,7 @@ const pkg = global.req('package.json');
 
 const cli = require('cli');
 cli.enable('version');
-cli.setApp(pkg.name, pkg.version);
+cli.setApp('bin/client.js', pkg.version);
 const options = cli.parse({ plugin: [ 'p', 'The plugin which should be used', 'string', false ] });
 
 if (!options.plugin) {

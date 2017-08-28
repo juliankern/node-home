@@ -4,7 +4,7 @@ const pkg = global.req('package.json');
 
 const cli = require('cli');
 cli.enable('version');
-cli.setApp(pkg.name, pkg.version);
+cli.setApp('bin/server.js', pkg.version);
 
 const cliOptions = cli.parse({ 
     port: [ 'p', 'Websocket port to use instead of autodiscover', 'int', null ],
