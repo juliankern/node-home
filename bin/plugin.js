@@ -2,7 +2,7 @@ require('../util/global.js');
 
 const pkg = global.req('package.json');
 const storage = require('node-persist');
-storage.initSync({ dir: 'storage/server' });
+storage.initSync({ dir: global.approot + 'storage/server' });
 
 const cli = require('cli');
 cli.enable('version');
@@ -12,7 +12,7 @@ let maxPlugins;
 
 const opt = cli.parse({ 
     register: [ 'r', 'Activate register mode', 'bool', false ],
-    unregister: [ 'un', 'Activate unregister mode', 'bool', false ],
+    unregister: [ 'u', 'Activate unregister mode', 'bool', false ],
     name: [ 'n', 'Name of the plugin to be registered', 'string', null ],
     type: [ 't', 'Type of the plugin to be registered', 'string', null ]
 });

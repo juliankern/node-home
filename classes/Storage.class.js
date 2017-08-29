@@ -36,7 +36,9 @@ const fallbackStorage = {
     }
 }
 
-let pluginName = tmpStore.getItemSync('plugins.storage')[0];
+let pluginName = tmpStore.getItemSync('plugins.storage');
+pluginName = pluginName ? pluginName[0] : undefined;
+
 let plugin;
 
 if (pluginName) {
@@ -55,19 +57,19 @@ if (pluginName) {
             throw global.error(`Plugin ${pluginName.name} is missing a "Server" part. Please contact the author.`)
         }
         
-        if(!('get' in plugin.Client)) {
+        if(!('get' in plugin.Client.prototype)) {
             throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part. Please contact the author.`)
         }
         
-        if(!('get' in plugin.Server)) {
+        if(!('get' in plugin.Server.prototype)) {
             throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part. Please contact the author.`)
         }
         
-        if(!('set' in plugin.Client)) {
+        if(!('set' in plugin.Client.prototype)) {
             throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part. Please contact the author.`)
         }
         
-        if(!('set' in plugin.Server)) {
+        if(!('set' in plugin.Server.prototype)) {
             throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part. Please contact the author.`)
         }
     }
