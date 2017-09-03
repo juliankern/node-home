@@ -38,8 +38,6 @@ module.exports = class SmartNodeServer {
         }
 
         this.connectedClients = new ConnectedClientRegistry(this.storage, this);
-
-        global.log('this.connectedClients', this.connectedClients);
     }
 
     getNewPlugin(data) {

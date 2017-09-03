@@ -94,7 +94,7 @@ module.exports = (SmartNodePlugin) => {
         unpairClient(clientId) {
             let connectedClient = this.getClientById(clientId);
 
-            global.log('ConnectedClientRegistry.unpairClient', clientId, connectedClient);
+            global.log('ConnectedClientRegistry.unpairClient', clientId);
             
             return (connectedClient && ('unpair' in connectedClient)) && connectedClient.unpair() || undefined;
         }
