@@ -40,6 +40,19 @@ module.exports = class SmartNodeServer {
         this.connectedClients = new ConnectedClientRegistry(this.storage, this);
     }
 
+    /**
+     * enables using the swiss army knife helper
+     * 
+     * @author  Dennis Sterzenbach <dennis.sterzenbach@gmail.com>
+     */
+    useSwissArmyKnife(sak) {
+        if (sak) {
+            this.swissarmyknife = sak;
+        }
+
+        return this;
+    }
+
     getNewPlugin(data) {
         return new (SmartNodePlugin.Server(this))(data);
     }
@@ -66,10 +79,13 @@ module.exports = class SmartNodeServer {
             } else {
                 let handlers = getEventHandlersForSocketFn(Connector, socket);
 
-                global.log('Registering handlers for', connectionId);
+                // required to only once check if we can make handler function calls exception safe
+                let safely = !!this.swissarmyknife ? doEnableSafeCall.bind(this) : doNotEnableSafeCall.bind(this);
+
+                global.log('Registering handlers for', connectionId, 'using SAK', !!this.swissarmyknife);
 
                 for (var [name, handler] of Object.entries(handlers)) {
-                    Connector.addHandler(connectionId, name, handler);
+                    Connector.addHandler(connectionId, name, safely(handler));
                 }
 
             }
@@ -83,6 +99,14 @@ module.exports = class SmartNodeServer {
             global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
             global.success(`Webserver running on port ${webport}`);
         });
+
+        function doEnableSafeCall(handler) {
+            return this.swissarmyknife.makeFailSafe(handler);
+        }
+
+        function doNotEnableSafeCall(handler) {
+            return handler;
+        }
     }
 
     close(callback) {
