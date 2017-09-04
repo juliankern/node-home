@@ -5,11 +5,6 @@ const express = require('express');
 const socketio = require('socket.io');
 
 const utils = global.req('util');
-const storage = require('node-persist');
-storage.initSync({ 
-    dir: 'storage/server',
-    expiredInterval: 24 * 60 * 60 * 1000
-});
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
 const SmartNodeRouter = global.req('classes/Router.class');
@@ -28,8 +23,6 @@ module.exports = class SmartNodeServer {
         this.io = socketio({});
         this.bonjour = bonjour();
         this.storage = new ServerStorage();
-
-        if (!this.storage.get('clients')) this.storage.set('clients', {});
 
         this.globals = {
             global: {}
@@ -212,10 +205,12 @@ module.exports = class SmartNodeServer {
         let client = this.getClientBySocketId(id);
         if (!client) client = this.getClientById(id);
 
-        global.warn('Unloaded plugin for client:', client.id);
+        global.warn('Unloaded plugin for client:', client ? client.id : null);
 
-        if (client.loaded) client.unload();
-        this.removeClientBySocketId(id);
+        if (client) {
+            if (client.loaded) client.unload();
+            this.removeClientBySocketId(id);
+        }
     }
 
     /**

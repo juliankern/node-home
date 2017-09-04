@@ -40,6 +40,10 @@ module.exports = class SmartNodeClient {
         });
     }
 
+    close() {
+        
+    }
+
     onFoundMaster() {
         let address = this.service.addresses[0].includes(':') ? this.service.addresses[1] : this.service.addresses[0];
 
@@ -58,7 +62,7 @@ module.exports = class SmartNodeClient {
             id: this.socket.id,
         });
 
-        let clientId = this.adapter.storage.get('clientid');
+        let clientId = await this.adapter.storage.get('clientid');
 
         global.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
 
@@ -70,10 +74,8 @@ module.exports = class SmartNodeClient {
             configurationFormat: pkg.configurationFormat,
             displayName:  pkg.displayName,
             id: clientId
-        }, (data) => {
-            this.adapter.storage.set('clientid', data.id);
-
-            this.register();
+        }, async (data) => {
+            await this.register();
             callback({ id: clientId });
         });
     }
@@ -87,9 +89,11 @@ module.exports = class SmartNodeClient {
         this.onFoundMaster();
     }
 
-    register() {
+    async register() {
+        let clientId = await this.adapter.storage.get('clientid');
+        console.log('emitting register with clientID:', clientId);
         this.socket.emit('register', { 
-            id: this.adapter.storage.get('clientid')
+            id: clientId
         }, (data) => {
             global.muted('Registered successfully!');
 

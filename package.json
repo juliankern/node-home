@@ -46,7 +46,6 @@
     "nodemon": "^1.11.0",
     "pug": "^2.0.0-rc.3",
     "randomstring": "^1.1.5",
-    "smartnode-mongoose": "file:../smartnode-mongoose",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
     "socket.io": "^2.0.3"

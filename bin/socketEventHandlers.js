@@ -9,11 +9,11 @@ module.exports = (SmartNodeServer) => {
     return function(SmartNodeServerClientConnector, socket) {
         const socketEventHandlers = {};
 
-        socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id}, cb) => {
+        socketEventHandlers.connected = ({ plugin, configurationFormat, displayName, id}, cb) => {
             global.muted(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
-            let clients = SmartNodeServer.storage.get('clients');
-
+            let clients = SmartNodeServer.getClientList();
+            console.log('clientlist', clients);
 
             if (!id || !clients[id]) {
                 let clientId = utils.findClientId(clients);
@@ -43,10 +43,10 @@ module.exports = (SmartNodeServer) => {
             }
         };
 
-        socketEventHandlers.register = async ({ id }, cb) => { 
-            let clientData = SmartNodeServer.storage.get('clients')[id];
-            let configuration = clientData.config;
-            let configurationFormat = clientData.configurationFormat;
+        socketEventHandlers.register = ({ id }, cb) => { 
+            let clientData = SmartNodeServer.getClientById(id); console.log('SmartNodeServer.getClientById(id)', id, SmartNodeServer.getClientById(id));
+            let configuration = clientData ? clientData.config : null;
+            let configurationFormat = clientData ? clientData.configurationFormat : null;
 
             // check if configuration already exists and if its valid
             if (configuration && !SmartNodeServer.validConfiguration(configuration, configurationFormat)) {

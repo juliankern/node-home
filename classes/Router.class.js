@@ -45,7 +45,7 @@ module.exports = (SmartNodeServer) => {
 
         configRoute(route) {
             route
-            .get((req, res) => {
+            .get(async (req, res) => {
                 let client = SmartNodeServer.getClientById(req.params.clientId);
 
                 if (!client) {
@@ -58,14 +58,14 @@ module.exports = (SmartNodeServer) => {
                     id: client.id,
                     displayName: client.displayName,
                     configurationFormat: client.configurationFormat,
-                    rooms: SmartNodeServer.storage.get('rooms')
+                    rooms: await SmartNodeServer.storage.get('rooms')
                 });
             })
-            .post((req, res) => {
+            .post(async (req, res) => {
                 let config = {};
-                let clients = SmartNodeServer.storage.get('clients');
+                let clients = await SmartNodeServer.storage.get('clients');
                 let client = SmartNodeServer.getClientById(req.params.clientId);
-                let hasConfig = clients[req.params.clientId].config && Object.keys(clients[req.params.clientId].config).length;
+                let hasConfig = client.config && Object.keys(client.config).length;
 
                 for (let k in req.body) {
                     if (k === 'room' || k === 'newroom') continue;
@@ -82,12 +82,12 @@ module.exports = (SmartNodeServer) => {
                         client.socket.emit('unpair');
                         SmartNodeServer.unpairClient(req.params.clientId);
                         delete clients[req.params.clientId];
-                        SmartNodeServer.storage.set('clients', clients);
+                        await SmartNodeServer.storage.set('clients', clients);
                         
                         req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
                         return res.redirect('/');
                     } else {
-                        let rooms = SmartNodeServer.storage.get('rooms') || [];
+                        let rooms = await SmartNodeServer.storage.get('rooms') || [];
                         let room;
                         // no validation errors, save config and trigger onSetup
                         
@@ -95,14 +95,14 @@ module.exports = (SmartNodeServer) => {
                         if (req.body.room === '-1') {
                             config.room = req.body.newroom;
                             rooms.push(config.room);
-                            SmartNodeServer.storage.set('rooms', rooms);
+                            await SmartNodeServer.storage.set('rooms', rooms);
                         } else {
                             config.room = req.body.room;
                         }
 
-                        clients[req.params.clientId].config = config;
+                        client.config = config;
 
-                        SmartNodeServer.storage.set('clients', clients);
+                        await SmartNodeServer.storage.set('clients', clients);
                         SmartNodeServer.updateClient(req.params.clientId, { config: config });
                         client.init();
 

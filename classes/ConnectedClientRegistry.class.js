@@ -7,8 +7,8 @@ module.exports = (SmartNodePlugin) => {
             this.clients = {};
         }
 
-        registerClient(data) {
-            let savedClients = this.storage.get('clients');
+        async registerClient(data) {
+            let savedClients = (await this.storage.get('clients')) || [];
 
             savedClients[data.id] = {
                 id: data.id,
@@ -22,7 +22,7 @@ module.exports = (SmartNodePlugin) => {
                 savedClients[data.id].config = data.config;
             }
 
-            this.storage.set('clients', savedClients);
+            await this.storage.set('clients', savedClients);
 
             this.connectClient(data);
 
@@ -57,11 +57,12 @@ module.exports = (SmartNodePlugin) => {
             }
         }
 
-        updateClient(id, data) {
+        async updateClient(id, data) {
             if (data.config) {
-                let savedClients = this.storage.get('clients');
+                let savedClients = await this.storage.get('clients');
+                console.log('updateCOnfig, saved clients:', savedClients);
                 savedClients[id].config = data.config;
-                this.storage.set('clients', savedClients);
+                await this.storage.set('clients', savedClients);
             }
 
             let client = this.getClientById(id);
@@ -73,8 +74,8 @@ module.exports = (SmartNodePlugin) => {
             return Object.assign(client, data);
         }
 
-        updateClientBySocketId(id, data) {
-            return this.updateClient(this.getClientBySocketId(id).id, data);
+        async updateClientBySocketId(id, data) {
+            return await this.updateClient(this.getClientBySocketId(id).id, data);
         }
 
         removeClient(id) {
@@ -85,10 +86,10 @@ module.exports = (SmartNodePlugin) => {
             return this.removeClient(this.getClientBySocketId(id).id);
         }
 
-        deleteClient(id) {
-            let savedClients = this.storage.get('clients');
+        async deleteClient(id) {
+            let savedClients = await this.storage.get('clients');
             delete savedClients[data.id];
-            this.storage.set('clients', savedClients);
+            await this.storage.set('clients', savedClients);
         }
 
         unpairClient(clientId) {

@@ -9,29 +9,29 @@ const fallbackStorage = {
             this._room = room;
             this._plugin = plugin;
             this._storage = storage;
-            this._storage.initSync({ dir: 'storage/server' });
+            this._storage.init({ dir: 'storage/server' });
         }
         
-        get(key) {
-            return this._storage.getItemSync([this._room, this._plugin, key].filter((e) => !!e).join('.'));
+        async get(key) {
+            return await this._storage.getItem([this._room, this._plugin, key].filter((e) => !!e).join('.'));
         }
         
-        set(key, value) {
-            return this._storage.setItemSync([this._room, this._plugin, key].filter((e) => !!e).join('.'), value);
+        async set(key, value) {
+            return await this._storage.setItem([this._room, this._plugin, key].filter((e) => !!e).join('.'), value);
         }
     },
     Client: class ClientStorage {
         constructor(pluginName) {
             this._storage = storage;
-            this._storage.initSync({ dir: `storage/client/${pluginName}` });
+            this._storage.init({ dir: `storage/client/${pluginName}` });
         }
         
-        get(key) {
-            return this._storage.getItemSync(`${key}`);
+        async get(key) {
+            return await this._storage.getItem(`${key}`);
         }
         
-        set(key, value) {
-            return this._storage.setItemSync(`${key}`, value);
+        async set(key, value) {
+            return await this._storage.setItem(`${key}`, value);
         }
     }
 }
@@ -46,6 +46,7 @@ if (pluginName) {
         plugin = require(pluginName.name);
     } catch(e) {
         global.warn(`Cannot load storage plugin "${pluginName.name}". Falling back to node-persist.`);
+        global.muted('Error:', e);
     }
     
     if (plugin) {
@@ -72,6 +73,8 @@ if (pluginName) {
         if(!('set' in plugin.Server.prototype)) {
             throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part. Please contact the author.`)
         }
+        
+        global.success(`Storage plugin "${pluginName.name}" successfully loaded.`)
     }
 }
 

@@ -1,8 +1,10 @@
 require('../util/global.js');
 
+const path = require('path');
 const pkg = global.req('package.json');
+
 const storage = require('node-persist');
-storage.initSync({ dir: global.approot + 'storage/server' });
+storage.initSync({ dir: path.normalize(global.approot + '/../..')  + '/storage/server' });
 
 const cli = require('cli');
 cli.enable('version');
@@ -54,6 +56,7 @@ if (opt.register) {
     
     registeredPlugins.push({ name: opt.name });
     storage.setItemSync('plugins.' + opt.type, registeredPlugins);
+    global.success(`Plugin '${opt.name}' successfully installed`);
 } 
 else if (opt.unregister) {
     if (registeredPlugins.length === 0) {
@@ -61,4 +64,5 @@ else if (opt.unregister) {
     }
     
     storage.setItemSync('plugins.' + opt.type, registeredPlugins.filter((e) => e.name !== opt.name));
+    global.success(`Plugin '${opt.name}' successfully uninstalled`);
 }

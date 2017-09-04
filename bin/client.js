@@ -20,3 +20,27 @@ const client = new SmartNodeClient(options.plugin);
 //////////////////////////////////////////////////////////
 
 client.init().catch((e) => { global.error('Client init error', e) });
+
+/////////////////////////////////////////////////////////
+
+/**
+ * exit handler for cleanup and stuff
+ *
+ * @author Julian Kern <mail@juliankern.com>
+ *
+ * @param  {object} err Holding the error messages
+ */
+function exitHandler(err) {
+    global.log('SmartNode client exiting...');
+
+    if (err) {
+        global.error('System error!', err);
+    }
+
+    client.close(process.exit);
+}
+
+//do something when app is closing
+process.on('exit', exitHandler);
+process.on('SIGINT', exitHandler);
+process.on('uncaughtException', exitHandler);
