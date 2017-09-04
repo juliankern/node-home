@@ -107,3 +107,7 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
     global.error('You need to upgrade to NodeJS 8 to run this application!');
     process.exit(1);
 }
+
+////////////////////////////////////////////////////////
+
+process.on('unhandledRejection', function (err) { global.error('Unhandeled rejection caught!'); throw err; })
