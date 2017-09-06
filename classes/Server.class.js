@@ -35,7 +35,7 @@ module.exports = class SmartNodeServer {
 
         this.globals = {
             global: {}
-        }
+        };
 
         this.connectedClients = new ConnectedClientRegistry(this.storage, this);
     }
@@ -96,7 +96,7 @@ module.exports = class SmartNodeServer {
 
                 this.getClientIdList().forEach((id) => { 
                     client = this.getClientById(id);
-                    console.log('close if called', id, client);
+                    global.log('close if called', id, client);
                     if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
                 });
 
@@ -105,7 +105,7 @@ module.exports = class SmartNodeServer {
         } else {
             this.getClientIdList().forEach((id) => { 
                 client = this.getClientById(id);
-                console.log('close else called', id, client);
+                global.log('close else called', id, client);
                 if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
             });
 
@@ -149,7 +149,7 @@ module.exports = class SmartNodeServer {
 
         global.success(`Client ${id} has loaded it's plugin: ${this.getClientBySocketId(id).plugin}`);
 
-        await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e) });
+        await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e); });
 
         this.updateClientBySocketId(id, { loaded: true });
     }
@@ -175,7 +175,7 @@ module.exports = class SmartNodeServer {
             // => hand over client id and useful functions
             plugin = await require(`${adapter.plugin}`)
                 .Server(adapter)
-                .catch((e) => { global.error('Server load plugin error', e) });
+                .catch((e) => { global.error('Server load plugin error', e); });
         } catch(e) {
             // nope, the plugin isn't installed on server side yet - die()
             global.error(`Plugin "${adapter.plugin}" not found - you need to install it via "npm install ${adapter.plugin}" first!`);
@@ -184,13 +184,12 @@ module.exports = class SmartNodeServer {
         }
 
         let functionError;
-        if (!('load' in plugin)) { functionError = "load"; }
-        if (!('unload' in plugin)) { functionError = "unload"; }
-        if (!('unpair' in plugin)) { functionError = "unpair"; }
+        if (!('load' in plugin)) { functionError = 'load'; }
+        if (!('unload' in plugin)) { functionError = 'unload'; }
+        if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
             throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the server side. Please contact the author!`;
-            process.exit(1);
         }
 
         this.updateClientBySocketId(id, { 
@@ -281,4 +280,4 @@ module.exports = class SmartNodeServer {
     validConfiguration(config, format) {
         return SmartNodeConfig.validConfiguration(config, format);
     }
-}
+};

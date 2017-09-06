@@ -27,7 +27,9 @@ Object.assign(global, {
      */
     success: (arg1, ...args) => {
         // custom success logger with fancy arrows and green color
+        /* eslint-disable no-console */
         console.log(chalk.bold.green('> ' + arg1), ...args);
+        /* eslint-enable no-console */
     },
     /**
      * output function for log
@@ -39,7 +41,9 @@ Object.assign(global, {
      */
     log: (arg1, ...args) => {
         // custom info logger with color
+        /* eslint-disable no-console */
         console.log(chalk.bold.cyan(arg1), ...args);
+        /* eslint-enable no-console */
     },
     /**
      * output function for warnings
@@ -51,7 +55,9 @@ Object.assign(global, {
      */
     warn: (arg1, ...args) => {
         // custom info logger with color
+        /* eslint-disable no-console */
         console.log(chalk.bold.yellowBright('!! ' + arg1), ...args);
+        /* eslint-enable no-console */
     },
     /**
      * output function for errors
@@ -63,7 +69,9 @@ Object.assign(global, {
      */
     error: (arg1, ...args) => {
         // custom error logger with red color
+        /* eslint-disable no-console */
         console.log(chalk.bold.redBright('>> ' + arg1), ...args);
+        /* eslint-enable no-console */
     },
     /**
      * output function for muted messages
@@ -75,7 +83,9 @@ Object.assign(global, {
      */
     muted: (arg1, ...args) => {
         // custom error logger with gray color
+        /* eslint-disable no-console */
         console.log(chalk.gray(arg1), ...args);
+        /* eslint-enable no-console */
     },
     /**
      * output function for debug messages
@@ -88,7 +98,9 @@ Object.assign(global, {
     debug: (arg1, ...args) => {
         // custom error logger with gray color
         // TODO add DEBUG flag here
+        /* eslint-disable no-console */
         console.log(chalk.gray(arg1), ...args);
+        /* eslint-enable no-console */
     }
 });
 
@@ -110,4 +122,4 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 ////////////////////////////////////////////////////////
 
-process.on('unhandledRejection', function (err) { global.error('Unhandeled rejection caught!'); throw err; })
+process.on('unhandledRejection', function (err) { global.error('Unhandeled rejection caught!'); throw err; });

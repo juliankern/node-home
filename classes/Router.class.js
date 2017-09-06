@@ -1,8 +1,6 @@
 // const EventEmitter = require('events');
 const utils = global.req('util');
 
-const SmartNodeClient = global.req('classes/Client.class');
-
 module.exports = (SmartNodeServer) => {
     // return class SmartNodeRouter extends EventEmitter {
     return class SmartNodeRouter {
@@ -45,75 +43,74 @@ module.exports = (SmartNodeServer) => {
 
         configRoute(route) {
             route
-            .get((req, res) => {
-                let client = SmartNodeServer.getClientById(req.params.clientId);
+                .get((req, res) => {
+                    let client = SmartNodeServer.getClientById(req.params.clientId);
 
-                res.render('config', {
-                    config: client.config,
-                    plugin: client.plugin,
-                    id: client.id,
-                    displayName: client.displayName,
-                    configurationFormat: client.configurationFormat,
-                    rooms: SmartNodeServer.storage.get('rooms')
-                });
-            })
-            .post((req, res) => {
-                let config = {};
-                let clients = SmartNodeServer.storage.get('clients');
-                let client = SmartNodeServer.getClientById(req.params.clientId);
-                let hasConfig = clients[req.params.clientId].config && Object.keys(clients[req.params.clientId].config).length;
+                    res.render('config', {
+                        config: client.config,
+                        plugin: client.plugin,
+                        id: client.id,
+                        displayName: client.displayName,
+                        configurationFormat: client.configurationFormat,
+                        rooms: SmartNodeServer.storage.get('rooms')
+                    });
+                })
+                .post((req, res) => {
+                    let config = {};
+                    let clients = SmartNodeServer.storage.get('clients');
+                    let client = SmartNodeServer.getClientById(req.params.clientId);
+                    let hasConfig = clients[req.params.clientId].config && Object.keys(clients[req.params.clientId].config).length;
 
-                for (let k in req.body) {
-                    if (k === 'room' || k === 'newroom') continue;
-                    utils.setValueByPath(config, k, req.body[k]);
-                }
+                    for (let k in req.body) {
+                        if (k === 'room' || k === 'newroom') continue;
+                        utils.setValueByPath(config, k, req.body[k]);
+                    }
                 
-                let errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
-                console.log('SAVE CONFIG', config);
+                    let errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
+                    global.log('SAVE CONFIG', config);
 
-                if (errors) {
-                    req.arrayFlash(errors, 'error');
-                } else {
-                    if ('reset' in req.body) {
-                        client.socket.emit('unpair');
-                        SmartNodeServer.unpairClient(req.params.clientId);
-                        delete clients[req.params.clientId];
-                        SmartNodeServer.storage.set('clients', clients);
-                        
-                        req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
-                        return res.redirect('/');
+                    if (errors) {
+                        req.arrayFlash(errors, 'error');
                     } else {
-                        let rooms = SmartNodeServer.storage.get('rooms') || [];
-                        let room;
-                        // no validation errors, save config and trigger onSetup
+                        if ('reset' in req.body) {
+                            client.socket.emit('unpair');
+                            SmartNodeServer.unpairClient(req.params.clientId);
+                            delete clients[req.params.clientId];
+                            SmartNodeServer.storage.set('clients', clients);
+                        
+                            req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
+                            return res.redirect('/');
+                        } else {
+                            let rooms = SmartNodeServer.storage.get('rooms') || [];
+                            // no validation errors, save config and trigger onSetup
                         
 
-                        if (req.body.room === '-1') {
-                            config.room = req.body.newroom;
-                            rooms.push(config.room);
-                            SmartNodeServer.storage.set('rooms', rooms);
-                        } else {
-                            config.room = req.body.room;
-                        }
+                            if (req.body.room === '-1') {
+                                config.room = req.body.newroom;
+                                rooms.push(config.room);
+                                SmartNodeServer.storage.set('rooms', rooms);
+                            } else {
+                                config.room = req.body.room;
+                            }
 
-                        clients[req.params.clientId].config = config;
+                            clients[req.params.clientId].config = config;
 
-                        SmartNodeServer.storage.set('clients', clients);
-                        SmartNodeServer.updateClient(req.params.clientId, { config: config });
-                        client.init();
+                            SmartNodeServer.storage.set('clients', clients);
+                            SmartNodeServer.updateClient(req.params.clientId, { config: config });
+                            client.init();
 
-                        if (!hasConfig) {
-                            client.socket.emit('setup', { config });
-                            global.muted('Setup completed - waiting for client to load plugin...');
-                            req.flash('success', { message: 'The client was setup successfully.' });
-                        } else {
-                            req.flash('success', { message: 'The client was updated successfully.' });
+                            if (!hasConfig) {
+                                client.socket.emit('setup', { config });
+                                global.muted('Setup completed - waiting for client to load plugin...');
+                                req.flash('success', { message: 'The client was setup successfully.' });
+                            } else {
+                                req.flash('success', { message: 'The client was updated successfully.' });
+                            }
                         }
                     }
-                }
 
-                return res.redirect('/config/' + req.params.clientId)
-            })
+                    return res.redirect('/config/' + req.params.clientId);
+                });
         }
 
         handler(req, res, next) {
@@ -154,5 +151,5 @@ module.exports = (SmartNodeServer) => {
 
             next();
         }
-    }
-}
+    };
+};

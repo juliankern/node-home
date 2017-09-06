@@ -19,4 +19,4 @@ const client = new SmartNodeClient(options.plugin);
 
 //////////////////////////////////////////////////////////
 
-client.init().catch((e) => { global.error('Client init error', e) });
+client.init().catch((e) => { global.error('Client init error', e); });

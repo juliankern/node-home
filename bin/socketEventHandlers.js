@@ -66,7 +66,7 @@ module.exports = (SmartNodeServer) => {
                 cb();
             }
 
-        }
+        };
 
         socketEventHandlers.disconnect = async (reason) => {
             SmartNodeServer.unloadServerPlugin(socket.client.id);
@@ -77,10 +77,10 @@ module.exports = (SmartNodeServer) => {
 
         socketEventHandlers.pluginloaded = async () => {
             SmartNodeServer.clientPluginLoaded(socket.client.id, true)
-                .catch((e) => { global.error('Server load plugin error (4)', e) });;
+                .catch((e) => { global.error('Server load plugin error (4)', e); });
         };
 
         return socketEventHandlers;
-    }
+    };
 };
 

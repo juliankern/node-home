@@ -23,12 +23,12 @@ module.exports = (utils) => {
                 // }
                 
                 if (+config.room === 0) {
-                    errors.push({ fields: ['room'], message: `You need to select a room or create a new one.` }); 
+                    errors.push({ fields: ['room'], message: 'You need to select a room or create a new one.' }); 
                     return false;
                 }
 
                 if (+config.room === -1 && !config.newroom) {
-                    errors.push({ fields: ['newroom'], message: `You need to enter a name for the new room.` }); 
+                    errors.push({ fields: ['newroom'], message: 'You need to enter a name for the new room.' }); 
                     return false;
                 }
 
@@ -90,5 +90,5 @@ module.exports = (utils) => {
                 return true;
             }
         }
-    }
-}
+    };
+};
