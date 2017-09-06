@@ -1,8 +1,9 @@
-@mixin btn-link($color) {
+@mixin btn-link($color) {    
     @at-root {
         a#{&} {
             &:hover {
                 text-decoration: none;
+                
                 @include contrastText($color);
             }
         }
@@ -99,20 +100,22 @@
     }
 
     &--group {
-        input[type="checkbox"],
-        input[type="radio"] {
+        /* stylelint-disable selector-no-qualifying-type */
+        input[type='checkbox'],
+        input[type='radio'] {
             visibility: hidden;
             position: absolute;
 
             &:checked + label.btn {
                 @extend .btn:active;
-            } 
+            }
         }
+        /* stylelint-enable selector-no-qualifying-type */
         
         &__block {
             @extend .btn--group;
             
-            display: flex; 
+            display: flex;
             
             label {
                 flex: 1 1 auto;

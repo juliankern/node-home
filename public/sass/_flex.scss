@@ -18,10 +18,12 @@
             &__#{$n} {
                 @extend .flex-grid;
 
+                /* stylelint-disable max-nesting-depth */
                 .flex--item {
                     flex-basis: #{100% / $n};
-                    max-width: #{100% / $n}; 
+                    max-width: #{100% / $n};
                 }
+                /* stylelint-enable max-nesting-depth */
             }
         }
     }

@@ -21,7 +21,6 @@ $grays: (
 @function color($name) {
     @return map-get($colors, $name);
 }
-
 @function gray($value) {
     @return map-get($grays, $value);
 }
@@ -40,7 +39,7 @@ $border-radius:          .25rem !default;
 $small-font-size: 80% !default;
 $grid-gutter-width: 1rem !default;
 
-$font-family-base: Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif !default;
+$font-family-base: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !default;
 $font-weight-normal: normal !default;
 
 $font-size-base: 1rem !default;
@@ -67,7 +66,7 @@ $link-hover-color: darken($link-color, 15%) !default;
 $link-hover-decoration: underline !default;
 
 $headings-margin-bottom: ($spacer / 2) !default;
-$headings-font-family:   "Roboto Slab", "Arial Narrow", Arial, serif !default;
+$headings-font-family:   'Roboto Slab', 'Arial Narrow', Arial, serif !default;
 $headings-font-weight:   500 !default;
 $headings-line-height:   1.1 !default;
 $headings-color:         inherit !default;
@@ -93,7 +92,7 @@ $display3-weight:     300 !default;
 $display4-weight:     300 !default;
 $display-line-height: $headings-line-height !default;
 
-$hr-border-color: rgba(color(dark),.1) !default;
+$hr-border-color: rgba(color(dark), .1) !default;
 $hr-border-width: $border-width !default;
 
 $text-muted: gray(600) !default;
@@ -104,7 +103,7 @@ $card-spacer-y:            .75rem !default;
 $card-spacer-x:            1.25rem !default;
 $card-border-width:        $border-width !default;
 $card-border-radius:       $border-radius !default;
-$card-border-color:        rgba(color(dark),.125) !default;
+$card-border-color:        rgba(color(dark), .125) !default;
 $card-inner-border-radius: calc(#{$card-border-radius} - #{$card-border-width}) !default;
 $card-cap-bg:              rgba(color(dark), .03) !default;
 $card-bg:                  color(light) !default;
