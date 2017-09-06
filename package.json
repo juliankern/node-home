@@ -6,14 +6,15 @@
   "scripts": {
     "lint": "npm run lint:all",
     "lint:all": "npm run lint:server && npm run lint:public",
+    "lint:html": "pug-lint views/ templates/",
     "lint:js": "npm run lint:js:server && npm run lint:js:public",
     "lint:js:server": "eslint -c .eslintrc-server.json --no-eslintrc classes/ lib/ util/ bin/",
     "lint:js:public": "eslint -c .eslintrc-public.json --no-eslintrc public/js/",
-    "lint:public": "npm run lint:js:public",
+    "lint:public": "npm run lint:js:public && npm run lint:html",
     "lint:server": "npm run lint:js:server",
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
-    "start": "npm run lint:js && npm run server & npm run watch-scss",
+    "start": "npm run lint:all && npm run server & npm run watch-scss",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
@@ -52,6 +53,7 @@
     "node-sass": "^4.5.3",
     "nodemon": "^1.11.0",
     "pug": "^2.0.0-rc.3",
+    "pug-lint": "^2.5.0",
     "randomstring": "^1.1.5",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
@@ -59,5 +61,8 @@
   },
   "optionalDependencies": {
     "homekit": "0.0.3"
+  },
+  "devDependencies": {
+    "pug-lint-config-clock": "^2.0.0"
   }
 }

@@ -1,21 +1,21 @@
 doctype html
 html 
     head
-        title= (headline ? headline + ' - ' : '') + 'SmartNode'
-        link(href="/css/style.css", rel="stylesheet" type="text/css")
+        title= '${(headline ? headline + " - " : "") }SmartNode'
+        link(href='/css/style.css', rel='stylesheet', type='text/css')
 
         block scripts
-            script(src="/js/global.js")
+            script(src='/js/global.js')
 
             if scripts
                 each s in scripts
                     != s
     body
-        include navigation
+        include navigation.pug
         
         main                
             h2= headline
 
-            include messages
+            include messages.pug
 
             block content
