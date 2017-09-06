@@ -12,7 +12,7 @@
         "$": true,
         "$$": true
     },
-    "extends": "eslint:recommended",
+    "extends": "airbnb",
     "rules": {
         "indent": [
             "error",
@@ -29,6 +29,7 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "no-use-before-define": "off"
     }
 }
