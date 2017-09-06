@@ -70,4 +70,4 @@ module.exports = class SmartNodeHomeKit {
     static get Characteristic() {
         return HomeKit.Characteristic;
     }
-}
+};

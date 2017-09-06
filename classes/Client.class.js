@@ -1,5 +1,5 @@
 // const EventEmitter = require('events');
-const moment = require('moment');
+// const moment = require('moment');
 const bonjour = require('bonjour');
 const socketio = require('socket.io-client');
 
@@ -128,7 +128,7 @@ module.exports = class SmartNodeClient {
         try {
             plugin = await require(`${this.pluginName}`)
                 .Client(this.adapter)
-                .catch((e) => { global.error('Client load plugin error', e) });
+                .catch((e) => { global.error('Client load plugin error', e); });
         } catch(e) {
             global.error(`Could not load plugin "${this.pluginName}" - you probably need to install it via "npm install ${this.pluginName}" first!`);
             global.muted('Debug', e);
@@ -136,14 +136,13 @@ module.exports = class SmartNodeClient {
         }
 
         let functionError;
-        if (!('init' in plugin)) { functionError = "init"; }
-        if (!('load' in plugin)) { functionError = "load"; }
-        if (!('unload' in plugin)) { functionError = "unload"; }
-        if (!('unpair' in plugin)) { functionError = "unpair"; }
+        if (!('init' in plugin)) { functionError = 'init'; }
+        if (!('load' in plugin)) { functionError = 'load'; }
+        if (!('unload' in plugin)) { functionError = 'unload'; }
+        if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the client side. Please contact the author!`;
-            process.exit(1);
+            throw `Plugin "${this.adapter.plugin}" does not provide a "${functionError}()"-function on the client side. Please contact the author!`;
         }
 
         return plugin;
@@ -176,4 +175,4 @@ module.exports = class SmartNodeClient {
         this.adapter.loaded = false;
         this.adapter.socket.close();
     }
-}
+};

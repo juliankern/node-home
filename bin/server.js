@@ -22,7 +22,7 @@ const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 //////////////////////////////////////////////////////////
 
 SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web}, ServerClientConnector, socketEventHandlers)
-    .catch((e) => { global.error('Server init error', e) });
+    .catch((e) => { global.error('Server init error', e); });
 
 //////////////////////////////////////////////////////////
 

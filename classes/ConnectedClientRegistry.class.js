@@ -1,4 +1,4 @@
-module.exports = (SmartNodePlugin) => {
+module.exports = () => {
     return class ConnectedClientRegistry {
         constructor(storage, parentServer) {
             this.storage = storage;
@@ -87,7 +87,7 @@ module.exports = (SmartNodePlugin) => {
 
         deleteClient(id) {
             let savedClients = this.storage.get('clients');
-            delete savedClients[data.id];
+            delete savedClients[id];
             this.storage.set('clients', savedClients);
         }
 
@@ -99,5 +99,5 @@ module.exports = (SmartNodePlugin) => {
             return (connectedClient && ('unpair' in connectedClient)) && connectedClient.unpair() || undefined;
         }
 
-    }
+    };
 };

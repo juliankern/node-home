@@ -90,7 +90,7 @@ module.exports = {
                 return { 
                     global: SmartNodeServer.globalsGetGlobals(),
                     room: SmartNodeServer.globalsGetRoom(this.room) 
-                } 
+                }; 
             }
             
             removeGlobals() {
@@ -117,11 +117,11 @@ module.exports = {
                 }
 
                 if(glo && Object.keys(glo).length > 0 && !this.globals.global.length) {
-                    throw 'The plugin doesn\'t define it\'s global variables. Please contact the author.'
+                    throw 'The plugin doesn\'t define it\'s global variables. Please contact the author.';
                 }
 
                 if(room && Object.keys(room).length > 0 && !this.globals.room.length) {
-                    throw 'The plugin doesn\'t define it\'s room variables. Please contact the author.'
+                    throw 'The plugin doesn\'t define it\'s room variables. Please contact the author.';
                 }
 
                 let globalPaths = utils.getObjectPaths(glo);
@@ -129,7 +129,7 @@ module.exports = {
 
                 globalPaths.forEach((key) => {
                     if (!this.globals.global.includes(key)) {
-                        throw `The plugin tries to change a not previously defined global variable (${key}). Please contact the author.`
+                        throw `The plugin tries to change a not previously defined global variable (${key}). Please contact the author.`;
                     }
                     
                     if (utils.getValueByPath(SmartNodeServer.globalsGetGlobals(), key) === utils.getValueByPath(glo, key)) {
@@ -143,7 +143,7 @@ module.exports = {
                 
                 roomPaths.forEach((key) => {
                     if (!this.globals.room.includes(key)) {
-                        throw `The plugin tries to change a not previously defined room variable (${key}). Please contact the author.`
+                        throw `The plugin tries to change a not previously defined room variable (${key}). Please contact the author.`;
                     }
                     
                     if (utils.getValueByPath(SmartNodeServer.globalsGetRoom(this.room), key) === utils.getValueByPath(room, key)) {
@@ -163,7 +163,7 @@ module.exports = {
                     }
                 );
             }
-        }
+        };
     },
     Client: (SmartNodeClient) => {
         return class SmartNodeClientPlugin extends EventEmitter {
@@ -187,6 +187,6 @@ module.exports = {
                     }
                 };
             }
-        }
+        };
     }
-}
+};

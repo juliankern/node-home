@@ -10,12 +10,13 @@ module.exports = {
     object2pathlist,
     getObjectPaths,
     randomInt
-}
+};
 
 function findClientId(clients) {
     let id;
+    let cond = true;
 
-    while(true) {
+    while(cond) {
         id = randomstring.generate({ length: 12, readable: true });
         if (!clients[id]) { break; }
     }
@@ -28,7 +29,9 @@ function randomInt(min, max) {
 }
 
 function getValueByPath(obj, path) {
+    /* eslint-disable no-redeclare */
     for (var i = 0, path = path.split('.'); i < path.length; i++) {
+        /* eslint-enable no-redeclare */
         if (!obj) break;
         obj = obj[path[i]];
     }
@@ -38,11 +41,15 @@ function getValueByPath(obj, path) {
 
 function setValueByPath(obj, path, value) {
     let arrayMatch, currPath;
+    /* eslint-disable no-redeclare */
     for (var i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
+        /* eslint-enable no-redeclare */
         currPath = path[i];
         if (!curr) break;
         
+        /* eslint-disable no-cond-assign */
         if (arrayMatch = path[i].match(/\[(\d)+\]/)) {
+            /* eslint-enable no-cond-assign */
             currPath = path[i].replace(/\[(\d)+\]/, '');
             if (!curr[currPath]) curr[currPath] = [];
             curr[currPath][arrayMatch[1]] = value; 
@@ -57,7 +64,9 @@ function setValueByPath(obj, path, value) {
 }
 
 function deleteByPath(obj, path) {
+    /* eslint-disable no-redeclare */
     for (var i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
+        /* eslint-enable no-redeclare */
         if (!curr) break;
         if (i === path.length - 1) { delete curr[path[i]]; break; }
         curr = curr[path[i]];
@@ -74,13 +83,13 @@ async function findPort(start) {
 
         var server = require('http').createServer();
         try {
-            server.listen(port, (err) => {
+            server.listen(port, () => {
                 server.once('close', () => {
                     cb(port);
                 });
                 server.close();
             });
-            server.on('error', (err) => {
+            server.on('error', () => {
                 find(cb);
             });
         } catch (e) {
@@ -88,17 +97,17 @@ async function findPort(start) {
         }
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         find((port) => {
             resolve(port);
-        })
+        });
     });
 }
 
 function object2pathlist(data, every) {
     var pathlist = {};
 
-    getKeysForVar(pathlist, null, data)
+    getKeysForVar(pathlist, null, data);
 
     return pathlist;
     
@@ -109,7 +118,7 @@ function object2pathlist(data, every) {
                     pathlist[(currentKey ? currentKey + '.' : '') + key] = data[key];
                 }
                 
-                getKeysForVar(pathlist, (currentKey ? currentKey + '.' : '') + key, data[key])
+                getKeysForVar(pathlist, (currentKey ? currentKey + '.' : '') + key, data[key]);
             } else {
                 pathlist[(currentKey ? currentKey + '.' : '') + key] = data[key];
             }
