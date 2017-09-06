@@ -8,6 +8,7 @@ module.exports = (SmartNodePlugin) => {
         }
 
         async registerClient(data) {
+            console.log('registerClient', data);
             let savedClients = (await this.storage.get('clients')) || [];
 
             savedClients[data.id] = {
@@ -23,6 +24,7 @@ module.exports = (SmartNodePlugin) => {
             }
 
             await this.storage.set('clients', savedClients);
+            console.log('CLIENTLIST', await this.storage.get('clients'));
 
             this.connectClient(data);
 
@@ -30,6 +32,7 @@ module.exports = (SmartNodePlugin) => {
         }
 
         connectClient(data) {
+            console.log('connectClient', data);
             this.clients[data.id] = this.parentServer.getNewPlugin(data);
 
             return this.getClientById(data.id);
