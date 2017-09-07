@@ -33,6 +33,7 @@
         "no-use-before-define": "off",
         "max-len": ["error", 120],
         "no-underscore-dangle": ["error", { "allowAfterThis": true }],
-        "class-methods-use-this": "off"
+        "class-methods-use-this": "off",
+        "no-plusplus": "off"
     }
 }

@@ -9,14 +9,14 @@ module.exports = {
     findClientId,
     object2pathlist,
     getObjectPaths,
-    randomInt
+    randomInt,
 };
 
 function findClientId(clients) {
     let id;
-    let cond = true;
+    const cond = true;
 
-    while(cond) {
+    while (cond) {
         id = randomstring.generate({ length: 12, readable: true });
         if (!clients[id]) { break; }
     }
@@ -25,63 +25,75 @@ function findClientId(clients) {
 }
 
 function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * ((max - min) + 1)) + min;
 }
 
+// eslint-disable-next-line no-unused-vars
 function getValueByPath(obj, path) {
-    /* eslint-disable no-redeclare */
-    for (var i = 0, path = path.split('.'); i < path.length; i++) {
-        /* eslint-enable no-redeclare */
+    /* eslint-disable no-param-reassign, no-shadow */
+    for (let i = 0, path = path.split('.'); i < path.length; i++) {
         if (!obj) break;
         obj = obj[path[i]];
     }
+    /* eslint-enable no-param-reassign, no-shadow */
 
     return obj;
 }
 
 function setValueByPath(obj, path, value) {
-    let arrayMatch, currPath;
-    /* eslint-disable no-redeclare */
-    for (var i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
-        /* eslint-enable no-redeclare */
+    let arrayMatch;
+    let currPath;
+
+    /* eslint-disable no-shadow */
+    for (let i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
+        /* eslint-enable no-shadow */
         currPath = path[i];
         if (!curr) break;
-        
+
         /* eslint-disable no-cond-assign */
         if (arrayMatch = path[i].match(/\[(\d)+\]/)) {
             /* eslint-enable no-cond-assign */
             currPath = path[i].replace(/\[(\d)+\]/, '');
             if (!curr[currPath]) curr[currPath] = [];
-            curr[currPath][arrayMatch[1]] = value; 
+            curr[currPath][arrayMatch[1]] = value;
         } else {
             if (!curr[path[i]]) curr[path[i]] = {};
             if (i === path.length - 1) { curr[path[i]] = value; break; }
             curr = curr[path[i]];
-        } 
-    }   
+        }
+    }
 
     return obj;
 }
 
+// eslint-disable-next-line no-unused-vars
 function deleteByPath(obj, path) {
-    /* eslint-disable no-redeclare */
-    for (var i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
-        /* eslint-enable no-redeclare */
+    /* eslint-disable no-shadow */
+    for (let i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
+        /* eslint-enable no-shadow */
         if (!curr) break;
         if (i === path.length - 1) { delete curr[path[i]]; break; }
         curr = curr[path[i]];
-    }   
+    }
 
     return obj;
 }
 
 async function findPort(start) {
-    var port = start || 8000;
+    let port = start || 8000;
+
+    return new Promise((resolve) => {
+        // eslint-disable-next-line no-shadow
+        find((port) => {
+            resolve(port);
+        });
+    });
 
     function find(cb) {
         port++;
 
-        var server = require('http').createServer();
+        // eslint-disable-next-line global-require
+        const server = require('http').createServer();
         try {
             server.listen(port, () => {
                 server.once('close', () => {
@@ -96,31 +108,29 @@ async function findPort(start) {
             find(cb);
         }
     }
-
-    return new Promise((resolve) => {
-        find((port) => {
-            resolve(port);
-        });
-    });
 }
 
 function object2pathlist(data, every) {
-    var pathlist = {};
+    const pathlist = {};
 
     getKeysForVar(pathlist, null, data);
 
     return pathlist;
-    
+
+    // eslint-disable-next-line no-shadow
     function getKeysForVar(pathlist, currentKey, data) {
-        for (var key in data) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const key in data) {
             if (data[key] === Object(data[key])) {
                 if (every) {
-                    pathlist[(currentKey ? currentKey + '.' : '') + key] = data[key];
+                    // eslint-disable-next-line no-param-reassign
+                    pathlist[(currentKey ? `${currentKey}.` : '') + key] = data[key];
                 }
-                
-                getKeysForVar(pathlist, (currentKey ? currentKey + '.' : '') + key, data[key]);
+
+                getKeysForVar(pathlist, (currentKey ? `${currentKey}.` : '') + key, data[key]);
             } else {
-                pathlist[(currentKey ? currentKey + '.' : '') + key] = data[key];
+                // eslint-disable-next-line no-param-reassign
+                pathlist[(currentKey ? `${currentKey}.` : '') + key] = data[key];
             }
         }
 
@@ -133,10 +143,10 @@ function getObjectPaths(obj, every) {
 }
 
 function arraysEqual(arr1, arr2) {
-    if(arr1.length !== arr2.length) return false;
+    if (arr1.length !== arr2.length) return false;
 
-    for(var i = arr1.length; i--;) {
-        if(arr1[i] !== arr2[i]) return false;
+    for (let i = arr1.length; i--;) {
+        if (arr1[i] !== arr2[i]) return false;
     }
 
     return true;
