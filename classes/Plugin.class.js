@@ -86,7 +86,7 @@ module.exports = {
         getGlobals() {
             return {
                 global: SmartNodeServer.globalsGetGlobals(),
-                room: SmartNodeServer.globalsGetRoom(this.room) 
+                room: SmartNodeServer.globalsGetRoom(this.room),
             };
         }
 

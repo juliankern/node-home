@@ -58,7 +58,7 @@
     "randomstring": "^1.1.5",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
-    "socket.io": "^2.0.3",
+    "socket.io": "^2.0.3"
   },
   "optionalDependencies": {
     "homekit": "0.0.3",

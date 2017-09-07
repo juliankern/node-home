@@ -1,9 +1,9 @@
-document.addEventListener('DOMContentLoaded', function() { 
-    var roomDropdown = $('select[name="room"]');
+document.addEventListener('DOMContentLoaded', () => {
+    const roomDropdown = $('select[name="room"]');
 
     checkRoomDropdown();
 
-    roomDropdown.addEventListener('change', function() {
+    roomDropdown.addEventListener('change', () => {
         checkRoomDropdown();
     });
 
