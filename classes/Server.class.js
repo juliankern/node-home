@@ -1,5 +1,6 @@
 const bonjour = require('bonjour');
 const express = require('express');
+const http = require('http');
 const socketio = require('socket.io');
 
 const utils = global.req('util');
@@ -18,7 +19,7 @@ module.exports = class SmartNodeServer {
      */
     constructor() {
         this.app = express();
-        this.io = socketio({});
+        this.io = socketio(http.Server(this.app));
         this.bonjour = bonjour();
         this.storage = new ServerStorage();
 
@@ -42,9 +43,20 @@ module.exports = class SmartNodeServer {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
         webport = webport || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
-        (SmartNodeRouter(this))(this.app);
+        const router = new (SmartNodeRouter(this))(this.app);
+        router.init();
+
+        this.io.listen(port);
+        this.app.listen(webport, () => {
+            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
+            this.bonjour.published = true;
+
+            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
+            global.success(`Webserver running on port ${webport}`);
+        });
 
         this.io.on('connection', (socket) => {
+            // console.log(socket.client); return;
             global.log('Client connected:', socket.client.id);
 
             const connectionId = Connector.register(socket);
@@ -60,15 +72,6 @@ module.exports = class SmartNodeServer {
                     Connector.addHandler(connectionId, name, handler);
                 });
             }
-        });
-
-        this.io.listen(port);
-        this.app.listen(webport, () => {
-            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
-            this.bonjour.published = true;
-
-            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
-            global.success(`Webserver running on port ${webport}`);
         });
     }
 

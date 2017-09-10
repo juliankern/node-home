@@ -32,7 +32,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
         this.app.use(this.handler);
 
-        this.init();
+        // this.init();
     }
 
     init() {

@@ -13,7 +13,7 @@ const cliOptions = cli.parse({
 
 // ////////////////////////////////////////////////////////
 
-const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js')();
+const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js');
 const ServerClientConnector = new SmartNodeServerClientConnector();
 const SmartNodeServer = new (global.req('classes/Server.class.js'))();
 
