@@ -1,7 +1,7 @@
-extends ../templates/layout
+extends ../templates/layout.pug
 
 block append scripts
-    script(src="/js/config.js")
+    script(src='/js/config.js')
 
 block content
     - hasConfig = config && Object.keys(config).length;
@@ -11,19 +11,18 @@ block content
     h2 #{displayName} #{hasConfig ? '@ ' + config.room : ''} 
         small.text-muted ID #{id}
 
-
-    form(action="", method="post")
+    form(action='', method='post')
         .form--field
             label Room
-            select(name="room", class=hasErrors && fields.includes('room') ? 'input-invalid' : '').form--element
-                option(value="0", selected= formdata.room ? formdata.room === '0' : false) Select a room...
+            select.form--element(name='room', class=hasErrors && fields.includes('room') ? 'input-invalid' : '')
+                option(value='0', selected= formdata.room ? formdata.room === '0' : false) Select a room...
                 if rooms
                     each room in rooms
                         option(value= room, selected= formdata.room ? formdata.room === room : hasConfig ? config.room : false)= room
-                option(value="-1", selected= formdata.room ? formdata.room === '-1' : false) New room
+                option(value='-1', selected= formdata.room ? formdata.room === '-1' : false) New room
         .form--field.newroom.hidden
             label New room name
-            input(type="text", name="newroom", value= formdata.newroom, class=hasErrors && fields.includes('newroom') ? 'input-invalid' : '').form--element
+            input.form--element(type='text', name='newroom', value= formdata.newroom, class=hasErrors && fields.includes('newroom') ? 'input-invalid' : '')
 
         if configurationFormat
             each prop, key in configurationFormat
@@ -31,16 +30,16 @@ block content
                     label= prop.description
 
                     if prop.type === 'number'
-                        input(name= key, type="number", value= formdata[key] ? formdata[key] : hasConfig ? config[key] : prop.default ? prop.default : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                        input.form--element(name= key, type='number', value= formdata[key] ? formdata[key] : hasConfig ? config[key] : prop.default ? prop.default : '', class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
                     if prop.type === 'string'
-                        input(name= key, type="text", value= formdata[key] ? formdata[key] : hasConfig ? config[key] : prop.default ? prop.default : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                        input.form--element(name= key, type='text', value= formdata[key] ? formdata[key] : hasConfig ? config[key] : prop.default ? prop.default : '', class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
                     if prop.type === 'select'
-                        select(name= key, class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                        select.form--element(name= key, class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
                             each opt in prop.values
                                 option(value= opt, selected= formdata[key] ? formdata[key] === opt : hasConfig ? config[key] === opt : prop.default ? prop.default === opt : false)= opt
                     if prop.type === 'array'
                         each val, index in (new Array(prop.length))
-                            input(name= key + '['+index+']', type="text", value= formdata[key] ? formdata[key][index] : hasConfig ? config[key][index] : prop.default ? prop.default[index] : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                            input.form--element(name= key + '['+index+']', type='text', value= formdata[key] ? formdata[key][index] : hasConfig ? config[key][index] : prop.default ? prop.default[index] : '', class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
 
                     if prop.type === 'object'
                         each subprop, subkey in prop.properties
@@ -48,19 +47,18 @@ block content
                                 label= subprop.description || subkey
 
                                 if subprop.type === 'number'
-                                    input(name= key +'.'+ subkey, type="number", value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : hasConfig && config[key] ? config[key][subkey] : subprop.default ? subprop.default : "", class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                    input.form--element(name= key +'.'+ subkey, type='number', value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : hasConfig && config[key] ? config[key][subkey] : subprop.default ? subprop.default : '', class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '')
                                 if subprop.type === 'string'
-                                    input(name= key +'.'+ subkey, type="text", value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : hasConfig && config[key] ? config[key][subkey] : subprop.default ? subprop.default : "", class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                    input.form--element(name= key +'.'+ subkey, type='text', value= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] : hasConfig && config[key] ? config[key][subkey] : subprop.default ? subprop.default : '', class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').
                                 if subprop.type === 'select'
-                                    select(name= key +'.'+ subkey, class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '').form--element
+                                    select.form--element(name= key +'.'+ subkey, class=hasErrors && fields.includes(key +'.'+ subkey) ? 'input-invalid' : '')
                                         each opt in subprop.values
                                             option(value= opt, selected= formdata[key+'.'+subkey] ? formdata[key+'.'+subkey] === opt : hasConfig && config[key] ? config[key][subkey] === opt : subprop.default ? subprop.default === opt : false)= opt
                                 if subprop.type === 'array'
                                     each val, index in (new Array(subprop.length))
-                                        input(name= key +'.'+ subkey + '['+index+']', type="text", value= formdata[key+'.'+subkey] ? formdata[key][subkey][index] : hasConfig ? config[key][subkey][index] : subprop.default ? subprop.default[index] : "", class=hasErrors && fields.includes(key) ? 'input-invalid' : '').form--element
+                                        input.form--element(name= key +'.'+ subkey + '['+index+']', type='text', value= formdata[key+'.'+subkey] ? formdata[key][subkey][index] : hasConfig ? config[key][subkey][index] : subprop.default ? subprop.default[index] : '', class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
 
-        button(type="submit").btn__primary= hasConfig ? 'Update Configuration' : 'Complete Setup'
+        button.btn__primary(type='submit')= hasConfig ? 'Update Configuration' : 'Complete Setup'
     
         if hasConfig
-            button(type="submit", name="reset", data-confirm="Are you sure that you want to unpair this accessory and delete it's configuration?").btn__danger.pull-right Unpair
-
+            button.btn__danger.pull-right(type='submit', name='reset', data-confirm='Are you sure that you want to unpair this accessory and delete it\'s configuration?') Unpair

@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", function(event) { 
-    var roomDropdown = $('select[name="room"]');
+document.addEventListener('DOMContentLoaded', () => {
+    const roomDropdown = $('select[name="room"]');
 
     checkRoomDropdown();
 
-    roomDropdown.addEventListener('change', function(e) {
+    roomDropdown.addEventListener('change', () => {
         checkRoomDropdown();
     });
 
@@ -15,4 +15,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
             $('.newroom').classList.add('hidden');
         }
     }
-})
+});

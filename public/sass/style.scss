@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,700');
 @import url('https://fonts.googleapis.com/css?family=Roboto+Slab:400,700');
-
-@import "settings";
-@import "mixins";
-
-@import "reboot";
+@import 'settings';
+@import 'mixins';
+@import 'reboot';
 
 main,
 .container {
@@ -22,7 +20,7 @@ main,
     flex-direction: row;
     
     &::before {
-        content: "";
+        content: '';
         background-image: url(/img/add-to-homekit.png);
         background-size: contain;
         width: 50px;
@@ -78,14 +76,13 @@ main,
     display: none;
 }
 
-@import "grid";
-@import "flex";
-@import "form";
-@import "button";
-@import "card";
-@import "table";
-@import "nav";
-@import "image";
-@import "typography";
-
-@import "views";
+@import 'grid';
+@import 'flex';
+@import 'form';
+@import 'button';
+@import 'card';
+@import 'table';
+@import 'nav';
+@import 'image';
+@import 'typography';
+@import 'views';

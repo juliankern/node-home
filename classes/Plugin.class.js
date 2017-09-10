@@ -13,8 +13,7 @@ const Storage = global.req('classes/Storage.class');
  * @param  {function} options.globalsChanged    function to be called when globals get changed => triggers events on all other plugins
  */
 module.exports = {
-    Server: (SmartNodeServer) => {
-        return class SmartNodeServerPlugin extends EventEmitter {
+    Server: (SmartNodeServer) => class SmartNodeServerPlugin extends EventEmitter {
             /**
              * SmartNodeServerPlugin contructor
              *

@@ -13,10 +13,8 @@ Object.assign(global, {
      *
      * @return {object}            required module
      */
-    req: (modulepath) => {
-        // custom require to handle relative paths from project root
-        return require(path.resolve('./', modulepath));   
-    },
+    // eslint-disable-next-line import/no-dynamic-require, global-require
+    req: modulepath => require(path.resolve('./', modulepath)),
     /**
      * output function for success
      *
@@ -27,7 +25,8 @@ Object.assign(global, {
      */
     success: (arg1, ...args) => {
         // custom success logger with fancy arrows and green color
-        console.log(chalk.bold.green('> ' + arg1), ...args);
+        // eslint-disable-next-line no-console
+        console.log(chalk.bold.green(`> ${arg1}`), ...args);
     },
     /**
      * output function for log
@@ -39,6 +38,7 @@ Object.assign(global, {
      */
     log: (arg1, ...args) => {
         // custom info logger with color
+        // eslint-disable-next-line no-console
         console.log(chalk.bold.cyan(arg1), ...args);
     },
     /**
@@ -51,7 +51,8 @@ Object.assign(global, {
      */
     warn: (arg1, ...args) => {
         // custom info logger with color
-        console.log(chalk.bold.yellowBright('!! ' + arg1), ...args);
+        // eslint-disable-next-line no-console
+        console.log(chalk.bold.yellowBright(`!! ${arg1}`), ...args);
     },
     /**
      * output function for errors
@@ -63,7 +64,8 @@ Object.assign(global, {
      */
     error: (arg1, ...args) => {
         // custom error logger with red color
-        console.log(chalk.bold.redBright('>> ' + arg1), ...args);
+        // eslint-disable-next-line no-console
+        console.log(chalk.bold.redBright(`>> ${arg1}`), ...args);
     },
     /**
      * output function for muted messages
@@ -75,6 +77,7 @@ Object.assign(global, {
      */
     muted: (arg1, ...args) => {
         // custom error logger with gray color
+        // eslint-disable-next-line no-console
         console.log(chalk.gray(arg1), ...args);
     },
     /**
@@ -88,13 +91,14 @@ Object.assign(global, {
     debug: (arg1, ...args) => {
         // custom error logger with gray color
         // TODO add DEBUG flag here
+        // eslint-disable-next-line no-console
         console.log(chalk.gray(arg1), ...args);
-    }
+    },
 });
 
 global.log('');
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 // System checks
 
 if (+process.version.replace('v', '').split('.')[0] < 8) {
@@ -102,6 +106,6 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
     process.exit(1);
 }
 
-////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////
 
-process.on('unhandledRejection', function (err) { global.error('Unhandeled rejection caught!'); throw err; })
+process.on('unhandledRejection', (err) => { global.error('Unhandeled rejection caught!'); throw err; });

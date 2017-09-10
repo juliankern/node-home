@@ -4,10 +4,19 @@
   "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npm run lint:all",
+    "lint:all": "npm run lint:server && npm run lint:public",
+    "lint:html": "pug-lint views/ templates/",
+    "lint:scss": "stylelint public/sass/**/*.scss",
+    "lint:sass": "npm run lint:scss",
+    "lint:js": "npm run lint:js:server && npm run lint:js:public",
+    "lint:js:server": "eslint -c .eslintrc-server.json --no-eslintrc classes/ lib/ util/ bin/",
+    "lint:js:public": "eslint -c .eslintrc-public.json --no-eslintrc public/js/",
+    "lint:public": "npm run lint:js:public && npm run lint:html && npm run lint:scss",
+    "lint:server": "npm run lint:js:server",
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
-    "start": "npm run server & npm run watch-scss",
+    "start": "npm run lint:all && (npm run server & npm run watch-scss)",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
@@ -44,6 +53,7 @@
     "node-persist": "^2.1.0",
     "node-sass": "^4.5.3",
     "nodemon": "^1.11.0",
+    "postcss": "^6.0.11",
     "pug": "^2.0.0-rc.3",
     "randomstring": "^1.1.5",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
@@ -51,6 +61,17 @@
     "socket.io": "^2.0.3"
   },
   "optionalDependencies": {
-    "homekit": "0.0.3"
+    "homekit": "0.0.3",
+    "rpi-gpio": "^0.8.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
+    "pug-lint": "^2.5.0",
+    "pug-lint-config-clock": "^2.0.0",
+    "stylelint": "^8.1.1"
   }
 }

@@ -3,7 +3,6 @@
         grid-template-columns: repeat(#{$num}, 1fr);
     }
 }
-
 @mixin gridFlowColumns($num) {
     &__flowcolumn-#{$num} {
         @extend .grid__flowcolumn;
@@ -28,7 +27,7 @@
     }
 
     &__flowcolumn {
-        grid-auto-flow: column; 
+        grid-auto-flow: column;
     }
 
     &--full,

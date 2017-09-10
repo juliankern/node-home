@@ -9,17 +9,17 @@ module.exports = class SmartNodeHomeKit {
      *
      * @param  {object} data holds the data needed to init the plugin
      */
-    constructor({ 
-        id, 
+    constructor({
+        id,
         deviceName,
         model,
         service,
         serial = 'A0000001',
-        manufacturer = 'juliankern.com'
+        manufacturer = 'juliankern.com',
     }) {
         // super();
 
-        let uuid = HomeKit.uuid.generate(`homekit:${id}`);
+        const uuid = HomeKit.uuid.generate(`homekit:${id}`);
         this.accessory = new HomeKit.Accessory(deviceName, uuid);
 
         this.accessory.getService(HomeKit.Service.AccessoryInformation)
@@ -31,8 +31,8 @@ module.exports = class SmartNodeHomeKit {
         this.accessory.addService(HomeKit.Service[service], deviceName);
 
         this.Characteristic = HomeKit.Characteristic;
-        
-        this.timetimerout;
+
+        this.timetimerout = null;
     }
 
     onIdentify(callback) {
@@ -66,8 +66,8 @@ module.exports = class SmartNodeHomeKit {
     destroy() {
         this.accessory.destroy();
     }
-    
+
     static get Characteristic() {
         return HomeKit.Characteristic;
     }
-}
+};

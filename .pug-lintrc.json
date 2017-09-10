@@ -1,0 +1,4 @@
+{
+	"extends": "clock",
+	"validateIndentation": 4
+}
