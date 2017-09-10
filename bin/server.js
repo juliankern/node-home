@@ -1,17 +1,17 @@
 require('../util/global.js');
 
 const pkg = global.req('package.json');
-
 const cli = require('cli');
+
 cli.enable('version');
 cli.setApp('bin/server.js', pkg.version);
 
-const cliOptions = cli.parse({ 
-    port: [ 'p', 'Websocket port to use instead of autodiscover', 'int', null ],
-    web: [ 'w', 'Port for the website to use', 'int', null ]
+const cliOptions = cli.parse({
+    port: ['p', 'Websocket port to use instead of autodiscover', 'int', null],
+    web: ['w', 'Port for the website to use', 'int', null],
 });
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 
 const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js')();
 const ServerClientConnector = new SmartNodeServerClientConnector();
@@ -19,17 +19,18 @@ const SmartNodeServer = new (global.req('classes/Server.class.js'))();
 
 const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 
+// eslint-disable-next-line global-require
 if (process.title === 'npm' && require('os').type().includes('Windows')) {
     global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
     global.log('');
 }
 
-SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web}, ServerClientConnector, socketEventHandlers)
-    .catch((e) => { global.error('Server init error', e) });
+SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
+    .catch((e) => { global.error('Server init error', e); });
 
-//////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////
 
 /**
  * exit handler for cleanup and stuff
@@ -48,7 +49,7 @@ function exitHandler(err) {
     SmartNodeServer.close(process.exit);
 }
 
-//do something when app is closing
+// do something when app is closing
 process.on('exit', exitHandler);
 process.on('SIGINT', exitHandler);
 process.on('uncaughtException', exitHandler);

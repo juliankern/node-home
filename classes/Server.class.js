@@ -23,8 +23,8 @@ module.exports = class SmartNodeServer {
         this.storage = new ServerStorage();
 
         this.globals = {
-            global: {}
-        }
+            global: {},
+        };
 
         this.connectedClients = new ConnectedClientRegistry(this.storage, this);
     }
@@ -39,34 +39,32 @@ module.exports = class SmartNodeServer {
      * @author Julian Kern <mail@juliankern.com>
      */
     async init({ port, webport }, Connector, getEventHandlersForSocketFn) {
-        port = port || (await utils.findPort());
-        webport = webport || (await utils.findPort(port + 1));
+        port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
+        webport = webport || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
-        new (SmartNodeRouter(this))(this.app);
+        (SmartNodeRouter(this))(this.app);
 
         this.io.on('connection', (socket) => {
             global.log('Client connected:', socket.client.id);
 
-            let connectionId = Connector.register(socket); 
+            const connectionId = Connector.register(socket);
 
             if (connectionId === false) {
                 global.log('ERROR! Failed to register connection for new Client', socket.client.id);
-
             } else {
-                let handlers = getEventHandlersForSocketFn(Connector, socket);
+                const handlers = getEventHandlersForSocketFn(Connector, socket);
 
                 global.log('Registering handlers for', connectionId);
 
-                for (var [name, handler] of Object.entries(handlers)) {
+                Object.entries(handlers).forEach(([name, handler]) => {
                     Connector.addHandler(connectionId, name, handler);
-                }
-
+                });
             }
         });
 
         this.io.listen(port);
         this.app.listen(webport, () => {
-            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port: port });
+            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
             this.bonjour.published = true;
 
             global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
@@ -78,24 +76,24 @@ module.exports = class SmartNodeServer {
         let client;
         this.io.close();
 
-        if(this.bonjour.published) {
+        if (this.bonjour.published) {
             this.bonjour.published = false;
             this.bonjour.unpublishAll(() => {
                 global.warn('Bonjour service unpublished!');
 
-                this.getClientIdList().forEach((id) => { 
+                this.getClientIdList().forEach((id) => {
                     client = this.getClientById(id);
-                    console.log('close if called', id, client);
-                    if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
+                    global.log('close if called', id, client);
+                    if (client.loaded) this.unloadServerPlugin(client.socket.client.id);
                 });
 
                 callback();
             });
         } else {
-            this.getClientIdList().forEach((id) => { 
+            this.getClientIdList().forEach((id) => {
                 client = this.getClientById(id);
-                console.log('close else called', id, client);
-                if (client.loaded) this.unloadServerPlugin(client.socket.client.id); 
+                global.log('close else called', id, client);
+                if (client.loaded) this.unloadServerPlugin(client.socket.client.id);
             });
 
             callback();
@@ -138,9 +136,11 @@ module.exports = class SmartNodeServer {
 
         global.success(`Client ${id} has loaded it's plugin: ${this.getClientBySocketId(id).plugin}`);
 
-        await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e) });
+        await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e); });
 
         this.updateClientBySocketId(id, { loaded: true });
+
+        return true;
     }
 
     /**
@@ -154,7 +154,7 @@ module.exports = class SmartNodeServer {
      */
     async _loadServerPlugin(id) {
         // load the plugin mathing to the client
-        let adapter = this.getClientBySocketId(id);
+        const adapter = this.getClientBySocketId(id);
         let plugin;
 
         // try to load the plugin and check if it's installed
@@ -162,29 +162,32 @@ module.exports = class SmartNodeServer {
             // apparently the plugin is installed
             // => load the server side
             // => hand over client id and useful functions
+            // eslint-disable-next-line global-require, import/no-dynamic-require
             plugin = await require(`${adapter.plugin}`)
                 .Server(adapter)
-                .catch((e) => { global.error('Server load plugin error', e) });
-        } catch(e) {
+                .catch((e) => { global.error('Server load plugin error', e); });
+        } catch (e) {
             // nope, the plugin isn't installed on server side yet - die()
-            global.error(`Plugin "${adapter.plugin}" not found - you need to install it via "npm install ${adapter.plugin}" first!`);
+            global.error(`Plugin "${adapter.plugin}" not found 
+                - you need to install it via "npm install ${adapter.plugin}" first!`);
             global.muted('Debug', e);
             process.exit(1);
         }
 
         let functionError;
-        if (!('load' in plugin)) { functionError = "load"; }
-        if (!('unload' in plugin)) { functionError = "unload"; }
-        if (!('unpair' in plugin)) { functionError = "unpair"; }
+        if (!('load' in plugin)) { functionError = 'load'; }
+        if (!('unload' in plugin)) { functionError = 'unload'; }
+        if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the server side. Please contact the author!`;
-            process.exit(1);
+            throw global.error(`Plugin "${adapter.plugin}" does not provide a 
+                "${functionError}()"-function on the server side. 
+                Please contact the author!`);
         }
 
-        this.updateClientBySocketId(id, { 
+        this.updateClientBySocketId(id, {
             unload: plugin.unload,
-            unpair: plugin.unpair
+            unpair: plugin.unpair,
         });
 
         plugin.load();
@@ -220,13 +223,13 @@ module.exports = class SmartNodeServer {
      * @param  {object} changed  array of variable paths that got changed
      */
     globalsChanged(clientId, changed) {
-        Object.keys(this.getClientList()).filter((id) => {
-            return id !== clientId;
-        }).forEach((id) => {
-            this.getClientById(id).emit('globalsChanged', { 
-                changed
+        Object.keys(this.getClientList())
+            .filter(id => id !== clientId)
+            .forEach((id) => {
+                this.getClientById(id).emit('globalsChanged', {
+                    changed,
+                });
             });
-        });
     }
 
     getClientIdList() {
@@ -272,4 +275,4 @@ module.exports = class SmartNodeServer {
     validConfiguration(config, format) {
         return SmartNodeConfig.validConfiguration(config, format);
     }
-}
+};

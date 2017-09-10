@@ -1,4 +1,4 @@
-module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
+module.exports = () => class ConnectedClientRegistry {
     constructor(storage, parentServer) {
         this.storage = storage;
         this.parentServer = parentServer;
@@ -7,15 +7,15 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
     }
 
     async registerClient(data) {
-        console.log('registerClient', data);
-        let savedClients = (await this.storage.get('clients')) || [];
+        global.log('registerClient', data);
+        const savedClients = (await this.storage.get('clients')) || [];
 
         savedClients[data.id] = {
             id: data.id,
             plugin: data.plugin,
             configurationFormat: data.configurationFormat,
             displayName: data.displayName,
-            config: {}
+            config: {},
         };
 
         if (data.config) {
@@ -23,7 +23,7 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
         }
 
         await this.storage.set('clients', savedClients);
-        console.log('CLIENTLIST', await this.storage.get('clients'));
+        global.log('CLIENTLIST', await this.storage.get('clients'));
 
         this.connectClient(data);
 
@@ -31,7 +31,7 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
     }
 
     connectClient(data) {
-        console.log('connectClient', data);
+        global.log('connectClient', data);
         this.clients[data.id] = this.parentServer.getNewPlugin(data);
 
         return this.getClientById(data.id);
@@ -52,22 +52,21 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
     getClientBySocketId(socketId) {
         return this.getClientById(findClientIdBySocketId.call(this, socketId));
 
-        function findClientIdBySocketId(socketId) {
-            return this.getClientIdList().find((clientId) => {
-                return this.getClientById(clientId).socket.client.id === socketId;
-            });
+        function findClientIdBySocketId(id) {
+            return this.getClientIdList()
+                .find(clientId => this.getClientById(clientId).socket.client.id === id);
         }
     }
 
     async updateClient(id, data) {
         if (data.config) {
-            let savedClients = await this.storage.get('clients');
-            console.log('updateCOnfig, saved clients:', savedClients);
+            const savedClients = await this.storage.get('clients');
+            global.log('updateCOnfig, saved clients:', savedClients);
             savedClients[id].config = data.config;
             await this.storage.set('clients', savedClients);
         }
 
-        let client = this.getClientById(id);
+        const client = this.getClientById(id);
 
         if (!client) {
             return undefined;
@@ -77,7 +76,7 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
     }
 
     async updateClientBySocketId(id, data) {
-        return await this.updateClient(this.getClientBySocketId(id).id, data);
+        return this.updateClient(this.getClientBySocketId(id).id, data);
     }
 
     removeClient(id) {
@@ -89,16 +88,16 @@ module.exports = (SmartNodePlugin) => class ConnectedClientRegistry {
     }
 
     async deleteClient(id) {
-        let savedClients = await this.storage.get('clients');
-        delete savedClients[data.id];
+        const savedClients = await this.storage.get('clients');
+        delete savedClients[id];
         await this.storage.set('clients', savedClients);
     }
 
     unpairClient(clientId) {
-        let connectedClient = this.getClientById(clientId);
+        const connectedClient = this.getClientById(clientId);
 
         global.log('ConnectedClientRegistry.unpairClient', clientId);
-        
-        return (connectedClient && ('unpair' in connectedClient)) && connectedClient.unpair() || undefined;
+
+        return ((connectedClient && ('unpair' in connectedClient)) && connectedClient.unpair()) || undefined;
     }
 };

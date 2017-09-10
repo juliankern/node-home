@@ -1,9 +1,11 @@
 // const EventEmitter = require('events');
 const utils = global.req('util');
+const express = require('express');
+const expressSession = require('express-session');
+const bodyparser = require('body-parser');
+const connectFlash = require('connect-flash');
 
-const SmartNodeClient = global.req('classes/Client.class');
-
-module.exports = (SmartNodeServer) => class SmartNodeRouter {
+module.exports = SmartNodeServer => class SmartNodeRouter {
     /**
      * SmartNodeServerPlugin contructor
      *
@@ -15,18 +17,18 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
         // super();
         this.app = app;
 
-        this.app.use(require('express-session')({
+        this.app.use(expressSession({
             secret: 'keyboard cat',
             cookie: app.get('env') === 'production' ? { secure: true } : {},
             saveUninitialized: false,
-            resave: true
+            resave: true,
         }));
 
         this.app.set('view engine', 'pug');
         this.app.set('views', './views');
-        this.app.use(require('express').static('public'));
-        this.app.use(require('body-parser').urlencoded({ extended: false }));
-        this.app.use(require('connect-flash')());
+        this.app.use(express.static('public'));
+        this.app.use(bodyparser.urlencoded({ extended: false }));
+        this.app.use(connectFlash());
 
         this.app.use(this.handler);
 
@@ -34,7 +36,7 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
     }
 
     init() {
-        this.app.get('/', function (req, res) {
+        this.app.get('/', (req, res) => {
             res.render('index', {});
         });
 
@@ -43,52 +45,51 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
 
     configRoute(route) {
         route
-        .get(async (req, res) => {
-            let client = SmartNodeServer.getClientById(req.params.clientId);
+            .get(async (req, res) => {
+                const client = SmartNodeServer.getClientById(req.params.clientId);
 
-            if (!client) {
-                return res.redirect('/'); 
-            }
+                if (!client) {
+                    return res.redirect('/');
+                }
 
-            return res.render('config', {
-                config: client.config,
-                plugin: client.plugin,
-                id: client.id,
-                displayName: client.displayName,
-                configurationFormat: client.configurationFormat,
-                rooms: await SmartNodeServer.storage.get('rooms')
-            });
-        })
-        .post(async (req, res) => {
-            let config = {};
-            let clients = await SmartNodeServer.storage.get('clients');
-            let client = SmartNodeServer.getClientById(req.params.clientId);
-            let hasConfig = client.config && Object.keys(client.config).length;
+                return res.render('config', {
+                    config: client.config,
+                    plugin: client.plugin,
+                    id: client.id,
+                    displayName: client.displayName,
+                    configurationFormat: client.configurationFormat,
+                    rooms: await SmartNodeServer.storage.get('rooms'),
+                });
+            })
+            .post(async (req, res) => {
+                const config = {};
+                const clients = await SmartNodeServer.storage.get('clients');
+                const client = SmartNodeServer.getClientById(req.params.clientId);
+                const hasConfig = client.config && Object.keys(client.config).length;
 
-            for (let k in req.body) {
-                if (k === 'room' || k === 'newroom') continue;
-                utils.setValueByPath(config, k, req.body[k]);
-            }
-            
-            let errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
-            console.log('SAVE CONFIG', config);
+                Object.keys(req.body).forEach((k) => {
+                    if (k !== 'room' && k !== 'newroom') {
+                        utils.setValueByPath(config, k, req.body[k]);
+                    }
+                });
 
-            if (errors) {
-                req.arrayFlash(errors, 'error');
-            } else {
-                if ('reset' in req.body) {
+                const errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
+                global.log('SAVE CONFIG', config);
+
+                if (errors) {
+                    req.arrayFlash(errors, 'error');
+                } else if ('reset' in req.body) {
                     client.socket.emit('unpair');
                     SmartNodeServer.unpairClient(req.params.clientId);
                     delete clients[req.params.clientId];
                     await SmartNodeServer.storage.set('clients', clients);
-                    
-                    req.flash('success', { message: 'The client was unpaired successfully. You can now set it up again.' });
+
+                    req.flash('success', { message: `The client was unpaired successfully. 
+                        You can now set it up again.` });
                     return res.redirect('/');
                 } else {
-                    let rooms = await SmartNodeServer.storage.get('rooms') || [];
-                    let room;
+                    const rooms = await SmartNodeServer.storage.get('rooms') || [];
                     // no validation errors, save config and trigger onSetup
-                    
 
                     if (req.body.room === '-1') {
                         config.room = req.body.newroom;
@@ -101,7 +102,7 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
                     client.config = config;
 
                     await SmartNodeServer.storage.set('clients', clients);
-                    SmartNodeServer.updateClient(req.params.clientId, { config: config });
+                    SmartNodeServer.updateClient(req.params.clientId, { config });
                     client.init();
 
                     if (!hasConfig) {
@@ -112,10 +113,9 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
                         req.flash('success', { message: 'The client was updated successfully.' });
                     }
                 }
-            }
 
-            return res.redirect('/config/' + req.params.clientId)
-        })
+                return res.redirect(`/config/${req.params.clientId}`);
+            });
     }
 
     handler(req, res, next) {
@@ -126,9 +126,9 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
             messages: {
                 success: req.flash('success'),
                 info: req.flash('info'),
-                error: req.flash('error')
+                error: req.flash('error'),
             },
-            formdata: req.flash('form')[0]
+            formdata: req.flash('form')[0],
         });
 
         // transform error array to flashes
@@ -156,4 +156,4 @@ module.exports = (SmartNodeServer) => class SmartNodeRouter {
 
         next();
     }
-}
+};

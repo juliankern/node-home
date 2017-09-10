@@ -1,7 +1,6 @@
 // const EventEmitter = require('events');
-const moment = require('moment');
 const bonjour = require('bonjour');
-const socketio = require('socket.io-client');
+const socketio = require('socket.io-client'); // eslint-disable-line import/no-extraneous-dependencies
 
 const ClientStorage = global.req('classes/Storage.class').Client;
 const SmartNodePlugin = global.req('classes/Plugin.class');
@@ -15,7 +14,7 @@ module.exports = class SmartNodeClient {
     constructor(pluginName) {
         this.bonjour = bonjour();
         this.pluginName = pluginName;
-        console.log('new SmartNodeClient:', pluginName);
+        global.log('new SmartNodeClient:', pluginName);
         this.storage = new ClientStorage(this.pluginName);
 
         this.adapter = {};
@@ -31,26 +30,26 @@ module.exports = class SmartNodeClient {
     async init() {
         global.log('Starting search for master server...');
 
-        let browser = this.bonjour.find({ type: 'smartnode' });
-        
+        const browser = this.bonjour.find({ type: 'smartnode' });
+
         browser.on('up', (service) => {
             this.service = service;
-            
+
             this.onFoundMaster();
         });
     }
 
     close() {
-        
+
     }
 
     onFoundMaster() {
-        let address = this.service.addresses[0].includes(':') ? this.service.addresses[1] : this.service.addresses[0];
+        const address = this.service.addresses[0].includes(':') ? this.service.addresses[1] : this.service.addresses[0];
 
         global.success('Found an SmartNode server:', `http://${address}:${this.service.port}`);
 
         this.socket = socketio(`http://${address}:${this.service.port}`);
-        
+
         this.socket.on('connect', this.onConnect.bind(this));
         this.socket.on('unpair', this.onUnpair.bind(this));
         this.socket.on('disconnect', this.onDisconnect.bind(this));
@@ -62,38 +61,38 @@ module.exports = class SmartNodeClient {
             id: this.socket.id,
         });
 
-        let clientId = await this.adapter.storage.get('clientid');
+        const clientId = await this.adapter.storage.get('clientid');
 
         global.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
 
-        let plugin = await this._getPlugin();
-        let [pkg, callback] = plugin.init();
+        const plugin = await this._getPlugin();
+        const [pkg, callback] = plugin.init();
 
-        this.socket.emit('connected', { 
+        this.socket.emit('connected', {
             plugin: this.pluginName,
             configurationFormat: pkg.configurationFormat,
-            displayName:  pkg.displayName,
-            id: clientId
-        }, async (data) => {
+            displayName: pkg.displayName,
+            id: clientId,
+        }, async () => {
             await this.register();
             callback({ id: clientId });
         });
     }
-    
+
     onUnpair() {
         this.adapter.storage.set('clientid', undefined);
         this.adapter.unpair();
         this._unloadPlugin();
         delete this.adapter;
-        
+
         this.onFoundMaster();
     }
 
     async register() {
-        let clientId = await this.adapter.storage.get('clientid');
-        console.log('emitting register with clientID:', clientId);
-        this.socket.emit('register', { 
-            id: clientId
+        const clientId = await this.adapter.storage.get('clientid');
+        global.log('emitting register with clientID:', clientId);
+        this.socket.emit('register', {
+            id: clientId,
         }, (data) => {
             global.muted('Registered successfully!');
 
@@ -129,24 +128,26 @@ module.exports = class SmartNodeClient {
         let plugin;
 
         try {
+            // eslint-disable-next-line global-require, import/no-dynamic-require
             plugin = await require(`${this.pluginName}`)
                 .Client(this.adapter)
-                .catch((e) => { global.error('Client load plugin error', e) });
-        } catch(e) {
-            global.error(`Could not load plugin "${this.pluginName}" - you probably need to install it via "npm install ${this.pluginName}" first!`);
+                .catch((e) => { global.error('Client load plugin error', e); });
+        } catch (e) {
+            global.error(`Could not load plugin "${this.pluginName}" 
+                - you probably need to install it via "npm install ${this.pluginName}" first!`);
             global.muted('Debug', e);
             process.exit(1);
         }
 
         let functionError;
-        if (!('init' in plugin)) { functionError = "init"; }
-        if (!('load' in plugin)) { functionError = "load"; }
-        if (!('unload' in plugin)) { functionError = "unload"; }
-        if (!('unpair' in plugin)) { functionError = "unpair"; }
+        if (!('init' in plugin)) { functionError = 'init'; }
+        if (!('load' in plugin)) { functionError = 'load'; }
+        if (!('unload' in plugin)) { functionError = 'unload'; }
+        if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw `Plugin "${adapter.plugin}" does not provide a "${functionError}()"-function on the client side. Please contact the author!`;
-            process.exit(1);
+            throw global.error(`Plugin "${this.pluginName}" does not provide a "${functionError}()"
+                -function on the client side. Please contact the author!`);
         }
 
         return plugin;
@@ -160,7 +161,7 @@ module.exports = class SmartNodeClient {
      * @return {[type]} returns true if loaded
      */
     async _loadPlugin() {
-        let plugin = await this._getPlugin();
+        const plugin = await this._getPlugin();
         this.adapter.unload = plugin.unload;
         this.adapter.unpair = plugin.unpair;
 
@@ -179,4 +180,4 @@ module.exports = class SmartNodeClient {
         this.adapter.loaded = false;
         this.adapter.socket.close();
     }
-}
+};
