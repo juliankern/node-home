@@ -96,16 +96,4 @@ Object.assign(global, {
     },
 });
 
-global.log('');
-
-// ////////////////////////////////////////////////////////
-// System checks
-
-if (+process.version.replace('v', '').split('.')[0] < 8) {
-    global.error('You need to upgrade to NodeJS 8 to run this application!');
-    process.exit(1);
-}
-
-// //////////////////////////////////////////////////////
-
 process.on('unhandledRejection', (err) => { global.error('Unhandeled rejection caught!'); throw err; });

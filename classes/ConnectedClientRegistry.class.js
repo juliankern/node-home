@@ -7,7 +7,7 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     async registerClient(data) {
-        global.log('registerClient', data);
+        // global.log('registerClient', data);
         const savedClients = (await this.storage.get('clients')) || [];
 
         savedClients[data.id] = {
@@ -31,7 +31,7 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     connectClient(data) {
-        global.log('connectClient', data);
+        // global.log('connectClient', data);
         this.clients[data.id] = this.parentServer.getNewPlugin(data);
 
         return this.getClientById(data.id);
