@@ -3,5 +3,4 @@ node_js:
   - "8"
 
 before_install:
-  - git clone https://github.com/juliankern/smartnode-thermostat
-  - git clone https://github.com/juliankern/smartnode-statusdisplay
+  - sed -i '' 's/file:../https:\/\/github.com\/juliankern/g' package.json
