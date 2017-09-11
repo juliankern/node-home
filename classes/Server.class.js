@@ -21,8 +21,8 @@ module.exports = class SmartNodeServer {
         this.app = express();
         this.io = socketio(http.Server(this.app));
         this.bonjour = bonjour();
-        this.storage = new ServerStorage(null, () => {
-            if(cb) cb();
+        this.storage = new ServerStorage({}, () => {
+            if (cb) cb();
         });
 
         this.globals = {

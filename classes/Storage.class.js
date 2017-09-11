@@ -12,7 +12,7 @@ const fallbackStorage = {
             this._storage
                 .init({ dir: 'storage/server' })
                 .then(() => {
-                    console.log('Server storage inited!');
+                    global.muted('Server storage inited!');
 
                     if (cb) cb();
                 });
@@ -38,19 +38,17 @@ const fallbackStorage = {
             this._storage
                 .init({ dir: `storage/client/${pluginName}` })
                 .then(() => {
-                    console.log('Client storage inited!', pluginName);
+                    global.muted('Client storage inited!', pluginName);
 
                     if (cb) cb();
                 });
         }
 
         async get(key) {
-            console.log('client Storage get:', key, this._storage.getItem(key));
             return this._storage.getItem(key);
         }
 
         async set(key, value) {
-            console.log('client Storage set:', key, value);
             return this._storage.setItem(key, value);
         }
     },

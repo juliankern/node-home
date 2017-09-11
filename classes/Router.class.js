@@ -69,7 +69,6 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                 Object.keys(req.body).forEach((k) => {
                     if (k !== 'room' && k !== 'newroom') {
-                        console.log('setvaluebypath', k);
                         utils.setValueByPath(config, k, req.body[k]);
                     }
                 });

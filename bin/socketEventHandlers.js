@@ -40,7 +40,8 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
     };
 
     socketEventHandlers.register = async ({ id }, cb) => {
-        const clientData = (await SmartNodeServer.storage.get('clients'))[id];
+        const clients = await SmartNodeServer.storage.get('clients');
+        const clientData = clients && clients[id] ? clients[id] : undefined;
         const configuration = clientData ? clientData.config : undefined;
         const configurationFormat = clientData ? clientData.configurationFormat : undefined;
 
