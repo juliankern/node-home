@@ -17,7 +17,7 @@
     "lint:server": "npm run lint:js:server",
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
-    "start": "npm run server & npm run watch-scss",
+    "start": "npm run watch-scss & npm run server",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },

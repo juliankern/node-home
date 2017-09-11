@@ -17,11 +17,13 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor() {
+    constructor(cb) {
         this.app = express();
         this.io = socketio(http.Server(this.app));
         this.bonjour = bonjour();
-        this.storage = new ServerStorage();
+        this.storage = new ServerStorage(null, () => {
+            if(cb) cb();
+        });
 
         this.globals = {
             global: {},
@@ -171,7 +173,7 @@ module.exports = class SmartNodeServer {
                 .catch((e) => { global.error('Server load plugin error', e); });
         } catch (e) {
             // nope, the plugin isn't installed on server side yet - die()
-            global.error(`Plugin "${adapter.plugin}" not found 
+            global.error(`Plugin "${adapter.plugin}" not found
                 - you need to install it via "npm install ${adapter.plugin}" first!`);
             global.muted('Debug', e);
             process.exit(1);
@@ -183,8 +185,8 @@ module.exports = class SmartNodeServer {
         if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw global.error(`Plugin "${adapter.plugin}" does not provide a 
-                "${functionError}()"-function on the server side. 
+            throw global.error(`Plugin "${adapter.plugin}" does not provide a
+                "${functionError}()"-function on the server side.
                 Please contact the author!`);
         }
 

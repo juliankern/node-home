@@ -27,7 +27,11 @@ const cliOptions = cli.parse({
 
 const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js');
 const ServerClientConnector = new SmartNodeServerClientConnector();
-const SmartNodeServer = new (global.req('classes/Server.class.js'))();
+const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
+    SmartNodeServer
+        .init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
+        .catch((e) => { global.error('Server init error', e); });
+});
 
 const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
@@ -38,9 +42,6 @@ if (process.title === 'npm' && require('os').type().includes('Windows')) {
     global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
     global.log('');
 }
-
-SmartNodeServer.init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
-    .catch((e) => { global.error('Server init error', e); });
 
 // ////////////////////////////////////////////////////////
 

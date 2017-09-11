@@ -11,15 +11,17 @@ module.exports = class SmartNodeClient {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor(pluginName) {
-        this.bonjour = bonjour();
-        this.pluginName = pluginName;
-        global.log('new SmartNodeClient:', pluginName);
-        this.storage = new ClientStorage(this.pluginName);
-
+    constructor(pluginName, cb) {
         this.adapter = {};
         this.socket = {};
         this.service = {};
+
+        this.bonjour = bonjour();
+        this.pluginName = pluginName;
+        global.log('new SmartNodeClient:', pluginName);
+        this.storage = new ClientStorage(this.pluginName, () => {
+            if (cb) cb();
+        });
     }
 
     /**
@@ -30,9 +32,9 @@ module.exports = class SmartNodeClient {
     async init() {
         global.log('Starting search for master server...');
 
-        const browser = this.bonjour.find({ type: 'smartnode' });
+        this.browser = this.bonjour.find({ type: 'smartnode' });
 
-        browser.on('up', (service) => {
+        this.browser.on('up', (service) => {
             this.service = service;
 
             this.onFoundMaster();
@@ -40,7 +42,9 @@ module.exports = class SmartNodeClient {
     }
 
     close() {
-
+        if ('close' in this.socket) this.socket.close();
+        this.browser.stop();
+        this.bonjour.destroy();
     }
 
     onFoundMaster() {
@@ -73,7 +77,11 @@ module.exports = class SmartNodeClient {
             configurationFormat: pkg.configurationFormat,
             displayName: pkg.displayName,
             id: clientId,
-        }, async () => {
+        }, async ({ id }) => {
+            if (id !== clientId) {
+                await this.adapter.storage.set('clientid', id);
+            }
+
             await this.register();
             callback({ id: clientId });
         });
@@ -110,7 +118,7 @@ module.exports = class SmartNodeClient {
     }
 
     async onSetup(data) {
-        global.muted('Setup completed - loading plugin...');
+        global.muted('Setup completed - loading plugin...', data);
         this.adapter.config = data.config;
         this.adapter.room = data.config.room;
 
@@ -133,7 +141,7 @@ module.exports = class SmartNodeClient {
                 .Client(this.adapter)
                 .catch((e) => { global.error('Client load plugin error', e); });
         } catch (e) {
-            global.error(`Could not load plugin "${this.pluginName}" 
+            global.error(`Could not load plugin "${this.pluginName}"
                 - you probably need to install it via "npm install ${this.pluginName}" first!`);
             global.muted('Debug', e);
             process.exit(1);

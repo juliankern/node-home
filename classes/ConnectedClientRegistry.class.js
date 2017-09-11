@@ -8,7 +8,7 @@ module.exports = () => class ConnectedClientRegistry {
 
     async registerClient(data) {
         // global.log('registerClient', data);
-        const savedClients = (await this.storage.get('clients')) || [];
+        const savedClients = (await this.storage.get('clients')) || {};
 
         savedClients[data.id] = {
             id: data.id,
@@ -16,6 +16,7 @@ module.exports = () => class ConnectedClientRegistry {
             configurationFormat: data.configurationFormat,
             displayName: data.displayName,
             config: {},
+            registered: Date.now(),
         };
 
         if (data.config) {
@@ -23,7 +24,6 @@ module.exports = () => class ConnectedClientRegistry {
         }
 
         await this.storage.set('clients', savedClients);
-        global.log('CLIENTLIST', await this.storage.get('clients'));
 
         this.connectClient(data);
 
@@ -33,8 +33,13 @@ module.exports = () => class ConnectedClientRegistry {
     connectClient(data) {
         // global.log('connectClient', data);
         this.clients[data.id] = this.parentServer.getNewPlugin(data);
+        this.clients[data.id].lastConnection = Date.now();
 
         return this.getClientById(data.id);
+    }
+
+    checkClientlist() {
+
     }
 
     getClientIdList() {

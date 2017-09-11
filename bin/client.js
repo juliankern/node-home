@@ -27,11 +27,10 @@ if (!options.plugin) {
 // ////////////////////////////////////////////////////////
 
 const SmartNodeClient = global.req('classes/Client.class');
-const client = new SmartNodeClient(options.plugin);
-
-// ////////////////////////////////////////////////////////
-
-client.init().catch((e) => { global.error('Client init error', e); });
+const client = new SmartNodeClient(options.plugin, () => {
+    client.init()
+        .catch((e) => { global.error('Client init error', e); });
+});
 
 // ///////////////////////////////////////////////////////
 

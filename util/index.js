@@ -18,7 +18,7 @@ function findClientId(clients) {
 
     while (cond) {
         id = randomstring.generate({ length: 12, readable: true });
-        if (!clients[id]) { break; }
+        if (!clients || !clients[id]) { break; }
     }
 
     return id;
@@ -30,36 +30,38 @@ function randomInt(min, max) {
 
 // eslint-disable-next-line no-unused-vars
 function getValueByPath(obj, path) {
-    /* eslint-disable no-param-reassign, no-shadow */
-    for (let i = 0, path = path.split('.'); i < path.length; i++) {
+    const pathArray = path.split('.');
+
+    /* eslint-disable no-param-reassign */
+    for (let i = 0; i < pathArray.length; i++) {
         if (!obj) break;
-        obj = obj[path[i]];
+        obj = obj[pathArray[i]];
     }
-    /* eslint-enable no-param-reassign, no-shadow */
+    /* eslint-enable no-param-reassign */
 
     return obj;
 }
 
 function setValueByPath(obj, path, value) {
+    const pathArray = path.split('.');
+
     let arrayMatch;
     let currPath;
 
-    /* eslint-disable no-shadow */
-    for (let i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
-        /* eslint-enable no-shadow */
-        currPath = path[i];
+    for (let i = 0, curr = obj; i < pathArray.length; i++) {
+        currPath = pathArray[i];
         if (!curr) break;
 
         /* eslint-disable no-cond-assign */
-        if (arrayMatch = path[i].match(/\[(\d)+\]/)) {
+        if (arrayMatch = pathArray[i].match(/\[(\d)+\]/)) {
             /* eslint-enable no-cond-assign */
-            currPath = path[i].replace(/\[(\d)+\]/, '');
+            currPath = pathArray[i].replace(/\[(\d)+\]/, '');
             if (!curr[currPath]) curr[currPath] = [];
             curr[currPath][arrayMatch[1]] = value;
         } else {
-            if (!curr[path[i]]) curr[path[i]] = {};
-            if (i === path.length - 1) { curr[path[i]] = value; break; }
-            curr = curr[path[i]];
+            if (!curr[pathArray[i]]) curr[pathArray[i]] = {};
+            if (i === pathArray.length - 1) { curr[pathArray[i]] = value; break; }
+            curr = curr[pathArray[i]];
         }
     }
 
@@ -68,12 +70,12 @@ function setValueByPath(obj, path, value) {
 
 // eslint-disable-next-line no-unused-vars
 function deleteByPath(obj, path) {
-    /* eslint-disable no-shadow */
-    for (let i = 0, path = path.split('.'), curr = obj; i < path.length; i++) {
-        /* eslint-enable no-shadow */
+    const pathArray = path.split('.');
+
+    for (let i = 0, curr = obj; i < pathArray.length; i++) {
         if (!curr) break;
-        if (i === path.length - 1) { delete curr[path[i]]; break; }
-        curr = curr[path[i]];
+        if (i === pathArray.length - 1) { delete curr[pathArray[i]]; break; }
+        curr = curr[pathArray[i]];
     }
 
     return obj;

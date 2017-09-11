@@ -69,6 +69,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                 Object.keys(req.body).forEach((k) => {
                     if (k !== 'room' && k !== 'newroom') {
+                        console.log('setvaluebypath', k);
                         utils.setValueByPath(config, k, req.body[k]);
                     }
                 });
@@ -84,7 +85,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
                     delete clients[req.params.clientId];
                     await SmartNodeServer.storage.set('clients', clients);
 
-                    req.flash('success', { message: `The client was unpaired successfully. 
+                    req.flash('success', { message: `The client was unpaired successfully.
                         You can now set it up again.` });
                     return res.redirect('/');
                 } else {
@@ -121,7 +122,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
     handler(req, res, next) {
         // handle some app specific data
 
-        // add error/siccess/info messages to templates 
+        // add error/siccess/info messages to templates
         Object.assign(res.locals, {
             messages: {
                 success: req.flash('success'),

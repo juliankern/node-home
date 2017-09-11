@@ -5,33 +5,53 @@ tmpStore.initSync({ dir: 'storage/server' });
 
 const fallbackStorage = {
     Server: class ServerStorage {
-        constructor({ room, plugin } = {}) {
+        constructor({ room, plugin } = {}, cb) {
             this._room = room;
             this._plugin = plugin;
             this._storage = storage;
-            this._storage.init({ dir: 'storage/server' });
+            this._storage
+                .init({ dir: 'storage/server' })
+                .then(() => {
+                    console.log('Server storage inited!');
+
+                    if (cb) cb();
+                });
+        }
+
+        buildPath(key) {
+            return [this._room, this._plugin, key].filter(e => !!e).join('.');
         }
 
         async get(key) {
-            return this._storage.getItem([this._room, this._plugin, key].filter(e => !!e).join('.'));
+            // console.log('Storage: get', this.buildPath(key), (await this._storage.getItem(this.buildPath(key))));
+            return this._storage.getItem(this.buildPath(key));
         }
 
         async set(key, value) {
-            return this._storage.setItem([this._room, this._plugin, key].filter(e => !!e).join('.'), value);
+            // console.log('Storage: set', this.buildPath(key), typeof value, value);
+            return this._storage.setItem(this.buildPath(key), value);
         }
     },
     Client: class ClientStorage {
-        constructor(pluginName) {
+        constructor(pluginName, cb) {
             this._storage = storage;
-            this._storage.init({ dir: `storage/client/${pluginName}` });
+            this._storage
+                .init({ dir: `storage/client/${pluginName}` })
+                .then(() => {
+                    console.log('Client storage inited!', pluginName);
+
+                    if (cb) cb();
+                });
         }
 
         async get(key) {
-            return this._storage.getItem(`${key}`);
+            console.log('client Storage get:', key, this._storage.getItem(key));
+            return this._storage.getItem(key);
         }
 
         async set(key, value) {
-            return this._storage.setItem(`${key}`, value);
+            console.log('client Storage set:', key, value);
+            return this._storage.setItem(key, value);
         }
     },
 };
@@ -60,27 +80,29 @@ if (pluginName) {
         }
 
         if (!('get' in plugin.Client.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part. 
+            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part.
                 Please contact the author.`);
         }
 
         if (!('get' in plugin.Server.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part. 
+            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part.
                 Please contact the author.`);
         }
 
         if (!('set' in plugin.Client.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part. 
+            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part.
                 Please contact the author.`);
         }
 
         if (!('set' in plugin.Server.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part. 
+            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part.
                 Please contact the author.`);
         }
 
         global.success(`Storage plugin "${pluginName.name}" successfully loaded.`);
     }
+} else {
+    global.log('No storage plugin defined. Falling back to node-persist.');
 }
 
 module.exports = plugin || fallbackStorage;
