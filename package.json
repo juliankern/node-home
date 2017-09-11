@@ -4,6 +4,7 @@
   "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
   "scripts": {
+    "test": "npm run lint",
     "lint": "npm run lint:all",
     "lint:all": "npm run lint:server && npm run lint:public",
     "lint:html": "pug-lint views/ templates/",
@@ -16,7 +17,7 @@
     "lint:server": "npm run lint:js:server",
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
-    "start": "npm run lint:all && (npm run server & npm run watch-scss)",
+    "start": "npm run server & npm run watch-scss",
     "server": "nodemon -e js --ignore bin/client.js bin/server.js",
     "client": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
