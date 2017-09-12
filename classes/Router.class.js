@@ -63,7 +63,6 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
             })
             .post(async (req, res) => {
                 const config = {};
-                const clients = await SmartNodeServer.storage.get('clients');
                 const client = SmartNodeServer.getClientById(req.params.clientId);
                 const hasConfig = client.config && Object.keys(client.config).length;
 
@@ -81,11 +80,11 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
                 } else if ('reset' in req.body) {
                     client.socket.emit('unpair');
                     SmartNodeServer.unpairClient(req.params.clientId);
-                    delete clients[req.params.clientId];
-                    await SmartNodeServer.storage.set('clients', clients);
+                    await SmartNodeServer.clients.registeredClients.remove(req.params.clientId);
 
                     req.flash('success', { message: `The client was unpaired successfully.
                         You can now set it up again.` });
+
                     return res.redirect('/');
                 } else {
                     const rooms = await SmartNodeServer.storage.get('rooms') || [];
@@ -101,8 +100,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                     client.config = config;
 
-                    await SmartNodeServer.storage.set('clients', clients);
-                    SmartNodeServer.updateClient(req.params.clientId, { config });
+                    await SmartNodeServer.updateClient(req.params.clientId, { config });
                     client.init();
 
                     if (!hasConfig) {

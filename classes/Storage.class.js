@@ -19,6 +19,7 @@ const fallbackStorage = {
         }
 
         buildPath(key) {
+            // console.log('buildPath', key, [this._room, this._plugin, key].filter(e => !!e).join('.'));
             return [this._room, this._plugin, key].filter(e => !!e).join('.');
         }
 
@@ -28,7 +29,7 @@ const fallbackStorage = {
         }
 
         async set(key, value) {
-            // console.log('Storage: set', this.buildPath(key), typeof value, value);
+            // console.log('Storage: __set', this.buildPath(key), value);
             return this._storage.setItem(this.buildPath(key), value);
         }
     },

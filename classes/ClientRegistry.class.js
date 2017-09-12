@@ -41,22 +41,31 @@ class RegisteredClientsList {
     }
 
     async _read() {
+        // console.log('RegisteredClientsList _read()', await this._storage.get('clients'));
+
         this._clients = (await this._storage.get('clients')) || {};
+        return this._clients;
     }
 
     async _write() {
-        await this._storage.set('clients', this._clients);
+        // console.log('RegisteredClientsList _write()', this._clients);
+        // console.log('RegisteredClientsList isArray()', Array.isArray(this._clients));
+        // console.trace();
+
+        return this._storage.set('clients', this._clients);
     }
 
     async add(id) {
+        // console.log('RegisteredClientsList add(id)', id);
         await this._read();
-        this._clients[id] = {};
+        Object.assign(this._clients, { [id]: { id } });
         return this._write();
     }
 
     async exists(id) {
         await this._read();
-        return id in this._clients;
+        // console.log('RegisteredClientsList exists(id)', id, this._clients);
+        return !!this._clients[id];
     }
 
     async fill(id, data) {
@@ -82,7 +91,10 @@ class RegisteredClientsList {
     }
 
     async update(id, data) {
-        if (this.exists(id)) {
+        // console.log('RegisteredClientsList update(id, data)', id, data);
+        // console.log('RegisteredClientsList update 1', await this.exists(id));
+
+        if (await this.exists(id)) {
             this._clients[id] = mergeDeep(this._clients[id], data);
             return this._write();
         }
@@ -101,6 +113,8 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     async registerClient(data) {
+        console.log('registerClient with data', data);
+
         await this.registeredClients.add(data.id);
         this.connectedClients.add(data.id);
         this.connectedClients.fill(data.id, {
@@ -115,6 +129,8 @@ module.exports = () => class ConnectedClientRegistry {
         if (data.config) {
             await this.registeredClients.update(data.id, { config: data.config });
         }
+
+        console.log('after register', await this.registeredClients.getAll());
 
         return this.connectClient(data);
     }
@@ -171,23 +187,17 @@ module.exports = () => class ConnectedClientRegistry {
         return this.connectedClients.get(findClientIdBySocketId.call(this, socketId));
 
         function findClientIdBySocketId(id) {
-            if (this.connectedClients.exists(id)) {
-                return this.getClientIdList()
-                    .find(clientId => this.connectedClients.get(clientId).socket.client.id === id);
-            }
-
-            return false;
+            return this.getClientIdList()
+                .find(clientId => this.connectedClients.get(clientId).socket.client.id === id);
         }
     }
 
     async updateClient(id, data) {
-        if (data.config || data.connected) {
-            if (this.registeredClients.exists(id)) {
-                if (data.config) await this.registeredClients.update(id, { config: data.config });
-                if (data.connected) await this.registeredClients.update(id, { connected: data.connected });
-                if (data.lastConnection) {
-                    await this.registeredClients.update(id, { lastConnection: data.lastConnection });
-                }
+        if (data.config || data.connected || data.lastConnection) {
+            if (data.config) await this.registeredClients.update(id, { config: data.config });
+            if (data.connected) await this.registeredClients.update(id, { connected: data.connected });
+            if (data.lastConnection) {
+                await this.registeredClients.update(id, { lastConnection: data.lastConnection });
             }
         }
 
