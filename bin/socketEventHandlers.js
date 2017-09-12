@@ -10,7 +10,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
     socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id }, cb) => {
         global.muted(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
-        const clients = await SmartNodeServer.storage.get('clients');
+        const clients = await SmartNodeServer.clients.registeredClients.getAll();
 
         if (!id || !clients[id]) {
             const clientId = utils.findClientId(clients);
@@ -65,7 +65,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
     };
 
     socketEventHandlers.disconnect = async (reason) => {
-        SmartNodeServer.unloadServerPlugin(socket.client.id);
+        SmartNodeServer.disconnectClient(socket.client.id);
         SmartNodeServerClientConnector.unregister(socket.client.id, reason);
 
         global.warn('Client disconnected! ID:', socket.client.id, reason);

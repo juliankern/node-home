@@ -27,13 +27,14 @@ const cliOptions = cli.parse({
 
 const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js');
 const ServerClientConnector = new SmartNodeServerClientConnector();
+let socketEventHandlers = {};
 const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
+    socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer); // eslint-disable-line global-require
     SmartNodeServer
         .init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
         .catch((e) => { global.error('Server init error', e); });
 });
 
-const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
 // ////////////////////////////////////////////////////////
 

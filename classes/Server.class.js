@@ -9,7 +9,7 @@ const SmartNodePlugin = global.req('classes/Plugin.class');
 const SmartNodeRouter = global.req('classes/Router.class');
 const ServerStorage = global.req('classes/Storage.class').Server;
 const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
-const ConnectedClientRegistry = (global.req('classes/ConnectedClientRegistry.class')(SmartNodePlugin));
+const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
 
 module.exports = class SmartNodeServer {
     /**
@@ -29,7 +29,7 @@ module.exports = class SmartNodeServer {
             global: {},
         };
 
-        this.connectedClients = new ConnectedClientRegistry(this.storage, this);
+        this.clients = new ClientRegistry(this.storage, this);
     }
 
     getNewPlugin(data) {
@@ -118,11 +118,15 @@ module.exports = class SmartNodeServer {
     }
 
     registerClient(data) {
-        return this.connectedClients.registerClient(data);
+        return this.clients.registerClient(data);
     }
 
     connectClient(data) {
-        return this.connectedClients.connectClient(data);
+        return this.clients.connectClient(data);
+    }
+
+    disconnectClient(id) {
+        return this.clients.disconnectClient(id);
     }
 
     /**
@@ -238,43 +242,43 @@ module.exports = class SmartNodeServer {
     }
 
     getClientIdList() {
-        return this.connectedClients.getClientIdList();
+        return this.clients.getClientIdList();
     }
 
     getClientList() {
-        return this.connectedClients.getClientList();
+        return this.clients.getClientList();
     }
 
     getClientById(id) {
-        return this.connectedClients.getClientById(id);
+        return this.clients.getClientById(id);
     }
 
     getClientBySocketId(socketId) {
-        return this.connectedClients.getClientBySocketId(socketId);
+        return this.clients.getClientBySocketId(socketId);
     }
 
     updateClient(id, data) {
-        return this.connectedClients.updateClient(id, data);
+        return this.clients.updateClient(id, data);
     }
 
     updateClientBySocketId(id, data) {
-        return this.connectedClients.updateClientBySocketId(id, data);
+        return this.clients.updateClientBySocketId(id, data);
     }
 
     removeClient(id) {
-        return this.connectedClients.removeClient(id);
+        return this.clients.removeClient(id);
     }
 
     removeClientBySocketId(id) {
-        return this.connectedClients.removeClientBySocketId(id);
+        return this.clients.removeClientBySocketId(id);
     }
 
     deleteClient(id) {
-        return this.connectedClients.deleteClient(id);
+        return this.clients.deleteClient(id);
     }
 
     unpairClient(id) {
-        return this.connectedClients.unpairClient(id);
+        return this.clients.unpairClient(id);
     }
 
     validConfiguration(config, format) {
