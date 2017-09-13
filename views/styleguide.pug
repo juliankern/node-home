@@ -1,4 +1,57 @@
 extends ../templates/layout.pug
 
 block content
-    p TEST
+    h3 Grid
+
+    style(type="text/css")
+        | .box { padding: 1rem; border: 1px solid #ddd; display: block; }
+        | .box-success { padding: 1rem; border: 1px solid green; display: block; background: lightgreen; }
+
+    h4 Example
+    .grid--row
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+        .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
+            span.box small-12, medium-6, large-4, xlarge-2
+
+    h4 Code
+    pre
+        | &lt;div class="grid--col-small-12 grid--col-medium-6 grid--col-large-4 grid--col-xlarge-2"&gt;
+        | &nbsp;&nbsp;&lt;span class="box"&gt;small-12, medium-6, large-4, xlarge-2&lt;/span&gt;
+        | &lt;/div&gt;
+
+    h3 Responsive visibility
+    h4 Example
+    .grid--row
+        .grid--show-small-only.grid--col-medium-6
+            span.box-success small breakpoint
+        .grid--hide-small-only.grid--col-medium-6
+            span.box NOT small breakpoint
+        .grid--show-medium-only.grid--col-medium-6
+            span.box-success medium breakpoint
+        .grid--hide-medium-only.grid--col-medium-6
+            span.box NOT medium breakpoint
+        .grid--show-large-only.grid--col-medium-6
+            span.box-success large breakpoint
+        .grid--hide-large-only.grid--col-medium-6
+            span.box NOT large breakpoint
+        .grid--show-xlarge-only.grid--col-medium-6
+            span.box-success xlarge breakpoint
+        .grid--hide-xlarge-only.grid--col-medium-6
+            span.box NOT xlarge breakpoint
+    h4 Code
+    pre
+        | &lt;div class="grid--<strong>show</strong>-small-only"&gt;
+        | &nbsp;&nbsp;&lt;span class="box"&gt;small breakpoint&lt;/span&gt;
+        | &lt;/div&gt;
+        | &lt;div class="grid--<strong>hide</strong>-small-only"&gt;
+        | &nbsp;&nbsp;&lt;span class="box"&gt;NOT small breakpoint&lt;/span&gt;
+        | &lt;/div&gt;

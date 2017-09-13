@@ -7,7 +7,7 @@
 
 $settings: (
     config: (
-        features: classes visibility offset,
+        features: classes visibility offset adv-visibility,
         mode: flex
     ),
     breakpoints: (
@@ -21,7 +21,7 @@ $settings: (
         medium: (
             min: 468px,
             max: 1023px,
-            content: 468px,
+            content: 428px,
             padding: 20px,
             gutter: 12px,
             columnCount: 12
@@ -29,14 +29,14 @@ $settings: (
         large: (
             min: 1024px,
             max: 1439px,
-            content: 1024px,
+            content: 974px,
             padding: 25px,
             gutter: 16px,
             columnCount: 12
         ),
         xlarge: (
             min: 1440px,
-            content: 1440px,
+            content: 1370px,
             padding: 35px,
             gutter: 24px,
             columnCount: 12
@@ -52,12 +52,12 @@ $settings: (
     }
 }
 
-main,
-.container {
-    width: 90vw;
-    margin: 0 auto;
-    overflow: hidden;
-}
+// main,
+// .container {
+//     width: 90vw;
+//     margin: 0 auto;
+//     overflow: hidden;
+// }
 
 .homekitpin {
     margin-top: 10px;
@@ -124,8 +124,6 @@ main,
     display: none;
 }
 
-@import 'grid';
-@import 'flex';
 @import 'form';
 @import 'button';
 @import 'card';

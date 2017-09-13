@@ -4,11 +4,11 @@ block content
     h2 Dashboard
 
     p Connected clients: #{Object.keys(clients).length}
-    .flex-grid__3
+    .grid--row
         each c, id in clients
             - hasConfig = c.config && Object.keys(c.config).length;
 
-            .flex--item
+            .grid--col-large-6.grid--col-xlarge-4
                 .client.card
                     .card-body
                         h4.card-title #{c.displayName} #{hasConfig ? '@ ' + c.config.room : ''}
@@ -41,4 +41,4 @@ block content
                         else
                             a.btn__primary.client--button(href='/config/' + c.id) Configure
         else
-            p No clients connected yet
+            .grid--col-small-12 No clients connected yet
