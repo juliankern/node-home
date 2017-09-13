@@ -1,7 +1,7 @@
 doctype html
-html 
+html
     head
-        title= '${(headline ? headline + " - " : "") }SmartNode'
+        title #{(headline ? headline + " - " : "")}SmartNode
         link(href='/css/style.css', rel='stylesheet', type='text/css')
 
         block scripts
@@ -12,8 +12,8 @@ html
                     != s
     body
         include navigation.pug
-        
-        main                
+
+        main
             h2= headline
 
             include messages.pug

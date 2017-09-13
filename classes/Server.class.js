@@ -1,21 +1,15 @@
-// const EventEmitter = require('events');
-
 const bonjour = require('bonjour');
 const express = require('express');
+const http = require('http');
 const socketio = require('socket.io');
 
 const utils = global.req('util');
-const storage = require('node-persist');
-
-storage.initSync({
-    dir: 'storage/server',
-    expiredInterval: 24 * 60 * 60 * 1000,
-});
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
 const SmartNodeRouter = global.req('classes/Router.class');
+const ServerStorage = global.req('classes/Storage.class').Server;
 const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
-const ConnectedClientRegistry = (global.req('classes/ConnectedClientRegistry.class')(SmartNodePlugin));
+const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
 
 module.exports = class SmartNodeServer {
     /**
@@ -23,22 +17,19 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor() {
+    constructor(cb) {
         this.app = express();
-        this.io = socketio({});
+        this.io = socketio(http.Server(this.app));
         this.bonjour = bonjour();
-        this.storage = storage;
-
-        this.storage.get = this.storage.getItemSync;
-        this.storage.set = this.storage.setItemSync;
-
-        if (!this.storage.get('clients')) this.storage.set('clients', {});
+        this.storage = new ServerStorage({}, () => {
+            if (cb) cb();
+        });
 
         this.globals = {
             global: {},
         };
 
-        this.connectedClients = new ConnectedClientRegistry(this.storage, this);
+        this.clients = new ClientRegistry(this.storage, this);
     }
 
     getNewPlugin(data) {
@@ -51,14 +42,23 @@ module.exports = class SmartNodeServer {
      * @author Julian Kern <mail@juliankern.com>
      */
     async init({ port, webport }, Connector, getEventHandlersForSocketFn) {
-        // eslint-disable-next-line no-param-reassign
-        port = port || (await utils.findPort());
-        // eslint-disable-next-line no-param-reassign
-        webport = webport || (await utils.findPort(port + 1));
+        port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
+        webport = webport || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
-        (SmartNodeRouter(this))(this.app);
+        const router = new (SmartNodeRouter(this))(this.app);
+        router.init();
+
+        this.io.listen(port);
+        this.app.listen(webport, () => {
+            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
+            this.bonjour.published = true;
+
+            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
+            global.success(`Webserver running on port ${webport}`);
+        });
 
         this.io.on('connection', (socket) => {
+            // console.log(socket.client); return;
             global.log('Client connected:', socket.client.id);
 
             const connectionId = Connector.register(socket);
@@ -70,20 +70,10 @@ module.exports = class SmartNodeServer {
 
                 global.log('Registering handlers for', connectionId);
 
-                // eslint-disable-next-line no-restricted-syntax
-                for (const [name, handler] of Object.entries(handlers)) {
+                Object.entries(handlers).forEach(([name, handler]) => {
                     Connector.addHandler(connectionId, name, handler);
-                }
+                });
             }
-        });
-
-        this.io.listen(port);
-        this.app.listen(webport, () => {
-            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
-            this.bonjour.published = true;
-
-            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
-            global.success(`Webserver running on port ${webport}`);
         });
     }
 
@@ -128,11 +118,15 @@ module.exports = class SmartNodeServer {
     }
 
     registerClient(data) {
-        return this.connectedClients.registerClient(data);
+        return this.clients.registerClient(data);
     }
 
     connectClient(data) {
-        return this.connectedClients.connectClient(data);
+        return this.clients.connectClient(data);
+    }
+
+    disconnectClient(id) {
+        return this.clients.disconnectClient(id);
     }
 
     /**
@@ -155,7 +149,7 @@ module.exports = class SmartNodeServer {
 
         this.updateClientBySocketId(id, { loaded: true });
 
-        return null;
+        return true;
     }
 
     /**
@@ -183,8 +177,8 @@ module.exports = class SmartNodeServer {
                 .catch((e) => { global.error('Server load plugin error', e); });
         } catch (e) {
             // nope, the plugin isn't installed on server side yet - die()
-            global.error(`Plugin "${adapter.plugin}" not found - 
-                you need to install it via "npm install ${adapter.plugin}" first!`);
+            global.error(`Plugin "${adapter.plugin}" not found
+                - you need to install it via "npm install ${adapter.plugin}" first!`);
             global.muted('Debug', e);
             process.exit(1);
         }
@@ -195,8 +189,9 @@ module.exports = class SmartNodeServer {
         if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw global.error(`Plugin "${adapter.plugin}" does not provide a 
-                "${functionError}()"-function on the server side. Please contact the author!`);
+            throw global.error(`Plugin "${adapter.plugin}" does not provide a
+                "${functionError}()"-function on the server side.
+                Please contact the author!`);
         }
 
         this.updateClientBySocketId(id, {
@@ -220,10 +215,12 @@ module.exports = class SmartNodeServer {
         let client = this.getClientBySocketId(id);
         if (!client) client = this.getClientById(id);
 
-        global.warn('Unloaded plugin for client:', client.id);
+        global.warn('Unloaded plugin for client:', client ? client.id : null);
 
-        if (client.loaded) client.unload();
-        this.removeClientBySocketId(id);
+        if (client) {
+            if (client.loaded) client.unload();
+            this.removeClientBySocketId(id);
+        }
     }
 
     /**
@@ -235,56 +232,55 @@ module.exports = class SmartNodeServer {
      * @param  {object} changed  array of variable paths that got changed
      */
     globalsChanged(clientId, changed) {
-        Object.keys(this.getClientList()).filter(
-            id => id !== clientId,
-        ).forEach((id) => {
-            this.getClientById(id).emit('globalsChanged', {
-                changed,
+        Object.keys(this.getClientList())
+            .filter(id => id !== clientId)
+            .forEach((id) => {
+                this.getClientById(id).emit('globalsChanged', {
+                    changed,
+                });
             });
-        });
     }
 
     getClientIdList() {
-        return this.connectedClients.getClientIdList();
+        return this.clients.getClientIdList();
     }
 
     getClientList() {
-        return this.connectedClients.getClientList();
+        return this.clients.getClientList();
     }
 
     getClientById(id) {
-        return this.connectedClients.getClientById(id);
+        return this.clients.getClientById(id);
     }
 
     getClientBySocketId(socketId) {
-        return this.connectedClients.getClientBySocketId(socketId);
+        return this.clients.getClientBySocketId(socketId);
     }
 
     updateClient(id, data) {
-        return this.connectedClients.updateClient(id, data);
+        return this.clients.updateClient(id, data);
     }
 
     updateClientBySocketId(id, data) {
-        return this.connectedClients.updateClientBySocketId(id, data);
+        return this.clients.updateClientBySocketId(id, data);
     }
 
     removeClient(id) {
-        return this.connectedClients.removeClient(id);
+        return this.clients.removeClient(id);
     }
 
     removeClientBySocketId(id) {
-        return this.connectedClients.removeClientBySocketId(id);
+        return this.clients.removeClientBySocketId(id);
     }
 
     deleteClient(id) {
-        return this.connectedClients.deleteClient(id);
+        return this.clients.deleteClient(id);
     }
 
     unpairClient(id) {
-        return this.connectedClients.unpairClient(id);
+        return this.clients.unpairClient(id);
     }
 
-    // eslint-disable-next-line class-methods-use-this
     validConfiguration(config, format) {
         return SmartNodeConfig.validConfiguration(config, format);
     }

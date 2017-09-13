@@ -1,10 +1,22 @@
+// ////////////////////////////////////////////////////////
+// System checks
+
+if (+process.version.replace('v', '').split('.')[0] < 8) {
+    // eslint-disable-next-line no-console
+    throw console.error('\n\x1B[1;31mYou need to upgrade to NodeJS 8 to run this application!\x1B[0m');
+}
+
+// //////////////////////////////////////////////////////
+
 require('../util/global.js');
+
+global.log('');
 
 const pkg = global.req('package.json');
 const cli = require('cli');
 
 cli.enable('version');
-cli.setApp(pkg.name, pkg.version);
+cli.setApp('bin/server.js', pkg.version);
 
 const cliOptions = cli.parse({
     port: ['p', 'Websocket port to use instead of autodiscover', 'int', null],
@@ -15,16 +27,22 @@ const cliOptions = cli.parse({
 
 const SmartNodeServerClientConnector = global.req('classes/ServerClientConnector.class.js');
 const ServerClientConnector = new SmartNodeServerClientConnector();
-const SmartNodeServer = new (global.req('classes/Server.class.js'))();
+let socketEventHandlers = {};
+const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
+    socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer); // eslint-disable-line global-require
+    SmartNodeServer
+        .init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
+        .catch((e) => { global.error('Server init error', e); });
+});
 
-const socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer);
 
 // ////////////////////////////////////////////////////////
 
-SmartNodeServer
-    .init(
-        { port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
-    .catch((e) => { global.error('Server init error', e); });
+// eslint-disable-next-line global-require
+if (process.title === 'npm' && require('os').type().includes('Windows')) {
+    global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
+    global.log('');
+}
 
 // ////////////////////////////////////////////////////////
 

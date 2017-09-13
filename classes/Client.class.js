@@ -1,11 +1,8 @@
 // const EventEmitter = require('events');
-// const moment = require('moment');
 const bonjour = require('bonjour');
-// eslint-disable-next-line import/no-extraneous-dependencies
-const socketio = require('socket.io-client');
+const socketio = require('socket.io-client'); // eslint-disable-line import/no-extraneous-dependencies
 
-const storage = require('node-persist');
-
+const ClientStorage = global.req('classes/Storage.class').Client;
 const SmartNodePlugin = global.req('classes/Plugin.class');
 
 module.exports = class SmartNodeClient {
@@ -14,15 +11,17 @@ module.exports = class SmartNodeClient {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor(pluginName) {
-        this.bonjour = bonjour();
-        this.storage = storage;
-        this.storage.initSync({ dir: `storage/client/${pluginName}` });
-
-        this.pluginName = pluginName;
+    constructor(pluginName, cb) {
         this.adapter = {};
         this.socket = {};
         this.service = {};
+
+        this.bonjour = bonjour();
+        this.pluginName = pluginName;
+        global.log('new SmartNodeClient:', pluginName);
+        this.storage = new ClientStorage(this.pluginName, () => {
+            if (cb) cb();
+        });
     }
 
     /**
@@ -33,13 +32,19 @@ module.exports = class SmartNodeClient {
     async init() {
         global.log('Starting search for master server...');
 
-        const browser = this.bonjour.find({ type: 'smartnode' });
+        this.browser = this.bonjour.find({ type: 'smartnode' });
 
-        browser.on('up', (service) => {
+        this.browser.on('up', (service) => {
             this.service = service;
 
             this.onFoundMaster();
         });
+    }
+
+    close() {
+        if ('close' in this.socket) this.socket.close();
+        this.browser.stop();
+        this.bonjour.destroy();
     }
 
     onFoundMaster() {
@@ -60,7 +65,7 @@ module.exports = class SmartNodeClient {
             id: this.socket.id,
         });
 
-        const clientId = this.adapter.storage.get('clientid');
+        const clientId = await this.adapter.storage.get('clientid');
 
         global.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
 
@@ -72,10 +77,13 @@ module.exports = class SmartNodeClient {
             configurationFormat: pkg.configurationFormat,
             displayName: pkg.displayName,
             id: clientId,
-        }, (data) => {
-            this.adapter.storage.set('clientid', data.id);
+        }, async ({ id }) => {
+            console.log('connected callback', clientId, id);
+            if (id !== clientId) {
+                await this.adapter.storage.set('clientid', id);
+            }
 
-            this.register();
+            await this.register();
             callback({ id: clientId });
         });
     }
@@ -89,9 +97,11 @@ module.exports = class SmartNodeClient {
         this.onFoundMaster();
     }
 
-    register() {
+    async register() {
+        const clientId = await this.adapter.storage.get('clientid');
+        global.log('emitting register with clientID:', clientId);
         this.socket.emit('register', {
-            id: this.adapter.storage.get('clientid'),
+            id: clientId,
         }, (data) => {
             global.muted('Registered successfully!');
 
@@ -109,7 +119,7 @@ module.exports = class SmartNodeClient {
     }
 
     async onSetup(data) {
-        global.muted('Setup completed - loading plugin...');
+        global.muted('Setup completed - loading plugin...', data);
         this.adapter.config = data.config;
         this.adapter.room = data.config.room;
 
@@ -127,13 +137,13 @@ module.exports = class SmartNodeClient {
         let plugin;
 
         try {
-            // eslint-disable-next-line import/no-dynamic-require, global-require
+            // eslint-disable-next-line global-require, import/no-dynamic-require
             plugin = await require(`${this.pluginName}`)
                 .Client(this.adapter)
                 .catch((e) => { global.error('Client load plugin error', e); });
         } catch (e) {
-            global.error(`Could not load plugin "${this.pluginName}" -
-             you probably need to install it via "npm install ${this.pluginName}" first!`);
+            global.error(`Could not load plugin "${this.pluginName}"
+                - you probably need to install it via "npm install ${this.pluginName}" first!`);
             global.muted('Debug', e);
             process.exit(1);
         }
@@ -145,8 +155,8 @@ module.exports = class SmartNodeClient {
         if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw global.error(`Plugin "${this.adapter.plugin}" does not provide a 
-                "${functionError}()"-function on the client side. Please contact the author!`);
+            throw global.error(`Plugin "${this.pluginName}" does not provide a "${functionError}()"
+                -function on the client side. Please contact the author!`);
         }
 
         return plugin;

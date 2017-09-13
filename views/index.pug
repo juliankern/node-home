@@ -21,7 +21,7 @@ block content
 
                             if c.displayData
                                 each d, key in c.displayData
-                                    li(class='client--' + d.data.type) ${d.data.description}:
+                                    li(class='client--' + d.data.type) #{d.data.description}:
                                         if d.data.type === 'boolean'
                                             span.value
                                                 label.form--switch
@@ -34,7 +34,7 @@ block content
                                             span.value= d.data.value
 
                         //- != JSON.stringify(c.config)
-                        
+
                         if !hasConfig
                             p Client isn't configured yet. Please set it up in order to use the client.
                             a.btn__primary.client--button(href='/config/' + c.id) Setup

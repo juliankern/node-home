@@ -10,8 +10,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
     socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id }, cb) => {
         global.muted(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
-        const clients = SmartNodeServer.storage.get('clients');
-
+        const clients = await SmartNodeServer.clients.registeredClients.getAll();
 
         if (!id || !clients[id]) {
             const clientId = utils.findClientId(clients);
@@ -41,16 +40,14 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
     };
 
     socketEventHandlers.register = async ({ id }, cb) => {
-        const clientData = SmartNodeServer.storage.get('clients')[id];
-        const configuration = clientData.config;
-        const configurationFormat = clientData.configurationFormat;
+        const client = await SmartNodeServer.clients.registeredClients.get(id);
+        const configuration = client ? client.config : undefined;
+        const configurationFormat = client ? client.configurationFormat : undefined;
 
         // check if configuration already exists and if its valid
         if (configuration && !SmartNodeServer.validConfiguration(configuration, configurationFormat)) {
             // valid configuration exists
             // => continue with loading
-            clientData.socket = socket;
-            clientData.config = configuration;
 
             socket.join(configuration.room);
 
@@ -58,14 +55,20 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
         } else {
             // no configuration exists or it's not valid anymore
             // => stop here, and wait for configuration via web interface
-
             global.muted('Client has no configuration yet, waiting for web configuration');
+            // global.debug('getAll()', await SmartNodeServer.clients.registeredClients.getAll());
+            // global.debug('id', id);
+            // global.debug('client', client);
+            // global.debug('configuration', configuration);
+            // global.debug('validConfiguration', 
+            //  SmartNodeServer.validConfiguration(configuration, configurationFormat));
+
             cb();
         }
     };
 
     socketEventHandlers.disconnect = async (reason) => {
-        SmartNodeServer.unloadServerPlugin(socket.client.id);
+        SmartNodeServer.disconnectClient(socket.client.id);
         SmartNodeServerClientConnector.unregister(socket.client.id, reason);
 
         global.warn('Client disconnected! ID:', socket.client.id, reason);
