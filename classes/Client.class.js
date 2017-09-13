@@ -78,7 +78,7 @@ module.exports = class SmartNodeClient {
             displayName: pkg.displayName,
             id: clientId,
         }, async ({ id }) => {
-            console.log('connected callback', clientId, id);
+            // console.log('connected callback', clientId, id);
             if (id !== clientId) {
                 await this.adapter.storage.set('clientid', id);
             }
