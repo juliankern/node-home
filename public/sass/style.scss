@@ -3,6 +3,53 @@
 @import 'settings';
 @import 'mixins';
 @import 'reboot';
+@import '../lib/vgrid/src/scss/grid.scss';
+
+$settings: (
+    config: (
+        mode: flex
+    ),
+    breakpoints: (
+        small: (
+            max: 467px,
+            content: 100%,
+            padding: 10px,
+            gutter: 6px,
+            columnCount: 12
+        ),
+        medium: (
+            min: 468px,
+            max: 1023px,
+            content: 468px,
+            padding: 20px,
+            gutter: 12px,
+            columnCount: 12
+        ),
+        large: (
+            min: 1024px,
+            max: 1439px,
+            content: 1024px,
+            padding: 25px,
+            gutter: 16px,
+            columnCount: 12
+        ),
+        xlarge: (
+            min: 1440px,
+            content: 1440px,
+            padding: 35px,
+            gutter: 24px,
+            columnCount: 12
+        )
+    )
+);
+
+@include vgrid($settings);
+
+@mixin mq($a, $b: null) {
+    @include vgrid-mq($a, $b) {
+        @content;
+    }
+}
 
 main,
 .container {
@@ -18,7 +65,7 @@ main,
     padding: 10px;
     display: flex;
     flex-direction: row;
-    
+
     &::before {
         content: '';
         background-image: url(/img/add-to-homekit.png);
@@ -26,7 +73,7 @@ main,
         width: 50px;
         height: 50px;
     }
-    
+
     .pin {
         margin-left: 5px;
         border: 2px solid #000;
@@ -45,7 +92,7 @@ main,
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
-    
+
     &.msg-error {
         border-color: red;
         background: rgba(red, 0.2);
@@ -55,7 +102,7 @@ main,
         border-color: green;
         background: rgba(green, 0.2);
     }
-} 
+}
 
 .input-invalid {
     border: 1px solid red;
@@ -66,7 +113,7 @@ main,
     &-right {
         float: right;
     }
-    
+
     &-left {
         float: left;
     }

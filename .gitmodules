@@ -1,0 +1,3 @@
+[submodule "public/lib/vgrid"]
+	path = public/lib/vgrid
+	url = https://github.com/juliankern/vgrid
