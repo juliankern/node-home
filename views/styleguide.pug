@@ -55,3 +55,55 @@ block content
         | &lt;div class="grid--<strong>hide</strong>-small-only"&gt;
         | &nbsp;&nbsp;&lt;span class="box"&gt;NOT small breakpoint&lt;/span&gt;
         | &lt;/div&gt;
+
+    h3 Buttons
+
+    .grid--row
+        .grid--col-medium-4
+            h4 Example
+            button.btn Default
+
+        .grid--col-medium-8
+            h4 Code
+            pre &lt;button class="btn"&gt;Default&lt;/button&gt;
+
+    .grid--row
+        .grid--col-medium-4
+            button.btn.btn__primary Primary
+
+        .grid--col-medium-8
+            pre &lt;button class="btn btn__<strong>primary</strong>"&gt;Primary&lt;/button&gt;
+
+    .grid--row
+        .grid--col-medium-4
+            button.btn.btn__danger Danger
+
+        .grid--col-medium-8
+            pre &lt;button class="btn btn__<strong>danger</strong>"&gt;Danger&lt;/button&gt;
+
+    .grid--row
+        .grid--col-medium-4
+            button.btn.btn__success Success
+
+        .grid--col-medium-8
+            pre &lt;button class="btn btn__<strong>success</strong>"&gt;Success&lt;/button&gt;
+
+    .grid--row
+        .grid--col-medium-4
+            button.btn.btn__block Block
+
+        .grid--col-medium-8
+            pre &lt;button class="btn btn__<strong>block</strong>"&gt;Block&lt;/button&gt;
+
+    .grid--row
+        .grid--col-medium-4
+            .btn--group
+                button.btn.btn__primary Group
+                button.btn Buttons
+
+        .grid--col-medium-8
+            pre
+                | &lt;div class="btn--group"&gt;
+                | &nbsp;&nbsp;&lt;button class="btn btn__primary"&gt;Group&lt;/button&gt;
+                | &nbsp;&nbsp;&lt;button class="btn"&gt;buttons&lt;/button&gt;
+                | &lt;/div&gt;

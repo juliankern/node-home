@@ -8,9 +8,9 @@
     }
 }
 @mixin contrastText($color) {
-    @if (lightness($color) > 70) {
+    @if (lightness($color) > 60) {
         color: #000; // Lighter backgorund, return dark color
-    } 
+    }
 
     @else {
         color: #fff; // Darker background, return light color
@@ -23,7 +23,7 @@
     }
 }
 @mixin hover {
-    &:hover { 
+    &:hover {
         @content;
     }
 }

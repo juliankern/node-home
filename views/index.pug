@@ -37,8 +37,8 @@ block content
 
                         if !hasConfig
                             p Client isn't configured yet. Please set it up in order to use the client.
-                            a.btn__primary.client--button(href='/config/' + c.id) Setup
+                            a.btn.btn__primary.client--button(href='/config/' + c.id) Setup
                         else
-                            a.btn__primary.client--button(href='/config/' + c.id) Configure
+                            a.btn.btn__primary.client--button(href='/config/' + c.id) Configure
         else
             .grid--col-small-12 No clients connected yet

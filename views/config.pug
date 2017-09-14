@@ -8,7 +8,7 @@ block content
     if !formdata
         - formdata = {};
 
-    h2 #{displayName} #{hasConfig ? '@ ' + config.room : ''} 
+    h2 #{displayName} #{hasConfig ? '@ ' + config.room : ''}
         small.text-muted ID #{id}
 
     form(action='', method='post')
@@ -58,7 +58,7 @@ block content
                                     each val, index in (new Array(subprop.length))
                                         input.form--element(name= key +'.'+ subkey + '['+index+']', type='text', value= formdata[key+'.'+subkey] ? formdata[key][subkey][index] : hasConfig ? config[key][subkey][index] : subprop.default ? subprop.default[index] : '', class=hasErrors && fields.includes(key) ? 'input-invalid' : '')
 
-        button.btn__primary(type='submit')= hasConfig ? 'Update Configuration' : 'Complete Setup'
-    
+        button.btn.btn__primary(type='submit')= hasConfig ? 'Update Configuration' : 'Complete Setup'
+
         if hasConfig
-            button.btn__danger.pull-right(type='submit', name='reset', data-confirm='Are you sure that you want to unpair this accessory and delete it\'s configuration?') Unpair
+            button.btn.btn__danger.pull-right(type='submit', name='reset', data-confirm='Are you sure that you want to unpair this accessory and delete it\'s configuration?') Unpair
