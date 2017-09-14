@@ -11,14 +11,19 @@ module.exports = class SmartNodeClient {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor(pluginName, cb) {
+    constructor(options, cb) {
         this.adapter = {};
         this.socket = {};
         this.service = {};
 
-        this.bonjour = bonjour();
-        this.pluginName = pluginName;
-        global.log('new SmartNodeClient:', pluginName);
+        this.pluginName = options.plugin;
+        this.serverAddress = options.server || false;
+
+        if (!this.serverAddress) {
+            this.bonjour = bonjour();
+        }
+
+        global.log('new SmartNodeClient:', this.pluginName);
         this.storage = new ClientStorage(this.pluginName, () => {
             if (cb) cb();
         });
@@ -30,21 +35,35 @@ module.exports = class SmartNodeClient {
      * @author Julian Kern <mail@juliankern.com>
      */
     async init() {
-        global.log('Starting search for master server...');
+        if (!this.serverAddress) {
+            global.log('Starting search for master server...');
 
-        this.browser = this.bonjour.find({ type: 'smartnode' });
+            this.browser = this.bonjour.find({ type: 'smartnode' });
 
-        this.browser.on('up', (service) => {
-            this.service = service;
+            this.browser.on('up', (service) => {
+                this.service = service;
+
+                this.onFoundMaster();
+            });
+        } else {
+            const address = this.serverAddress.split(':')[0];
+            const port = this.serverAddress.split(':')[1] || 80;
+
+            this.service = {
+                addresses: [
+                    address,
+                ],
+                port,
+            };
 
             this.onFoundMaster();
-        });
+        }
     }
 
     close() {
         if ('close' in this.socket) this.socket.close();
-        this.browser.stop();
-        this.bonjour.destroy();
+        if (this.browser) this.browser.stop();
+        if (this.bonjour) this.bonjour.destroy();
     }
 
     onFoundMaster() {
@@ -57,6 +76,13 @@ module.exports = class SmartNodeClient {
         this.socket.on('connect', this.onConnect.bind(this));
         this.socket.on('unpair', this.onUnpair.bind(this));
         this.socket.on('disconnect', this.onDisconnect.bind(this));
+        this.socket.on('connect_error', (error) => {
+            if (this.serverAddress) {
+                global.error('Could not find master server. Did you type the server address correctly?');
+            }
+
+            throw global.error('Client connection error:', error);
+        });
     }
 
     async onConnect() {
@@ -78,7 +104,7 @@ module.exports = class SmartNodeClient {
             displayName: pkg.displayName,
             id: clientId,
         }, async ({ id }) => {
-            console.log('connected callback', clientId, id);
+            // console.log('connected callback', clientId, id);
             if (id !== clientId) {
                 await this.adapter.storage.set('clientid', id);
             }

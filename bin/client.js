@@ -17,7 +17,10 @@ const cli = require('cli');
 
 cli.enable('version');
 cli.setApp('bin/client.js', pkg.version);
-const options = cli.parse({ plugin: ['p', 'The plugin which should be used', 'string', false] });
+const options = cli.parse({
+    plugin: ['p', 'The plugin which should be used', 'string', false],
+    server: ['s', 'Server to connect to including port - if empty, bonjour will be used', 'string', false],
+});
 
 if (!options.plugin) {
     global.error('You need to provide a plugin name!');
@@ -27,7 +30,7 @@ if (!options.plugin) {
 // ////////////////////////////////////////////////////////
 
 const SmartNodeClient = global.req('classes/Client.class');
-const client = new SmartNodeClient(options.plugin, () => {
+const client = new SmartNodeClient(options, () => {
     client.init()
         .catch((e) => { global.error('Client init error', e); });
 });
