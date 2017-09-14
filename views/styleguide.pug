@@ -1,12 +1,64 @@
 extends ../templates/layout.pug
 
 block content
-    h3 Grid
+    h3 Colors
 
     style(type='text/css')
         | .box { padding: 1rem; border: 1px solid #ddd; display: block; }
+        | .box-small { padding: .5rem 1rem; display: block; }
         | .box-success { padding: 1rem; border: 1px solid green; display: block; background: lightgreen; }
 
+    .grid--row
+        .grid--col-medium-4
+            h5 Example
+            .box-small.c-primary primary
+        .grid--col-medium-8
+            h5 Code
+            pre .element { background: color(<strong>primary</strong>) }
+
+        .grid--col-medium-4
+            .box-small.c-dark(style='color: #fff') dark
+        .grid--col-medium-8
+            pre .element { background: color(<strong>dark</strong>) }
+
+        .grid--col-medium-4
+            .box-small.c-light light
+        .grid--col-medium-8
+            pre .element { background: color(<strong>light</strong>) }
+
+        .grid--col-medium-4
+            .box-small.c-accent1 accent1
+        .grid--col-medium-8
+            pre .element { background: color(<strong>accent1</strong>) }
+
+        .grid--col-medium-4
+            .box-small.c-accent2 accent2
+        .grid--col-medium-8
+            pre .element { background: color(<strong>accent2</strong>) }
+
+    h3 Grays
+
+    .grid--row
+        .grid--col-medium-4
+            h5 Example
+            .box-small.g-100 100
+        .grid--col-medium-8
+            h5 Code
+            pre .element { background: gray(<strong>100</strong>) }
+
+    .grid--row
+        .grid--col-medium-4
+            .box-small.g-400 400
+        .grid--col-medium-8
+            pre .element { background: gray(<strong>400</strong>) }
+
+    .grid--row
+        .grid--col-medium-4
+            .box-small.g-900(style='color: #fff') 900
+        .grid--col-medium-8
+            pre .element { background: gray(<strong>900</strong>) }
+
+    h3 Grid
     h5 Example
     .grid--row
         .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
@@ -245,7 +297,6 @@ block content
             pre
                 | &lt;blockquote class="blockquote"&gt;Lorem ipsum…&lt;/blockquote&gt;
 
-
         .grid--col-medium-6
             blockquote.blockquote Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
                 footer.blockquote-footer Someone famous in some book
@@ -298,6 +349,3 @@ block content
                 | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 2&lt;/li&gt;
                 | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 3&lt;/li&gt;
                 | &lt;/ul&gt;
-
-
-

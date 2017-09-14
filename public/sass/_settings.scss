@@ -18,6 +18,17 @@ $grays: (
     900: #212529
 ) !default;
 
+@each $key, $value in $colors {
+    .c-#{$key} {
+        background: $value;
+    }
+}
+@each $key, $value in $grays {
+    .g-#{$key} {
+        background: $value;
+    }
+}
+
 @function color($name) {
     @return map-get($colors, $name);
 }
