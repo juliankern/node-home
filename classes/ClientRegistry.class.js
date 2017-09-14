@@ -113,7 +113,7 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     async registerClient(data) {
-        console.log('registerClient with data', data);
+        // console.log('registerClient with data', data);
 
         await this.registeredClients.add(data.id);
         this.connectedClients.add(data.id);
@@ -130,7 +130,7 @@ module.exports = () => class ConnectedClientRegistry {
             await this.registeredClients.update(data.id, { config: data.config });
         }
 
-        console.log('after register', await this.registeredClients.getAll());
+        // console.log('after register', await this.registeredClients.getAll());
 
         return this.connectClient(data);
     }

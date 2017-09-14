@@ -21,6 +21,7 @@ cli.setApp('bin/server.js', pkg.version);
 const cliOptions = cli.parse({
     port: ['p', 'Websocket port to use instead of autodiscover', 'int', null],
     web: ['w', 'Port for the website to use', 'int', null],
+    nobonjour: ['n', 'Disable bonjour to let clients connect by the server address', 'bool', false],
 });
 
 // ////////////////////////////////////////////////////////
@@ -31,7 +32,7 @@ let socketEventHandlers = {};
 const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
     socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer); // eslint-disable-line global-require
     SmartNodeServer
-        .init({ port: cliOptions.port, web: cliOptions.web }, ServerClientConnector, socketEventHandlers)
+        .init(cliOptions, ServerClientConnector, socketEventHandlers)
         .catch((e) => { global.error('Server init error', e); });
 });
 

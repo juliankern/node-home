@@ -41,21 +41,27 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    async init({ port, webport }, Connector, getEventHandlersForSocketFn) {
+    async init({ port, web, nobonjour }, Connector, getEventHandlersForSocketFn) {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
-        webport = webport || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
+        web = web || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
         const router = new (SmartNodeRouter(this))(this.app);
         router.init();
 
         this.io.listen(port);
-        this.app.listen(webport, () => {
-            this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
-            this.bonjour.published = true;
 
-            global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
-            global.success(`Webserver running on port ${webport}`);
-        });
+        if (!nobonjour) {
+            this.app.listen(web, () => {
+                this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
+                this.bonjour.published = true;
+
+                global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
+                global.success(`Webserver running on port ${web}`);
+            });
+        } else {
+            global.success(`SmartNode server up and running, socket listening on port ${port}`);
+            global.success(`Webserver running on port ${web}`);
+        }
 
         this.io.on('connection', (socket) => {
             // console.log(socket.client); return;
@@ -81,7 +87,7 @@ module.exports = class SmartNodeServer {
         let client;
         this.io.close();
 
-        if (this.bonjour.published) {
+        if (this.bonjour && this.bonjour.published) {
             this.bonjour.published = false;
             this.bonjour.unpublishAll(() => {
                 global.warn('Bonjour service unpublished!');
