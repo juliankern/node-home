@@ -56,6 +56,18 @@ h6,
     color: gray(600);
 }
 
+.text-right {
+    text-align: right!important;
+}
+
+.text-center {
+    text-align: center!important;
+}
+
+.text-left {
+    text-align: left!important;
+}
+
 .lead {
     font-size: $lead-font-size;
     font-weight: $lead-font-weight;
@@ -140,12 +152,6 @@ mark,
 // Misc
 //
 
-// Builds on `abbr`
-.initialism {
-    font-size: 90%;
-    text-transform: uppercase;
-}
-
 // Blockquotes
 .blockquote {
     margin-bottom: $spacer;
@@ -169,6 +175,14 @@ pre {
 
 pre {
     padding: .5rem;
-    background: #ddd;
+    background: #eee;
     border-radius: 5px;
+}
+
+code {
+    padding: .2rem .4rem;
+    font-size: 90%;
+    color: #bd4147;
+    background-color: #f8f9fa;
+    border-radius: .25rem;
 }

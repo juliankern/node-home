@@ -7,7 +7,7 @@ block content
         | .box { padding: 1rem; border: 1px solid #ddd; display: block; }
         | .box-success { padding: 1rem; border: 1px solid green; display: block; background: lightgreen; }
 
-    h4 Example
+    h5 Example
     .grid--row
         .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
             span.box small-12, medium-6, large-4, xlarge-2
@@ -22,14 +22,14 @@ block content
         .grid--col-small-12.grid--col-medium-6.grid--col-large-4.grid--col-xlarge-2
             span.box small-12, medium-6, large-4, xlarge-2
 
-    h4 Code
+    h5 Code
     pre
         | &lt;div class="grid--col-small-12 grid--col-medium-6 grid--col-large-4 grid--col-xlarge-2"&gt;
         | &nbsp;&nbsp;&lt;span class="box"&gt;small-12, medium-6, large-4, xlarge-2&lt;/span&gt;
         | &lt;/div&gt;
 
-    h3 Responsive visibility
-    h4 Example
+    h4 Responsive visibility
+    h5 Example
     .grid--row
         .grid--show-small-only.grid--col-medium-6
             span.box-success small breakpoint
@@ -47,7 +47,7 @@ block content
             span.box-success xlarge breakpoint
         .grid--hide-xlarge-only.grid--col-medium-6
             span.box NOT xlarge breakpoint
-    h4 Code
+    h5 Code
     pre
         | &lt;div class="grid--<strong>show</strong>-small-only"&gt;
         | &nbsp;&nbsp;&lt;span class="box"&gt;small breakpoint&lt;/span&gt;
@@ -60,11 +60,11 @@ block content
 
     .grid--row
         .grid--col-medium-4
-            h4 Example
+            h5 Example
             button.btn Default
 
         .grid--col-medium-8
-            h4 Code
+            h5 Code
             pre &lt;button class="btn"&gt;Default&lt;/button&gt;
 
     .grid--row
@@ -107,3 +107,197 @@ block content
                 | &nbsp;&nbsp;&lt;button class="btn btn__primary"&gt;Group&lt;/button&gt;
                 | &nbsp;&nbsp;&lt;button class="btn"&gt;buttons&lt;/button&gt;
                 | &lt;/div&gt;
+
+    .grid--row
+        .grid--col-medium-6
+            h3 Typography
+
+        .grid--col-medium-6
+            pre(style='margin-top:3rem') &lt;h3&gt;Typography&lt;/h3&gt;
+
+    h4 Headlines
+    .grid--row
+        .grid--col-medium-6
+            h5 Example
+            h4 h4
+            .h5 h5
+            .h6 h6
+
+        .grid--col-medium-6
+            h5 Code
+            pre
+                | &lt;h4&gt;h4&lt;/h4&gt;
+                | &lt;div class="<strong>h5</strong>"&gt;h5&lt;/div&gt;
+                | &lt;div class="<strong>h6</strong>"&gt;h6&lt;/div&gt;
+
+    h4 Text helpers
+    .grid--row
+        .grid--col-medium-6
+            .lead lead
+            .text-muted muted
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="lead"&gt;lead&lt;/div&gt;
+                | &lt;div class="text-muted"&gt;muted&lt;/div&gt;
+
+        .grid--col-medium-6
+            .text-left text-left
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="text-left"&gt;text-left&lt;/div&gt;
+
+        .grid--col-medium-6
+            .text-center text-center
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="text-center"&gt;text-center&lt;/div&gt;
+
+        .grid--col-medium-6
+            .text-right text-right
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="text-right"&gt;text-right&lt;/div&gt;
+
+    h4 Display fonts
+    .grid--row
+        .grid--col-medium-6
+            .display-1 display-1
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="display-1"&gt;display-1&lt;/div&gt;
+
+        .grid--col-medium-6
+            .display-2 display-2
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="display-2"&gt;display-2&lt;/div&gt;
+
+        .grid--col-medium-6
+            .display-3 display-3
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="display-3"&gt;display-3&lt;/div&gt;
+
+        .grid--col-medium-6
+            .display-4 display-4
+
+        .grid--col-medium-6
+            pre
+                | &lt;div class="display-4"&gt;display-4&lt;/div&gt;
+
+    h4 Misc
+    .grid--row
+        .grid--col-medium-6
+            h5 Example
+            hr
+
+        .grid--col-medium-6
+            h5 Code
+            pre
+                | &lt;hr&gt;
+
+        .grid--col-medium-6
+            mark mark
+
+        .grid--col-medium-6
+            pre
+                | &lt;mark&gt;mark&lt;/mark&gt;
+                | &lt;div class="mark"&gt;mark&lt;/div&gt;
+
+        .grid--col-medium-6
+            small small
+
+        .grid--col-medium-6
+            pre
+                | &lt;small&gt;small&lt;/small&gt;
+                | &lt;div class="small"&gt;small&lt;/div&gt;
+
+    h4 Code
+    .grid--row
+        .grid--col-medium-6
+            pre Code
+
+        .grid--col-medium-6
+            pre
+                | &lt;pre&gt;Code&lt;/pre&gt;
+
+        .grid--col-medium-6
+            p Inline&nbsp;
+                code Code
+
+        .grid--col-medium-6
+            pre
+                | Inline &lt;code&gt;Code&lt;/code&gt;
+
+    h4 Quotes
+    .grid--row
+        .grid--col-medium-6
+            blockquote.blockquote Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+
+        .grid--col-medium-6
+            pre
+                | &lt;blockquote class="blockquote"&gt;Lorem ipsum…&lt;/blockquote&gt;
+
+
+        .grid--col-medium-6
+            blockquote.blockquote Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+                footer.blockquote-footer Someone famous in some book
+
+        .grid--col-medium-6
+            pre
+                | &lt;blockquote class="blockquote"&gt;
+                | &nbsp;&nbsp;Lorem ipsum…
+                | &nbsp;&nbsp;&lt;footer class="blockquote-footer"&gt;Someone famous in some book&lt;/footer&gt;
+                | &lt;/blockquote&gt;
+
+    h4 Lists
+    .grid--row
+        .grid--col-medium-6
+            ul.list-unstyled
+                li List item 1
+                li List item 2
+                li List item 3
+                    ul
+                        li Sublist item 1
+                        li Sublist item 2
+                li List item 4
+                li List item 5
+
+        .grid--col-medium-6
+            pre
+                | &lt;ul class="list-unstyled"&gt;
+                | &nbsp;&nbsp;&lt;li&gt;List item 1&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li&gt;List item 2&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li&gt;List item 3&lt;/li&gt;
+                | &nbsp;&nbsp;&nbsp;&nbsp;&lt;ul&gt;
+                | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;Sublist item 1&lt;/li&gt;
+                | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;li&gt;Sublist item 2&lt;/li&gt;
+                | &nbsp;&nbsp;&nbsp;&nbsp;&lt;/ul&gt;
+                | &nbsp;&nbsp;&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li&gt;List item 4&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li&gt;List item 5&lt;/li&gt;
+                | &lt;/ul&gt;
+
+        .grid--col-medium-6
+            ul.list-inline
+                li.list-inline-item List inline item 1
+                li.list-inline-item List inline item 2
+                li.list-inline-item List inline item 3
+
+        .grid--col-medium-6
+            pre
+                | &lt;ul class="list-inline"&gt;
+                | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 1&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 2&lt;/li&gt;
+                | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 3&lt;/li&gt;
+                | &lt;/ul&gt;
+
+
+
