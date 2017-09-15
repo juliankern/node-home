@@ -2,7 +2,7 @@
     &--field {
         padding: .5rem 0;
 
-        label {
+        label:not(.form--switch) {
             display: block;
 
             &::after {
@@ -20,7 +20,7 @@
 
         &--sub {
             @extend .form--field;
-            
+
             padding-left: 2rem;
         }
     }
@@ -28,13 +28,13 @@
     &--image {
         max-width: 100%;
     }
-    
+
     &--element {
         width: 100%;
-        
+
         @include global-focus;
     }
-    
+
     &--switch {
         position: relative;
         display: inline-block;
@@ -43,11 +43,11 @@
         margin-top: .125rem;
         margin-bottom: -.125rem;
 
-        input { 
+        input {
             display: none;
         }
     }
-    
+
     &--slider {
         position: absolute;
         cursor: pointer;
