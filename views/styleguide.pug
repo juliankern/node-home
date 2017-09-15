@@ -518,3 +518,20 @@ block content
                         | &nbsp;&nbsp;&lt;/div&gt;
                         | &nbsp;&nbsp;&lt;div class="card-footer text-muted"&gt;2 days ago&lt;/div&gt;
                         | &lt;/div&gt;
+
+    h4 Homekitpin
+    .accordion
+        input(id='hkpinaccordion', type='checkbox')
+        label.accordion--header(for='hkpinaccordion') Contents
+            i.fa.fa-chevron-right.accordion--chevron.pull-right(aria-hidden='true')
+        .accordion--body
+            .grid--row
+                .grid--col-medium-6
+                    .homekitpin
+                        .homekitpin--pin ABC-DE-FGH
+
+                .grid--col-medium-6
+                    pre
+                        | &lt;div class="homekitpin"&gt;
+                        | &nbsp;&nbsp;&lt;div class="homekitpin--pin"&gt;ABC-DE-FGH&lt;/div&gt;
+                        | &lt;/div&gt;
