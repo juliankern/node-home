@@ -24,7 +24,7 @@ module.exports = SmartNodeServer => class WebNotifications {
     }
 
     broadcast(type, message) {
-        return this._io.emit(type, message);
+        return this._io.emit('broadcast', { type, message });
     }
 
     send(type, message) {
