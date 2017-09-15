@@ -5,12 +5,7 @@ html
         link(href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', rel='stylesheet', type='text/css')
         link(href='/css/style.css', rel='stylesheet', type='text/css')
 
-        block scripts
-            script(src='/js/global.js')
-
-            if scripts
-                each s in scripts
-                    != s
+        block styles
     body
         include navigation.pug
 
@@ -20,3 +15,12 @@ html
             include messages.pug
 
             block content
+
+        block scripts
+            script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js', integrity='sha256-KaSi3am04I2b10TZZ7JqEYrnNk94r0QOeIY3PtwGR/M=', crossorigin='anonymous')
+            script(src='/js/global.js')
+            script(src='/js/notifications.js')
+
+            if scripts
+                each s in scripts
+                    != s

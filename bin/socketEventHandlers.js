@@ -43,33 +43,34 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
         const client = await SmartNodeServer.clients.registeredClients.get(id);
         const configuration = client ? client.config : undefined;
         const configurationFormat = client ? client.configurationFormat : undefined;
+        let eventname;
 
         // check if configuration already exists and if its valid
         if (configuration && !SmartNodeServer.validConfiguration(configuration, configurationFormat)) {
             // valid configuration exists
             // => continue with loading
-
             socket.join(configuration.room);
+            eventname = 'client-connect';
 
             cb({ config: configuration });
         } else {
             // no configuration exists or it's not valid anymore
             // => stop here, and wait for configuration via web interface
             global.muted('Client has no configuration yet, waiting for web configuration');
-            // global.debug('getAll()', await SmartNodeServer.clients.registeredClients.getAll());
-            // global.debug('id', id);
-            // global.debug('client', client);
-            // global.debug('configuration', configuration);
-            // global.debug('validConfiguration', 
-            //  SmartNodeServer.validConfiguration(configuration, configurationFormat));
 
+            eventname = 'client-register';
             cb();
         }
+
+        SmartNodeServer.webNotifications.broadcast(eventname, client);
     };
 
     socketEventHandlers.disconnect = async (reason) => {
         SmartNodeServer.disconnectClient(socket.client.id);
         SmartNodeServerClientConnector.unregister(socket.client.id, reason);
+
+        SmartNodeServer.webNotifications.broadcast('client-disconnect',
+            await SmartNodeServer.clients.getClientBySocketId(socket.client.id));
 
         global.warn('Client disconnected! ID:', socket.client.id, reason);
     };

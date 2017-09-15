@@ -6,9 +6,9 @@ const socketio = require('socket.io');
 const utils = global.req('util');
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
-const SmartNodeRouter = global.req('classes/Router.class');
 const ServerStorage = global.req('classes/Storage.class').Server;
 const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
+const WebNotifications = global.req('classes/WebNotifications.class');
 const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
 
 module.exports = class SmartNodeServer {
@@ -20,6 +20,8 @@ module.exports = class SmartNodeServer {
     constructor(cb) {
         this.app = express();
         this.io = socketio(http.Server(this.app));
+        this.webNotifications = {};
+
         this.bonjour = bonjour();
         this.storage = new ServerStorage({}, () => {
             if (cb) cb();
@@ -45,23 +47,20 @@ module.exports = class SmartNodeServer {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
         web = web || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
-        const router = new (SmartNodeRouter(this))(this.app);
-        router.init();
-
+        // socket server to communicate with clients
         this.io.listen(port);
+        this.webNotifications = new (WebNotifications(this))(this.app);
 
-        if (!nobonjour) {
-            this.app.listen(web, () => {
+        // webserver for configuration
+        this.webNotifications.listen(web, () => {
+            if (!nobonjour) {
                 this.bonjour.publish({ name: 'SmartNode Server', type: 'smartnode', port });
                 this.bonjour.published = true;
+            }
 
-                global.success(`SmartNode server up and running, broadcasting via bonjour on port ${port}`);
-                global.success(`Webserver running on port ${web}`);
-            });
-        } else {
-            global.success(`SmartNode server up and running, socket listening on port ${port}`);
+            global.success(`SmartNode server up and running, socket available on port ${port}`);
             global.success(`Webserver running on port ${web}`);
-        }
+        });
 
         this.io.on('connection', (socket) => {
             // console.log(socket.client); return;
