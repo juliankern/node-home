@@ -41,7 +41,6 @@ block content
                     pre .element { background: color(<strong>accent2</strong>) }
 
     h3 Grays
-
     .accordion
         input(id='graysaccordion', type='checkbox')
         label.accordion--header(for='graysaccordion') Contents
@@ -126,63 +125,6 @@ block content
                 | &lt;div class="grid--<strong>hide</strong>-small-only"&gt;
                 | &nbsp;&nbsp;&lt;span class="box"&gt;NOT small breakpoint&lt;/span&gt;
                 | &lt;/div&gt;
-
-    h3 Buttons
-
-    .accordion
-        input(id='btnaccordion', type='checkbox')
-        label.accordion--header(for='btnaccordion') Contents
-            i.fa.fa-chevron-right.accordion--chevron.pull-right(aria-hidden='true')
-        .accordion--body
-            .grid--row
-                .grid--col-medium-4
-                    h5 Example
-                    button.btn Default
-
-                .grid--col-medium-8
-                    h5 Code
-                    pre &lt;button class="btn"&gt;Default&lt;/button&gt;
-
-            .grid--row
-                .grid--col-medium-4
-                    button.btn.btn__primary Primary
-
-                .grid--col-medium-8
-                    pre &lt;button class="btn btn__<strong>primary</strong>"&gt;Primary&lt;/button&gt;
-
-            .grid--row
-                .grid--col-medium-4
-                    button.btn.btn__danger Danger
-
-                .grid--col-medium-8
-                    pre &lt;button class="btn btn__<strong>danger</strong>"&gt;Danger&lt;/button&gt;
-
-            .grid--row
-                .grid--col-medium-4
-                    button.btn.btn__success Success
-
-                .grid--col-medium-8
-                    pre &lt;button class="btn btn__<strong>success</strong>"&gt;Success&lt;/button&gt;
-
-            .grid--row
-                .grid--col-medium-4
-                    button.btn.btn__block Block
-
-                .grid--col-medium-8
-                    pre &lt;button class="btn btn__<strong>block</strong>"&gt;Block&lt;/button&gt;
-
-            .grid--row
-                .grid--col-medium-4
-                    .btn--group
-                        button.btn.btn__primary Group
-                        button.btn Buttons
-
-                .grid--col-medium-8
-                    pre
-                        | &lt;div class="btn--group"&gt;
-                        | &nbsp;&nbsp;&lt;button class="btn btn__primary"&gt;Group&lt;/button&gt;
-                        | &nbsp;&nbsp;&lt;button class="btn"&gt;buttons&lt;/button&gt;
-                        | &lt;/div&gt;
 
     h3 Typography
     .accordion
@@ -374,6 +316,123 @@ block content
                         | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 2&lt;/li&gt;
                         | &nbsp;&nbsp;&lt;li class="list-inline-item"&gt;List inline item 3&lt;/li&gt;
                         | &lt;/ul&gt;
+
+    h3 Buttons
+    .accordion
+        input(id='btnaccordion', type='checkbox')
+        label.accordion--header(for='btnaccordion') Contents
+            i.fa.fa-chevron-right.accordion--chevron.pull-right(aria-hidden='true')
+        .accordion--body
+            .grid--row
+                .grid--col-medium-4
+                    h5 Example
+                    button.btn Default
+
+                .grid--col-medium-8
+                    h5 Code
+                    pre &lt;button class="btn"&gt;Default&lt;/button&gt;
+
+            .grid--row
+                .grid--col-medium-4
+                    button.btn.btn__primary Primary
+
+                .grid--col-medium-8
+                    pre &lt;button class="btn btn__<strong>primary</strong>"&gt;Primary&lt;/button&gt;
+
+            .grid--row
+                .grid--col-medium-4
+                    button.btn.btn__danger Danger
+
+                .grid--col-medium-8
+                    pre &lt;button class="btn btn__<strong>danger</strong>"&gt;Danger&lt;/button&gt;
+
+            .grid--row
+                .grid--col-medium-4
+                    button.btn.btn__success Success
+
+                .grid--col-medium-8
+                    pre &lt;button class="btn btn__<strong>success</strong>"&gt;Success&lt;/button&gt;
+
+            .grid--row
+                .grid--col-medium-4
+                    button.btn.btn__block Block
+
+                .grid--col-medium-8
+                    pre &lt;button class="btn btn__<strong>block</strong>"&gt;Block&lt;/button&gt;
+
+            .grid--row
+                .grid--col-medium-4
+                    .btn--group
+                        button.btn.btn__primary Group
+                        button.btn Buttons
+
+                .grid--col-medium-8
+                    pre
+                        | &lt;div class="btn--group"&gt;
+                        | &nbsp;&nbsp;&lt;button class="btn btn__primary"&gt;Group&lt;/button&gt;
+                        | &nbsp;&nbsp;&lt;button class="btn"&gt;buttons&lt;/button&gt;
+                        | &lt;/div&gt;
+
+    h3 Form
+    .accordion
+        input(id='formaccordion', type='checkbox')
+        label.accordion--header(for='formaccordion') Contents
+            i.fa.fa-chevron-right.accordion--chevron.pull-right(aria-hidden='true')
+        .accordion--body
+            .grid--row
+                .grid--col-medium-6
+                    h5 Example
+                    .form--field
+                        label Select
+                        select.form--element
+                            option(value='0') Select...
+                            option(value='1') Option 1
+                            option(value='2') Option 2
+                            option(value='3') Option 3
+
+                .grid--col-medium-6
+                    h5 Code
+                    pre
+                        | &lt;div class="form--field"&gt;
+                        | &nbsp;&nbsp;&lt;label&gt;Select&lt;/label&gt;
+                        | &nbsp;&nbsp;&lt;select class="form--element"&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value="0"&gt;Select...&lt;/option&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value="1"&gt;Option 1&lt;/option&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value="2"&gt;Option 2&lt;/option&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;option value="3"&gt;Option 3&lt;/option&gt;
+                        | &nbsp;&nbsp;&lt;/select&gt;
+                        | &lt;/div&gt;
+
+            .grid--row
+                .grid--col-medium-6
+                    .form--field
+                        label Input
+                        input.form--element(type='text', placeholder='Placeholder')
+
+                .grid--col-medium-6
+                    pre
+                        | &lt;div class="form--field"&gt;
+                        | &nbsp;&nbsp;&lt;label&gt;Input&lt;/label&gt;
+                        | &nbsp;&nbsp;&lt;input class="form--element" type="text" placeholder="placeholder"&gt;
+                        | &lt;/div&gt;
+
+            .grid--row
+                .grid--col-medium-6
+                    .form--field
+                        label.form--switch
+                            input(type='checkbox')
+                            span.form--slider.round
+                        | Switch
+
+                .grid--col-medium-6
+                    pre
+                        | &lt;div class="form--field"&gt;
+                        | &nbsp;&nbsp;&lt;label class="form--switch"&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="checkbox"&gt;
+                        | &nbsp;&nbsp;&nbsp;&nbsp;&lt;span class="form--slider round"&gt;&lt;/span&gt;
+                        | &nbsp;&nbsp;&lt;/label&gt;
+                        | &nbsp;&nbsp;Switch
+                        | &lt;/div&gt;
 
     h3 Modules
     h4 Accordion
