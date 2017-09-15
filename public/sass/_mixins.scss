@@ -8,9 +8,9 @@
     }
 }
 @mixin contrastText($color) {
-    @if (lightness($color) > 70) {
+    @if (lightness($color) > 60) {
         color: #000; // Lighter backgorund, return dark color
-    } 
+    }
 
     @else {
         color: #fff; // Darker background, return light color
@@ -23,7 +23,7 @@
     }
 }
 @mixin hover {
-    &:hover { 
+    &:hover {
         @content;
     }
 }
@@ -55,4 +55,22 @@
         border-top-left-radius: $radius;
         border-bottom-left-radius: $radius;
     }
+}
+
+// ///////////////////////////////
+
+@function px2rem($pixel) {
+    @return #{strip-unit($pixel)/strip-unit($font-size-base)}rem;
+}
+
+/// Remove the unit of a length
+/// @param {Number} $number - Number to remove unit from
+/// @return {Number} - Unitless number
+
+@function strip-unit($number) {
+    @if type-of($number) == 'number' and not unitless($number) {
+        @return $number / ($number * 0 + 1);
+    }
+
+    @return $number;
 }

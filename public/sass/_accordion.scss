@@ -1,0 +1,30 @@
+.accordion {
+    > input {
+        display: none;
+    }
+
+    &--body {
+        display: none;
+    }
+
+    &--header {
+        background: gray(100);
+        display: block;
+        padding: 1rem;
+        cursor: pointer;
+    }
+
+    &--chevron {
+        margin-top: px2rem(5);
+        transform: rotate(90deg);
+    }
+
+    & > input:checked ~ &--body {
+        display: block;
+    }
+
+    /* stylelint-disable-next-line selector-max-compound-selectors */
+    & > input:checked ~ &--header &--chevron {
+        transform: rotate(-90deg);
+    }
+}

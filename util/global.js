@@ -3,6 +3,7 @@ const path = require('path');
 
 // add global functions
 Object.assign(global, {
+    DEVMODE: process.env.NODE_ENV === 'development',
     approot: path.resolve('./'),
     /**
      * require() wrapper for requires always based on approot

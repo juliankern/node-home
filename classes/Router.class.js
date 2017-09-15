@@ -40,7 +40,19 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
             res.render('index', {});
         });
 
-        this.configRoute(this.app.route('/config/:clientId'));
+        this.addRoute('/config/:clientId', this.configRoute);
+
+        if (global.DEVMODE) {
+            this.addRoute('/styleguide', this.styleguideRoute);
+        }
+    }
+
+    addRoute(path, handler) {
+        handler.call(this, this.app.route(path));
+    }
+
+    styleguideRoute(route) {
+        route.get((req, res) => res.render('styleguide', { headline: 'Styleguide' }));
     }
 
     configRoute(route) {

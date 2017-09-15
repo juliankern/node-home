@@ -36,7 +36,6 @@ const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
         .catch((e) => { global.error('Server init error', e); });
 });
 
-
 // ////////////////////////////////////////////////////////
 
 // eslint-disable-next-line global-require

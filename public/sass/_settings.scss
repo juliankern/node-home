@@ -18,6 +18,17 @@ $grays: (
     900: #212529
 ) !default;
 
+@each $key, $value in $colors {
+    .c-#{$key} {
+        background: $value;
+    }
+}
+@each $key, $value in $grays {
+    .g-#{$key} {
+        background: $value;
+    }
+}
+
 @function color($name) {
     @return map-get($colors, $name);
 }
@@ -42,7 +53,7 @@ $grid-gutter-width: 1rem !default;
 $font-family-base: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif !default;
 $font-weight-normal: normal !default;
 
-$font-size-base: 1rem !default;
+$font-size-base: 16px !default;
 
 $font-weight-base: normal !default;
 $font-weight-bold: bold !default;
