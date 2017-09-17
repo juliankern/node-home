@@ -62,7 +62,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
             cb();
         }
 
-        SmartNodeServer.webNotifications.broadcast(eventname, client);
+        SmartNodeServer.webNotifications.broadcast(eventname, SmartNodeServer.clients.connectedClients.get(id));
     };
 
     socketEventHandlers.disconnect = async (reason) => {

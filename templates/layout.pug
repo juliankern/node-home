@@ -5,6 +5,26 @@ html
         link(href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', rel='stylesheet', type='text/css')
         link(href='/css/style.css', rel='stylesheet', type='text/css')
 
+        script(id='notification', type='text/x-handlebars-template')
+            .notification.hidden
+                | {{#if icon}}
+                .notification--icon
+                    i(class='fa fa-3x fa-{{icon}}')
+                | {{/if}}
+                .notification--body
+                    | {{#if title}}
+                    .notification--title {{title}}
+                    | {{/if}}
+                    .notification--content {{message}}
+                .notification--buttons
+                    | {{#each buttons}}
+                    | {{#if url}}
+                    a(href='{{url}}') {{title}}
+                    | {{else}}
+                    button {{title}}
+                    | {{/if}}
+                    | {{/each}}
+                    button(data-dismiss) Dismiss
         block styles
     body
         include navigation.pug
@@ -16,18 +36,21 @@ html
 
             block content
 
-        .notification
-            .notification--icon
-                i.fa.fa-info.fa-3x
-            .notification--body
-                .notification--title Debug message
-                .notification--content Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi ratione cum autem incidunt porro quisquam minima maiores error placeat voluptas.
-            .notification--buttons
-                button Dismiss
-                //- button Install
+        .notificationlist
+            //- .notification
+            //-     .notification--icon
+            //-         i.fa.fa-info.fa-3x
+            //-     .notification--body
+            //-         .notification--title Debug message
+            //-         .notification--content Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi ratione cum autem incidunt porro quisquam minima maiores error placeat voluptas.
+            //-     .notification--buttons
+            //-         button Dismiss
+            //-         button Install
+            //-         button Remind me later
 
         block scripts
             script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.slim.js', integrity='sha256-KaSi3am04I2b10TZZ7JqEYrnNk94r0QOeIY3PtwGR/M=', crossorigin='anonymous')
+            script(src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js', integrity='sha256-0JaDbGZRXlzkFbV8Xi8ZhH/zZ6QQM0Y3dCkYZ7JYq34=', crossorigin='anonymous')
             script(src='/js/global.js')
             script(src='/js/notifications.js')
 
