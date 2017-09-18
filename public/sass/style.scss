@@ -11,17 +11,25 @@ $settings: (
         mode: flex
     ),
     breakpoints: (
-        small: (
+        xsmall: (
             max: 467px,
             content: 100%,
             padding: 10px,
             gutter: 6px,
             columnCount: 12
         ),
-        medium: (
+        small: (
             min: 468px,
+            max: 767px,
+            content: 436px,
+            padding: 16px,
+            gutter: 12px,
+            columnCount: 12
+        ),
+        medium: (
+            min: 768px,
             max: 1023px,
-            content: 428px,
+            content: 728px,
             padding: 20px,
             gutter: 12px,
             columnCount: 12

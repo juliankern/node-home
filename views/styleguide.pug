@@ -101,6 +101,10 @@ block content
         .accordion--body
             h5 Example
             .grid--row
+                .grid--show-xsmall-only.grid--col-medium-6
+                    span.box-success xsmall breakpoint
+                .grid--hide-xsmall-only.grid--col-medium-6
+                    span.box NOT xsmall breakpoint
                 .grid--show-small-only.grid--col-medium-6
                     span.box-success small breakpoint
                 .grid--hide-small-only.grid--col-medium-6
@@ -535,3 +539,43 @@ block content
                         | &lt;div class="homekitpin"&gt;
                         | &nbsp;&nbsp;&lt;div class="homekitpin--pin"&gt;ABC-DE-FGH&lt;/div&gt;
                         | &lt;/div&gt;
+
+    h4 Notification
+    .accordion
+        input(id='notifyaccordion', type='checkbox')
+        label.accordion--header(for='notifyaccordion') Contents
+            i.fa.fa-chevron-right.accordion--chevron.pull-right(aria-hidden='true')
+        .accordion--body
+            .grid--row
+                .grid--col-medium-6
+                    .notification(style='position:relative')
+                        .notification--icon
+                            i(class='fa fa-3x fa-info-circle')
+                        .notification--body
+                            .notification--title Notification title
+                            .notification--content  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque, aliquid, doloremque necessitatibus culpa id dolores architecto nihil dignissimos. Corrupti, dolor!
+                        .notification--buttons
+                            a.btn(href='#') Call to action!
+                            button.btn(data-dismiss) Dismiss
+
+                .grid--col-medium-6
+                    pre
+                        |&lt;div class="notification"&gt;
+                        |&nbsp;&nbsp;&lt;div class="notification--icon"&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;i class="fa fa-3x fa-info-circle"&gt;&lt;/i&gt;
+                        |&nbsp;&nbsp;&lt;/div&gt;
+                        |&nbsp;&nbsp;&lt;div class="notification--body"&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="notification--title"&gt;Notification title&lt;/div&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;div class="notification--content"&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lorem ipsum ...
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;
+                        |&nbsp;&nbsp;&lt;/div&gt;
+                        |&nbsp;&nbsp;&lt;div class="notification--buttons"&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;a class="btn" href="#"&gt;Call to action!&lt;/a&gt;
+                        |&nbsp;&nbsp;&nbsp;&nbsp;&lt;button class="btn" data-dismiss=""&gt;Dismiss&lt;/button&gt;
+                        |&nbsp;&nbsp;&lt;/div&gt;
+                        |&lt;/div&gt;
+
+
+
+

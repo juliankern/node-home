@@ -8,7 +8,7 @@ block content
         each c, id in clients
             - hasConfig = c.config && Object.keys(c.config).length;
 
-            .grid--col-large-6.grid--col-xlarge-4
+            .grid--col-medium-6.grid--col-large-4.grid--col-xlarge-4
                 .client.card
                     .card-body
                         h4.card-title #{c.displayName} #{hasConfig ? '@ ' + c.config.room : ''}
