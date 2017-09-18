@@ -85,7 +85,6 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
                 });
 
                 const errors = SmartNodeServer.validConfiguration(config, client.configurationFormat);
-                global.log('SAVE CONFIG', config);
 
                 if (errors) {
                     req.arrayFlash(errors, 'error');
@@ -117,7 +116,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                     if (!hasConfig) {
                         client.socket.emit('setup', { config });
-                        global.muted('Setup completed - waiting for client to load plugin...');
+                        SmartNodeServer.logger.info('Setup completed - waiting for client to load plugin...');
                         req.flash('success', { message: 'The client was setup successfully.' });
                     } else {
                         req.flash('success', { message: 'The client was updated successfully.' });

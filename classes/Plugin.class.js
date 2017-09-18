@@ -109,15 +109,18 @@ module.exports = {
          */
         setGlobals(glo, room) {
             if (!this.globals.global.length && !this.globals.room.length) {
-                throw global.error('The plugin doesn\'t define it\'s variables. Please contact the author.');
+                throw SmartNodeServer.logger.error(
+                    'The plugin doesn\'t define it\'s variables. Please contact the author.');
             }
 
             if (glo && Object.keys(glo).length > 0 && !this.globals.global.length) {
-                throw global.error('The plugin doesn\'t define it\'s global variables. Please contact the author.');
+                throw SmartNodeServer.logger.error(
+                    'The plugin doesn\'t define it\'s global variables. Please contact the author.');
             }
 
             if (room && Object.keys(room).length > 0 && !this.globals.room.length) {
-                throw global.error('The plugin doesn\'t define it\'s room variables. Please contact the author.');
+                throw SmartNodeServer.logger.error(
+                    'The plugin doesn\'t define it\'s room variables. Please contact the author.');
             }
 
             const globalPaths = utils.getObjectPaths(glo);
@@ -125,7 +128,8 @@ module.exports = {
 
             globalPaths.forEach((key) => {
                 if (!this.globals.global.includes(key)) {
-                    throw global.error(`The plugin tries to change a not previously defined global variable (${key}).
+                    throw SmartNodeServer.logger.error(
+                        `The plugin tries to change a not previously defined global variable (${key}).
                         Please contact the author.`);
                 }
 
@@ -140,7 +144,8 @@ module.exports = {
 
             roomPaths.forEach((key) => {
                 if (!this.globals.room.includes(key)) {
-                    throw global.error(`The plugin tries to change a not previously defined room variable (${key}).
+                    throw SmartNodeServer.logger.error(
+                        `The plugin tries to change a not previously defined room variable (${key}). 
                         Please contact the author.`);
                 }
 

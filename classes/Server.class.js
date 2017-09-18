@@ -11,6 +11,8 @@ const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
 const WebNotifications = global.req('classes/WebNotifications.class');
 const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
 
+const Logger = new (global.req('classes/Log.class'))();
+
 module.exports = class SmartNodeServer {
     /**
      * SmartNodeServer contructor
@@ -26,6 +28,8 @@ module.exports = class SmartNodeServer {
         this.storage = new ServerStorage({}, () => {
             if (cb) cb();
         });
+
+        this.logger = Logger;
 
         this.globals = {
             global: {},
@@ -58,22 +62,22 @@ module.exports = class SmartNodeServer {
                 this.bonjour.published = true;
             }
 
-            global.success(`SmartNode server up and running, socket available on port ${port}`);
-            global.success(`Webserver running on port ${web}`);
+            Logger.success(`SmartNode server up and running, socket available on port ${port}`);
+            Logger.success(`Webserver running on port ${web}`);
         });
 
         this.io.on('connection', (socket) => {
             // console.log(socket.client); return;
-            global.log('Client connected:', socket.client.id);
+            Logger.info('Client connected:', socket.client.id);
 
             const connectionId = Connector.register(socket);
 
             if (connectionId === false) {
-                global.log('ERROR! Failed to register connection for new Client', socket.client.id);
+                Logger.error('ERROR! Failed to register connection for new Client', socket.client.id);
             } else {
                 const handlers = getEventHandlersForSocketFn(Connector, socket);
 
-                global.log('Registering handlers for', connectionId);
+                Logger.debug('Registering handlers for', connectionId);
 
                 Object.entries(handlers).forEach(([name, handler]) => {
                     Connector.addHandler(connectionId, name, handler);
@@ -89,11 +93,11 @@ module.exports = class SmartNodeServer {
         if (this.bonjour && this.bonjour.published) {
             this.bonjour.published = false;
             this.bonjour.unpublishAll(() => {
-                global.warn('Bonjour service unpublished!');
+                Logger.warn('Bonjour service unpublished!');
 
                 this.getClientIdList().forEach((id) => {
                     client = this.getClientById(id);
-                    global.log('close if called', id, client);
+                    Logger.debug('close if called', id, client);
                     if (client.loaded) this.unloadServerPlugin(client.socket.client.id);
                 });
 
@@ -102,7 +106,7 @@ module.exports = class SmartNodeServer {
         } else {
             this.getClientIdList().forEach((id) => {
                 client = this.getClientById(id);
-                global.log('close else called', id, client);
+                Logger.debug('close else called', id, client);
                 if (client.loaded) this.unloadServerPlugin(client.socket.client.id);
             });
 
@@ -144,13 +148,13 @@ module.exports = class SmartNodeServer {
     async clientPluginLoaded(id) {
         if (this.getClientBySocketId(id).loaded) {
             // plugin already loaded
-            global.debug('Client plugin already loaded and therefore skipped for ', id);
+            Logger.info('Client plugin already loaded and therefore skipped for ', id);
             return false;
         }
 
-        global.success(`Client ${id} has loaded it's plugin: ${this.getClientBySocketId(id).plugin}`);
+        Logger.success(`Client ${id} has loaded it's plugin: ${this.getClientBySocketId(id).plugin}`);
 
-        await this._loadServerPlugin(id).catch((e) => { global.error('Server load plugin error (2)', e); });
+        await this._loadServerPlugin(id).catch((e) => { Logger.error('Server load plugin error (2)', e); });
 
         this.updateClientBySocketId(id, { loaded: true });
 
@@ -179,12 +183,12 @@ module.exports = class SmartNodeServer {
             // eslint-disable-next-line global-require, import/no-dynamic-require
             plugin = await require(`${adapter.plugin}`)
                 .Server(adapter)
-                .catch((e) => { global.error('Server load plugin error', e); });
+                .catch((e) => { Logger.error('Server load plugin error', e); });
         } catch (e) {
             // nope, the plugin isn't installed on server side yet - die()
-            global.error(`Plugin "${adapter.plugin}" not found
+            Logger.error(`Plugin "${adapter.plugin}" not found
                 - you need to install it via "npm install ${adapter.plugin}" first!`);
-            global.muted('Debug', e);
+            Logger.debug('Debug', e);
             process.exit(1);
         }
 
@@ -194,7 +198,7 @@ module.exports = class SmartNodeServer {
         if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw global.error(`Plugin "${adapter.plugin}" does not provide a
+            throw Logger.error(`Plugin "${adapter.plugin}" does not provide a
                 "${functionError}()"-function on the server side.
                 Please contact the author!`);
         }
@@ -220,7 +224,7 @@ module.exports = class SmartNodeServer {
         let client = this.getClientBySocketId(id);
         if (!client) client = this.getClientById(id);
 
-        global.warn('Unloaded plugin for client:', client ? client.id : null);
+        Logger.warn('Unloaded plugin for client:', client ? client.id : null);
 
         if (client) {
             if (client.loaded) client.unload();
