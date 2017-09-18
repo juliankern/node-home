@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const Storage = global.req('classes/Storage.class');
 
 /**
- * SmartNodeServerPlugin class      
+ * SmartNodeServerPlugin class
  *
  * @author Julian Kern <mail@juliankern.com>
  *
@@ -30,6 +30,8 @@ module.exports = {
             this.configurationFormat = data.configurationFormat;
             this.plugin = data.plugin;
             this.displayName = data.displayName;
+
+            this.webNotifications = SmartNodeServer.webNotifications;
 
             // which global variables the plugin will be using, to watch them
             this.globals = {
@@ -123,7 +125,7 @@ module.exports = {
 
             globalPaths.forEach((key) => {
                 if (!this.globals.global.includes(key)) {
-                    throw global.error(`The plugin tries to change a not previously defined global variable (${key}). 
+                    throw global.error(`The plugin tries to change a not previously defined global variable (${key}).
                         Please contact the author.`);
                 }
 
@@ -138,7 +140,7 @@ module.exports = {
 
             roomPaths.forEach((key) => {
                 if (!this.globals.room.includes(key)) {
-                    throw global.error(`The plugin tries to change a not previously defined room variable (${key}). 
+                    throw global.error(`The plugin tries to change a not previously defined room variable (${key}).
                         Please contact the author.`);
                 }
 

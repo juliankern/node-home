@@ -1,5 +1,5 @@
 {
 	"extends": "clock",
 	"validateIndentation": 4,
-    "disallowClassAttributeWithStaticValue": false
+    "disallowClassAttributeWithStaticValue": null
 }
