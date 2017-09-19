@@ -7,7 +7,8 @@ log4js.configure({
         out: { type: 'stdout' },
         errors: {
             type: 'file',
-            filename: 'error.log',
+            // TODO: globally define log file
+            filename: 'logs/error.log',
             maxLogSize: 1024,
             backups: 5,
         },
@@ -60,30 +61,18 @@ module.exports = class Log {
         return this.info(chalk.bold.green(`> ${text}`), ...args);
     }
 
-    all(...args) {
+    caller(name, ...args) {
         if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.all(...args);
+        return this._logger[name](...args);
     }
 
-    trace(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.trace(...args);
-    }
-
-    debug(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.debug(...args);
-    }
-
-    info(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.info(...args);
-    }
-
-    warn(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.warn(...args);
-    }
+    all(...args) { return this.caller('all', ...args); }
+    trace(...args) { return this.caller('trace', ...args); }
+    debug(...args) { return this.caller('debug', ...args); }
+    info(...args) { return this.caller('info', ...args); }
+    warn(...args) { return this.caller('warn', ...args); }
+    mark(...args) { return this.caller('mark', ...args); }
+    off(...args) { return this.caller('off', ...args); }
 
     error(...args) {
         args.push(this.getCaller.call(this).stack);
@@ -93,15 +82,5 @@ module.exports = class Log {
     fatal(...args) {
         args.push(this.getCaller.call(this).stack);
         return this._logger.fatal(...args);
-    }
-
-    mark(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.mark(...args);
-    }
-
-    off(...args) {
-        if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
-        return this._logger.off(...args);
     }
 };
