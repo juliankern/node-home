@@ -12,11 +12,27 @@ log4js.configure({
             maxLogSize: 1024,
             backups: 5,
         },
+        debugs: {
+            type: 'file',
+            // TODO: globally define log file
+            filename: 'logs/debug.log',
+            maxLogSize: 1024,
+            backups: 5,
+        },
+        infos: {
+            type: 'file',
+            // TODO: globally define log file
+            filename: 'logs/info.log',
+            maxLogSize: 1024,
+            backups: 5,
+        },
         'just-errors': { type: 'logLevelFilter', appender: 'errors', level: 'warn' },
+        'just-debug': { type: 'logLevelFilter', appender: 'debugs', level: 'debug', maxLevel: 'debug' },
+        'just-info': { type: 'logLevelFilter', appender: 'infos', level: 'info', maxLevel: 'info' },
     },
     categories: {
         default: {
-            appenders: ['out', 'just-errors'],
+            appenders: ['out', 'just-errors', 'just-debug', 'just-info'],
             level: 'trace',
         },
     },
