@@ -2,6 +2,7 @@ const socketio = require('socket.io');
 const http = require('http');
 
 const SmartNodeRouter = global.req('classes/Router.class');
+const Logger = global.req('classes/Log.class');
 
 module.exports = SmartNodeServer => class WebNotifications {
     constructor(app) {
@@ -9,6 +10,7 @@ module.exports = SmartNodeServer => class WebNotifications {
         this._server = http.Server(this._app);
         this._io = socketio(this._server);
         this._volatile = false;
+        this._logger = new Logger();
 
         const router = new (SmartNodeRouter(SmartNodeServer))(this._app);
         router.init();

@@ -1,3 +1,5 @@
+const Logger = global.req('classes/Log.class');
+
 class ConnectedClientsList {
     constructor() {
         this._clients = {};
@@ -105,6 +107,8 @@ class RegisteredClientsList {
 
 module.exports = () => class ConnectedClientRegistry {
     constructor(storage, parentServer) {
+        this._logger = new Logger();
+
         this.storage = storage;
         this.parentServer = parentServer;
 
@@ -229,7 +233,7 @@ module.exports = () => class ConnectedClientRegistry {
     unpairClient(clientId) {
         const connectedClient = this.connectedClients.get(clientId);
 
-        global.log('ConnectedClientRegistry.unpairClient', clientId);
+        this._logger.info('ConnectedClientRegistry.unpairClient', clientId);
 
         return ((connectedClient && ('unpair' in connectedClient)) && connectedClient.unpair()) || undefined;
     }

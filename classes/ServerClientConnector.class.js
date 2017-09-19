@@ -1,3 +1,5 @@
+const Logger = global.req('classes/Log.class');
+
 const connections = {};
 
 /**
@@ -7,6 +9,10 @@ const connections = {};
  * @author  Dennis Sterzenbach <dennis.sterzenbach@gmail.com>
  */
 module.exports = class SmartNodeServerClientConnector {
+    constructor() {
+        this._logger = new Logger();
+    }
+
     getConnectionId(connection) {
         return (connection && connection.client && connection.client.id) || '';
     }
@@ -17,14 +23,14 @@ module.exports = class SmartNodeServerClientConnector {
 
     register(connection) {
         if (!this.isValidConnection(connection)) {
-            global.log('SmartNodeServerClientConnector: invalid connection');
+            this._logger.info('SmartNodeServerClientConnector: invalid connection');
             return false;
         }
 
         const id = this.getConnectionId(connection);
 
         connections[id] = connection;
-        global.log('SmartNodeServerClientConnector: register connection', id);
+        this._logger.info('SmartNodeServerClientConnector: register connection', id);
 
         return id;
     }
@@ -33,21 +39,21 @@ module.exports = class SmartNodeServerClientConnector {
         const connection = connections[connectionId];
 
         if (connection) {
-            global.log('SmartNodeServerClientConnector: register handler', connectionId, type);
+            this._logger.info('SmartNodeServerClientConnector: register handler', connectionId, type);
 
             connection.on(type, handler);
 
             return true;
         }
 
-        global.error('SmartNodeServerClientConnector: did not find connection', connectionId);
+        this._logger.error('SmartNodeServerClientConnector: did not find connection', connectionId);
 
         return false;
     }
 
     unregister(connectionId) {
         if (connectionId in connections) {
-            global.log('SmartNodeServerClientConnector: unregister connection', connectionId);
+            this._logger.info('SmartNodeServerClientConnector: unregister connection', connectionId);
 
             delete connections[connectionId];
 

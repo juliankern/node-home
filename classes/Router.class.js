@@ -5,6 +5,8 @@ const expressSession = require('express-session');
 const bodyparser = require('body-parser');
 const connectFlash = require('connect-flash');
 
+const Logger = global.req('classes/Log.class');
+
 module.exports = SmartNodeServer => class SmartNodeRouter {
     /**
      * SmartNodeServerPlugin contructor
@@ -32,6 +34,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
         this.app.use(this.handler);
 
+        this._logger = new Logger();
         // this.init();
     }
 
@@ -116,7 +119,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                     if (!hasConfig) {
                         client.socket.emit('setup', { config });
-                        SmartNodeServer.logger.info('Setup completed - waiting for client to load plugin...');
+                        this.logger.info('Setup completed - waiting for client to load plugin...');
                         req.flash('success', { message: 'The client was setup successfully.' });
                     } else {
                         req.flash('success', { message: 'The client was updated successfully.' });

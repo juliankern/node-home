@@ -10,7 +10,10 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 require('../util/global.js');
 
-global.log('');
+const Logger = global.req('classes/Log.class');
+const logger = new Logger();
+
+console.log(''); // eslint-disable-line no-console
 
 const pkg = global.req('package.json');
 const cli = require('cli');
@@ -33,15 +36,15 @@ const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
     socketEventHandlers = require('./socketEventHandlers')(SmartNodeServer); // eslint-disable-line global-require
     SmartNodeServer
         .init(cliOptions, ServerClientConnector, socketEventHandlers)
-        .catch((e) => { global.error('Server init error', e); });
+        .catch((e) => { logger.error('Server init error', e); });
 });
 
 // ////////////////////////////////////////////////////////
 
 // eslint-disable-next-line global-require
 if (process.title === 'npm' && require('os').type().includes('Windows')) {
-    global.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
-    global.log('');
+    logger.warn('If you want to see the fontend, you\'ll need to run "npm run watch-scss" as well to compile CSS!');
+    console.log(''); // eslint-disable-line no-console
 }
 
 // ////////////////////////////////////////////////////////
@@ -54,10 +57,10 @@ if (process.title === 'npm' && require('os').type().includes('Windows')) {
  * @param  {object} err Holding the error messages
  */
 function exitHandler(err) {
-    global.log('SmartNode exiting...');
+    logger.info('SmartNode exiting...');
 
     if (err) {
-        global.error('System error!', err);
+        logger.error('System error!', err);
     }
 
     SmartNodeServer.close(process.exit);

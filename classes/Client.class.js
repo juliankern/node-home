@@ -5,7 +5,7 @@ const socketio = require('socket.io-client'); // eslint-disable-line import/no-e
 const ClientStorage = global.req('classes/Storage.class').Client;
 const SmartNodePlugin = global.req('classes/Plugin.class');
 
-const Logger = new (global.req('classes/Log.class'))();
+const Logger = global.req('classes/Log.class');
 
 module.exports = class SmartNodeClient {
     /**
@@ -21,13 +21,13 @@ module.exports = class SmartNodeClient {
         this.pluginName = options.plugin;
         this.serverAddress = options.server || false;
 
-        this.logger = Logger;
+        this._logger = new Logger();
 
         if (!this.serverAddress) {
             this.bonjour = bonjour();
         }
 
-        Logger.info('new SmartNodeClient:', this.pluginName);
+        this._logger.info('new SmartNodeClient:', this.pluginName);
         this.storage = new ClientStorage(this.pluginName, () => {
             if (cb) cb();
         });
@@ -40,7 +40,7 @@ module.exports = class SmartNodeClient {
      */
     async init() {
         if (!this.serverAddress) {
-            Logger.info('Starting search for master server...');
+            this._logger.info('Starting search for master server...');
 
             this.browser = this.bonjour.find({ type: 'smartnode' });
 
@@ -73,7 +73,7 @@ module.exports = class SmartNodeClient {
     onFoundMaster() {
         const address = this.service.addresses[0].includes(':') ? this.service.addresses[1] : this.service.addresses[0];
 
-        Logger.success('Found an SmartNode server:', `http://${address}:${this.service.port}`);
+        this._logger.success('Found an SmartNode server:', `http://${address}:${this.service.port}`);
 
         this.socket = socketio(`http://${address}:${this.service.port}`);
 
@@ -82,10 +82,10 @@ module.exports = class SmartNodeClient {
         this.socket.on('disconnect', this.onDisconnect.bind(this));
         this.socket.on('connect_error', (error) => {
             if (this.serverAddress) {
-                Logger.error('Could not find master server. Did you type the server address correctly?');
+                this._logger.error('Could not find master server. Did you type the server address correctly?');
             }
 
-            throw Logger.error('Client connection error:', error);
+            throw this._logger.error('Client connection error:', error);
         });
     }
 
@@ -97,7 +97,7 @@ module.exports = class SmartNodeClient {
 
         const clientId = await this.adapter.storage.get('clientid');
 
-        Logger.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
+        this._logger.success(`Connected to server! Own socket: ${this.socket.id}, own client-ID: ${clientId}`);
 
         const plugin = await this._getPlugin();
         const [pkg, callback] = plugin.init();
@@ -129,27 +129,27 @@ module.exports = class SmartNodeClient {
 
     async register() {
         const clientId = await this.adapter.storage.get('clientid');
-        Logger.info('emitting register with clientID:', clientId);
+        this._logger.info('emitting register with clientID:', clientId);
         this.socket.emit('register', {
             id: clientId,
         }, (data) => {
-            global.muted('Registered successfully!');
+            this._logger.debug('Registered successfully!');
 
             this.adapter.plugin = this.pluginName;
 
             if (data && data.config && Object.keys(data.config).length) {
                 this.adapter.config = data.config;
                 this._loadPlugin();
-                Logger.info('Setup already done, loading plugin...');
+                this._logger.info('Setup already done, loading plugin...');
             } else {
                 this.socket.on('setup', this.onSetup.bind(this));
-                Logger.info('Waiting for setup to complete...');
+                this._logger.info('Waiting for setup to complete...');
             }
         });
     }
 
     async onSetup(data) {
-        Logger.info('Setup completed - loading plugin...', data);
+        this._logger.info('Setup completed - loading plugin...', data);
         this.adapter.config = data.config;
         this.adapter.room = data.config.room;
 
@@ -157,10 +157,10 @@ module.exports = class SmartNodeClient {
     }
 
     async onDisconnect(reason) {
-        Logger.info('Server disconnected! Reason:', reason);
+        this._logger.info('Server disconnected! Reason:', reason);
         this._unloadPlugin();
 
-        Logger.info('Starting search for master server...');
+        this._logger.info('Starting search for master server...');
     }
 
     async _getPlugin() {
@@ -170,11 +170,11 @@ module.exports = class SmartNodeClient {
             // eslint-disable-next-line global-require, import/no-dynamic-require
             plugin = await require(`${this.pluginName}`)
                 .Client(this.adapter)
-                .catch((e) => { Logger.error('Client load plugin error', e); });
+                .catch((e) => { this._logger.error('Client load plugin error', e); });
         } catch (e) {
-            Logger.error(`Could not load plugin "${this.pluginName}"
+            this._logger.error(`Could not load plugin "${this.pluginName}"
                 - you probably need to install it via "npm install ${this.pluginName}" first!`);
-            Logger.debug('Debug', e);
+            this._logger.debug('Debug', e);
             process.exit(1);
         }
 
@@ -185,7 +185,7 @@ module.exports = class SmartNodeClient {
         if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
         if (functionError) {
-            throw Logger.error(`Plugin "${this.pluginName}" does not provide a "${functionError}()"
+            throw this._logger.error(`Plugin "${this.pluginName}" does not provide a "${functionError}()"
                 -function on the client side. Please contact the author!`);
         }
 

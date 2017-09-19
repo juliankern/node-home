@@ -1,18 +1,23 @@
 const storage = require('node-persist');
 const tmpStore = require('node-persist');
 
+const Logger = global.req('classes/Log.class');
+
+const localLogger = new Logger();
+
 tmpStore.initSync({ dir: 'storage/server' });
 
 const fallbackStorage = {
     Server: class ServerStorage {
         constructor({ room, plugin } = {}, cb) {
+            this._logger = new Logger();
             this._room = room;
             this._plugin = plugin;
             this._storage = storage;
             this._storage
                 .init({ dir: 'storage/server' })
                 .then(() => {
-                    global.muted('Server storage inited!');
+                    this._logger.debug('Server storage inited!');
 
                     if (cb) cb();
                 });
@@ -39,7 +44,7 @@ const fallbackStorage = {
             this._storage
                 .init({ dir: `storage/client/${pluginName}` })
                 .then(() => {
-                    global.muted('Client storage inited!', pluginName);
+                    this._logger.debug('Client storage inited!', pluginName);
 
                     if (cb) cb();
                 });
@@ -65,43 +70,45 @@ if (pluginName) {
         // eslint-disable-next-line global-require, import/no-dynamic-require
         plugin = require(pluginName.name);
     } catch (e) {
-        global.warn(`Cannot load storage plugin "${pluginName.name}". Falling back to node-persist.`);
-        global.muted('Error:', e);
+        localLogger.warn(`Cannot load storage plugin "${pluginName.name}". Falling back to node-persist.`);
+        localLogger.debug('Error:', e);
     }
 
     if (plugin) {
         if (!('Client' in plugin)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a "Client" part. Please contact the author.`);
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a "Client" part.
+                Please contact the author.`);
         }
 
         if (!('Server' in plugin)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a "Server" part. Please contact the author.`);
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a "Server" part.
+                Please contact the author.`);
         }
 
         if (!('get' in plugin.Client.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part.
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a get()-method within the Client part.
                 Please contact the author.`);
         }
 
         if (!('get' in plugin.Server.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part.
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a get()-method within the Server part.
                 Please contact the author.`);
         }
 
         if (!('set' in plugin.Client.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part.
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a set()-method within the Client part.
                 Please contact the author.`);
         }
 
         if (!('set' in plugin.Server.prototype)) {
-            throw global.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part.
+            throw localLogger.error(`Plugin ${pluginName.name} is missing a set()-method within the Server part.
                 Please contact the author.`);
         }
 
-        global.success(`Storage plugin "${pluginName.name}" successfully loaded.`);
+        localLogger.success(`Storage plugin "${pluginName.name}" successfully loaded.`);
     }
 } else {
-    global.log('No storage plugin defined. Falling back to node-persist.');
+    localLogger.info('No storage plugin defined. Falling back to node-persist.');
 }
 
 module.exports = plugin || fallbackStorage;

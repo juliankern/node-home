@@ -10,7 +10,10 @@
     },
     "globals": {
         "$": true,
-        "$$": true
+        "$$": true,
+        "__caller_function": true,
+        "__caller_line": true,
+        "__stack": true
     },
     "extends": "airbnb",
     "rules": {

@@ -5,6 +5,9 @@ const path = require('path');
 const storage = require('node-persist');
 const cli = require('cli');
 
+const Logger = global.req('classes/Log.class');
+const logger = new Logger();
+
 storage.initSync({ dir: `${path.normalize(`${global.approot}/../..`)}/storage/server` });
 
 cli.enable('version');
@@ -22,19 +25,19 @@ const opt = cli.parse({
 // //////////////////////////////////////////////////////////////
 
 if (!opt.register && !opt.unregister) {
-    throw global.error('You need to choose if to register or unregister this plugin.');
+    throw logger.error('You need to choose if to register or unregister this plugin.');
 }
 
 if (opt.register && opt.unregister) {
-    throw global.error('You need to choose if to register OR unregister this plugin.');
+    throw logger.error('You need to choose if to register OR unregister this plugin.');
 }
 
 if (!opt.name) {
-    throw global.error('Please provide a plugin name');
+    throw logger.error('Please provide a plugin name');
 }
 
 if (!opt.type) {
-    throw global.error('Please provide a plugin type');
+    throw logger.error('Please provide a plugin type');
 }
 
 // //////////////////////////////////////////////////////////////
@@ -42,7 +45,7 @@ if (!opt.type) {
 if (opt.type === 'storage') {
     maxPlugins = 1;
 } else {
-    throw global.error('Please provide a valid plugin type');
+    throw logger.error('Please provide a valid plugin type');
 }
 
 // //////////////////////////////////////////////////////////////
@@ -51,17 +54,17 @@ const registeredPlugins = storage.getItemSync(`plugins.${opt.type}`) || [];
 
 if (opt.register) {
     if (maxPlugins === 1 && registeredPlugins.length > 0) {
-        throw global.error(`There is already one ${opt.type}-plugin active. Please unregister it first.`);
+        throw logger.error(`There is already one ${opt.type}-plugin active. Please unregister it first.`);
     }
 
     registeredPlugins.push({ name: opt.name });
     storage.setItemSync(`plugins.${opt.type}`, registeredPlugins);
-    global.success(`Plugin '${opt.name}' successfully installed`);
+    logger.success(`Plugin '${opt.name}' successfully installed`);
 } else if (opt.unregister) {
     if (registeredPlugins.length === 0) {
-        throw global.warn(`There is no active ${opt.type}-plugin. Quitting.`);
+        throw logger.warn(`There is no active ${opt.type}-plugin. Quitting.`);
     }
 
     storage.setItemSync(`plugins.${opt.type}`, registeredPlugins.filter(e => e.name !== opt.name));
-    global.success(`Plugin '${opt.name}' successfully uninstalled`);
+    logger.success(`Plugin '${opt.name}' successfully uninstalled`);
 }

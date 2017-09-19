@@ -10,7 +10,10 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 require('../util/global.js');
 
-global.log('');
+const Logger = global.req('classes/Log.class');
+const logger = new Logger();
+
+console.log(''); // eslint-disable-line no-console
 
 const pkg = global.req('package.json');
 const cli = require('cli');
@@ -23,7 +26,7 @@ const options = cli.parse({
 });
 
 if (!options.plugin) {
-    global.error('You need to provide a plugin name!');
+    logger.error('You need to provide a plugin name!');
     process.exit(1);
 }
 
@@ -32,7 +35,7 @@ if (!options.plugin) {
 const SmartNodeClient = global.req('classes/Client.class');
 const client = new SmartNodeClient(options, () => {
     client.init()
-        .catch((e) => { global.error('Client init error', e); });
+        .catch((e) => { logger.error('Client init error', e); });
 });
 
 // ///////////////////////////////////////////////////////
@@ -45,10 +48,10 @@ const client = new SmartNodeClient(options, () => {
  * @param  {object} err Holding the error messages
  */
 function exitHandler(err) {
-    global.log('SmartNode client exiting...');
+    logger.info('SmartNode client exiting...');
 
     if (err) {
-        global.error('System error!', err);
+        logger.error('System error!', err);
     }
 
     client.close(process.exit);
