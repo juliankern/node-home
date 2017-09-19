@@ -57,13 +57,14 @@ module.exports = class Log {
         const fullStack = stack.join('at ');
 
         stack = stack[n].trim();
-        stack = stack.match(/([\w.<>]+) \(([\w./-]+\.js):([0-9]+):([0-9]+)\)/);
+        stack = stack.match(/([\w.<>]+)\s?(\[[\w ]+\])?\s?\(([\w./-]+\.js):([0-9]+):([0-9]+)\)/);
+
 
         return {
             stack: fullStack,
-            function: stack[1],
-            file: path.parse(stack[2]),
-            line: [stack[3], stack[4]],
+            function: stack[1] + stack[2],
+            file: path.parse(stack[3]),
+            line: [stack[4], stack[5]],
         };
     }
 

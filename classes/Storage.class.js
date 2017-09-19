@@ -40,6 +40,7 @@ const fallbackStorage = {
     },
     Client: class ClientStorage {
         constructor(pluginName, cb) {
+            this._logger = new Logger();
             this._storage = storage;
             this._storage
                 .init({ dir: `storage/client/${pluginName}` })

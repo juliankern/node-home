@@ -89,8 +89,23 @@ module.exports = class SmartNodeClient {
         });
     }
 
+    getNewPlugin(data) {
+        const args = SmartNodePlugin.Client;
+        const pluginFunction = args.pop();
+
+        const values = args.map((key) => {
+            if (key === 'storage') {
+                return this.storage;
+            }
+
+            return null;
+        });
+
+        return new (pluginFunction(...values))(data);
+    }
+
     async onConnect() {
-        this.adapter = new (SmartNodePlugin.Client(this))({
+        this.adapter = this.getNewPlugin({
             socket: this.socket,
             id: this.socket.id,
         });

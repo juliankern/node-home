@@ -35,10 +35,48 @@ module.exports = class SmartNodeServer {
         };
 
         this.clients = new ClientRegistry(this.storage, this);
+
+        this.globalVars = {
+            /**
+             * notifies every server plugin exept the initiator about globals changed
+             *
+             * @author Julian Kern <mail@juliankern.com>
+             *
+             * @param  {string} clientId Client ID
+             * @param  {object} changed  array of variable paths that got changed
+             */
+            changed: (clientId, changed) => {
+                Object.keys(this.getClientList())
+                    .filter(id => id !== clientId)
+                    .forEach((id) => {
+                        this.getClientById(id).emit('globalsChanged', {
+                            changed,
+                        });
+                    });
+            },
+            initRoom: (room) => {
+                if (!this.globals[room]) this.globals[room] = {};
+            },
+            getGlobals: () => this.globals.global,
+            getRoom: room => this.globals[room],
+        };
     }
 
     getNewPlugin(data) {
-        return new (SmartNodePlugin.Server(this))(data);
+        const args = SmartNodePlugin.Server;
+        const pluginFunction = args.pop();
+
+        const values = args.map((key) => {
+            if (key === 'webNotifications') {
+                return this.webNotifications;
+            } else if (key === 'globalVars') {
+                return this.globalVars;
+            }
+
+            return null;
+        });
+
+        return new (pluginFunction(...values))(data);
     }
 
     /**
@@ -113,18 +151,6 @@ module.exports = class SmartNodeServer {
         }
     }
 
-    globalsInitRoom(room) {
-        if (!this.globals[room]) this.globals[room] = {};
-    }
-
-    globalsGetGlobals() {
-        return this.globals.global;
-    }
-
-    globalsGetRoom(room) {
-        return this.globals[room];
-    }
-
     registerClient(data) {
         return this.clients.registerClient(data);
     }
@@ -180,7 +206,7 @@ module.exports = class SmartNodeServer {
             // => load the server side
             // => hand over client id and useful functions
             // eslint-disable-next-line global-require, import/no-dynamic-require
-            plugin = await require(`${adapter.plugin}`)
+            plugin = await require(adapter.plugin)
                 .Server(adapter)
                 .catch((e) => { this._logger.error('Server load plugin error', e); });
         } catch (e) {
@@ -229,24 +255,6 @@ module.exports = class SmartNodeServer {
             if (client.loaded) client.unload();
             this.removeClientBySocketId(id);
         }
-    }
-
-    /**
-     * notifies every server plugin exept the initiator about globals changed
-     *
-     * @author Julian Kern <mail@juliankern.com>
-     *
-     * @param  {string} clientId Client ID
-     * @param  {object} changed  array of variable paths that got changed
-     */
-    globalsChanged(clientId, changed) {
-        Object.keys(this.getClientList())
-            .filter(id => id !== clientId)
-            .forEach((id) => {
-                this.getClientById(id).emit('globalsChanged', {
-                    changed,
-                });
-            });
     }
 
     getClientIdList() {
