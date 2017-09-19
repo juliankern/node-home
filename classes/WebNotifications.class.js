@@ -84,6 +84,6 @@ module.exports = SmartNodeServer => class WebNotifications {
     }
 
     onConnection(socket) {
-        SmartNodeServer.logger.info('WebNotification client connected!', socket.id);
+        this._logger.info('WebNotification client connected!', socket.id);
     }
 };
