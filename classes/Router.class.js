@@ -6,6 +6,7 @@ const bodyparser = require('body-parser');
 const connectFlash = require('connect-flash');
 
 const Logger = global.req('classes/Log.class');
+const Room = global.req('models/Room.model');
 
 module.exports = SmartNodeServer => class SmartNodeRouter {
     /**
@@ -62,10 +63,19 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
         route
             .get(async (req, res) => {
                 const client = SmartNodeServer.getClientById(req.params.clientId);
+                await Room();
+
+                console.log('TEEEEEST')
+                console.dir(Room);
 
                 if (!client) {
                     return res.redirect('/');
                 }
+
+                const rooms = await Room.find().exec();
+                rooms = rooms.map((r) => {
+                    return r.name;
+                })
 
                 return res.render('config', {
                     config: client.config,
@@ -73,7 +83,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
                     id: client.id,
                     displayName: client.displayName,
                     configurationFormat: client.configurationFormat,
-                    rooms: await SmartNodeServer.storage.get('rooms'),
+                    rooms,
                 });
             })
             .post(async (req, res) => {
@@ -101,13 +111,11 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
                     return res.redirect('/');
                 } else {
-                    const rooms = await SmartNodeServer.storage.get('rooms') || [];
                     // no validation errors, save config and trigger onSetup
 
                     if (req.body.room === '-1') {
                         config.room = req.body.newroom;
-                        rooms.push(config.room);
-                        await SmartNodeServer.storage.set('rooms', rooms);
+                        await Room.insert({ name: req.body.newroom });
                     } else {
                         config.room = req.body.room;
                     }

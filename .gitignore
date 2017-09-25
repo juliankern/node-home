@@ -60,3 +60,5 @@ typings/
 storage/
 homekit.json
 public/css/
+serverstorage-*
+clientstorage-*
