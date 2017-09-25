@@ -1,13 +1,14 @@
 const ServerStorage = global.req('classes/Storage2.class').Server;
-var RxDB = require('rxdb');
 
-module.exports = async () => {
-    console.dir(RxDB);
-    const db = await ServerStorage();
+module.exports = class RoomModel extends ServerStorage {
+    constructor() {
+        super();
+    }
 
-    return db.collection({
-        name: 'rooms',
-        schema: {
+    async init() {
+        await super.init();
+
+        return super.model('rooms', {
             title: 'room schema',
             version: 0,
             type: 'object',
@@ -17,6 +18,6 @@ module.exports = async () => {
                     primary: true
                 }
             }
-        }
-    });
-};
+        });
+    }
+}

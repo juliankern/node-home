@@ -6,10 +6,12 @@ const bodyparser = require('body-parser');
 const connectFlash = require('connect-flash');
 
 const Logger = global.req('classes/Log.class');
-const Room = global.req('models/Room.model');
+const RoomModel = new (global.req('models/Room.model'))();
+
+let Room;
 
 module.exports = SmartNodeServer => class SmartNodeRouter {
-    /**
+        /**
      * SmartNodeServerPlugin contructor
      *
      * @author Julian Kern <mail@juliankern.com>
@@ -39,7 +41,9 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
         // this.init();
     }
 
-    init() {
+    async init() {
+        Room = await RoomModel.init();
+
         this.app.get('/', (req, res) => {
             res.render('index', {});
         });
@@ -63,16 +67,12 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
         route
             .get(async (req, res) => {
                 const client = SmartNodeServer.getClientById(req.params.clientId);
-                await Room();
-
-                console.log('TEEEEEST')
-                console.dir(Room);
 
                 if (!client) {
                     return res.redirect('/');
                 }
 
-                const rooms = await Room.find().exec();
+                let rooms = await Room.find().exec();
                 rooms = rooms.map((r) => {
                     return r.name;
                 })
@@ -135,7 +135,8 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
                 }
 
                 return res.redirect(`/config/${req.params.clientId}`);
-            });
+            })
+        ;
     }
 
     handler(req, res, next) {
