@@ -57,7 +57,7 @@ module.exports = class Log {
         const fullStack = stack.join('at ');
 
         stack = stack[n].trim();
-        stack = stack.match(/([\w.<>]+)\s?(\[[\w ]+\])?\s?\(([\w./-]+\.js):([0-9]+):([0-9]+)\)/);
+        stack = stack.match(/([\w.<>]+)\s?(\[[\w ]+\])?\s?\(([\w:.\\/-]+\.js):([0-9]+):([0-9]+)\)/);
 
 
         return {
