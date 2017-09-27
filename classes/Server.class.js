@@ -6,7 +6,7 @@ const socketio = require('socket.io');
 const utils = global.req('util');
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
-const ServerStorage = global.req('classes/Storage/Storage.class').Server;
+const ServerStorage = global.req('classes/Storages/Storage.class').Server;
 const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
 const WebNotifications = global.req('classes/WebNotifications.class');
 const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
