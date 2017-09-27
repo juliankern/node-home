@@ -1,7 +1,7 @@
 const utils = global.req('util');
 const EventEmitter = require('events');
 
-const Storage = global.req('classes/Storage.class');
+const Storage = global.req('classes/Storage/Storage.class');
 const Logger = global.req('classes/Log.class');
 
 /**
