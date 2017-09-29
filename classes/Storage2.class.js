@@ -1,4 +1,4 @@
-require('babel-polyfill');
+// require('babel-polyfill');
 var RxDB = require('rxdb');
 RxDB.plugin(require('pouchdb-adapter-node-websql'));
 
