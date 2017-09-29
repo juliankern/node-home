@@ -7,10 +7,12 @@ const utils = global.req('util');
 
 const SmartNodePlugin = global.req('classes/Plugin.class');
 const ServerStorage = global.req('classes/Storage.class').Server;
-const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
 const WebNotifications = global.req('classes/WebNotifications.class');
 const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
 const Logger = global.req('classes/Log.class');
+
+const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
+const ServerClientConnector = new (global.req('classes/ServerClientConnector.class.js'))();
 
 module.exports = class SmartNodeServer {
     /**
@@ -84,7 +86,7 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    async init({ port, web, nobonjour }, Connector, getEventHandlersForSocketFn) {
+    async init({ port, web, nobonjour }, getEventHandlersForSocketFn) {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
         web = web || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
@@ -107,17 +109,17 @@ module.exports = class SmartNodeServer {
             // console.log(socket.client); return;
             this._logger.info('Client connected:', socket.client.id);
 
-            const connectionId = Connector.register(socket);
+            const connectionId = ServerClientConnector.register(socket);
 
             if (connectionId === false) {
                 this._logger.error('ERROR! Failed to register connection for new Client', socket.client.id);
             } else {
-                const handlers = getEventHandlersForSocketFn(Connector, socket);
+                const handlers = getEventHandlersForSocketFn(ServerClientConnector, socket);
 
                 this._logger.debug('Registering handlers for', connectionId);
 
                 Object.entries(handlers).forEach(([name, handler]) => {
-                    Connector.addHandler(connectionId, name, handler);
+                    ServerClientConnector.addHandler(connectionId, name, handler);
                 });
             }
         });
