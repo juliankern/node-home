@@ -1,16 +1,33 @@
 const utils = global.req('util/');
 const Logger = global.req('classes/Log.class');
-const logger = new Logger();
+
 /**
  * Collection of Event-Handlers registered on each socket connection.
  *
  * @author  Dennis Sterzenbach <dennis.sterzenbach@gmail.com>
+ * @author  Julian Kern <mail@juliankern.com>
  */
-module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => {
-    const socketEventHandlers = {};
+module.exports = SmartNodeServer => class SocketEventsHandler {
+    constructor(socket, ServerClientConnector) {
+        this._socket = socket;
+        this._logger = new Logger();
 
-    socketEventHandlers.connected = async ({ plugin, configurationFormat, displayName, id }, cb) => {
-        logger.info(`Client connected with ID: ${id}, Plugin: ${plugin}`);
+        const eventHandlers = [
+            'connected',
+            'register',
+            'disconnect',
+            'pluginloaded',
+        ];
+
+        const connectionId = ServerClientConnector.register(socket);
+
+        eventHandlers.forEach((name) => {
+            ServerClientConnector.addHandler(connectionId, name, this[name].bind(this));
+        });
+    }
+
+    async connected({ plugin, configurationFormat, displayName, id }, cb) {
+        this._logger.info(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
         const clients = await SmartNodeServer.clients.registeredClients.getAll();
 
@@ -19,7 +36,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
 
             SmartNodeServer.registerClient({
                 id: clientId,
-                socket,
+                socket: this._socket,
                 plugin,
                 configurationFormat,
                 displayName,
@@ -29,7 +46,7 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
         } else {
             SmartNodeServer.connectClient(Object.assign({
                 id,
-                socket,
+                socket: this._socket,
                 plugin,
                 configurationFormat,
                 displayName,
@@ -39,9 +56,9 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
 
             cb({ id: client.id, config: client.config });
         }
-    };
+    }
 
-    socketEventHandlers.register = async ({ id }, cb) => {
+    async register({ id }, cb) {
         const client = await SmartNodeServer.clients.registeredClients.get(id);
         const configuration = client ? client.config : undefined;
         const configurationFormat = client ? client.configurationFormat : undefined;
@@ -51,37 +68,33 @@ module.exports = SmartNodeServer => (SmartNodeServerClientConnector, socket) => 
         if (configuration && !SmartNodeServer.validConfiguration(configuration, configurationFormat)) {
             // valid configuration exists
             // => continue with loading
-            socket.join(configuration.room);
+            this._socket.join(configuration.room);
             eventname = 'client-connect';
 
             cb({ config: configuration });
         } else {
             // no configuration exists or it's not valid anymore
             // => stop here, and wait for configuration via web interface
-            logger.info('Client has no configuration yet, waiting for web configuration');
+            this._logger.info('Client has no configuration yet, waiting for web configuration');
 
             eventname = 'client-register';
             cb();
         }
 
         SmartNodeServer.webNotifications.broadcast(eventname, SmartNodeServer.clients.connectedClients.get(id));
-    };
+    }
 
-    socketEventHandlers.disconnect = async (reason) => {
-        SmartNodeServer.disconnectClient(socket.client.id);
-        SmartNodeServerClientConnector.unregister(socket.client.id, reason);
+    async disconnect(reason) {
+        SmartNodeServer.disconnectClient(this._socket.client.id, reason);
 
         SmartNodeServer.webNotifications.broadcast('client-disconnect',
-            await SmartNodeServer.clients.getClientBySocketId(socket.client.id));
+            await SmartNodeServer.clients.getClientBySocketId(this._socket.client.id));
 
-        logger.warn('Client disconnected! ID:', socket.client.id, reason);
-    };
+        this._logger.warn('Client disconnected! ID:', this._socket.client.id, reason);
+    }
 
-    socketEventHandlers.pluginloaded = async () => {
-        SmartNodeServer.clientPluginLoaded(socket.client.id, true)
-            .catch((e) => { logger.error('Server load plugin error (4)', e); });
-    };
-
-    return socketEventHandlers;
+    async pluginloaded() {
+        SmartNodeServer.clientPluginLoaded(this._socket.client.id, true)
+            .catch((e) => { this._logger.error('Server load plugin error (4)', e); });
+    }
 };
-

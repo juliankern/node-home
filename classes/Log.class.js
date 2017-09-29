@@ -43,7 +43,7 @@ module.exports = class Log {
         this._withStack = false;
         this._caller = this.getCaller.call(this);
 
-        this._logger = log4js.getLogger(this._caller.file.base);
+        this._logger = log4js.getLogger(`${this._caller.file.dir.split(path.sep).pop()}/${this._caller.file.base}`);
         this._logger.level = global.DEVMODE ? 'trace' : 'info';
     }
 
@@ -57,8 +57,7 @@ module.exports = class Log {
         const fullStack = stack.join('at ');
 
         stack = stack[n].trim();
-        stack = stack.match(/([\w.<>]+)\s?(\[[\w ]+\])?\s?\(([\w./-]+\.js):([0-9]+):([0-9]+)\)/);
-
+        stack = stack.match(/([\w.<>]+)\s?(\[[\w ]+\])?\s?\(([\w:.\\/-]+\.js):([0-9]+):([0-9]+)\)/);
 
         return {
             stack: fullStack,
