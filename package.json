@@ -18,8 +18,10 @@
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
     "start": "npm run watch-scss & npm run server",
-    "server": "nodemon -e js --ignore bin/client.js bin/server.js",
-    "client": "nodemon -e js --ignore bin/server.js bin/client.js"
+    "server": "node bin/server.js",
+    "server:dev": "nodemon -e js --ignore bin/client.js bin/server.js",
+    "client": "node bin/client.js",
+    "client:dev": "nodemon -e js --ignore bin/server.js bin/client.js"
   },
   "repository": {
     "type": "git",
@@ -54,7 +56,6 @@
     "moment": "^2.18.1",
     "node-persist": "^2.1.0",
     "node-sass": "^4.5.3",
-    "nodemon": "^1.11.0",
     "postcss": "^6.0.11",
     "pug": "^2.0.0-rc.3",
     "randomstring": "^1.1.5",
@@ -72,6 +73,7 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.3.0",
+    "nodemon": "^1.11.0",
     "pug-lint": "^2.5.0",
     "pug-lint-config-clock": "^2.0.0",
     "stylelint": "^8.1.1"
