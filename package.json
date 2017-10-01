@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
+  "bin": {
+    "smartnode": "./bin/server.js",
+    "smartnode-client": "./bin/client.js"
+  },
   "scripts": {
     "test": "npm run lint",
     "lint": "npm run lint:all",
