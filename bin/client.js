@@ -10,9 +10,9 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 require('../util/global.js');
 
-const pkg = global.req('package.json');
+const pkg = global.SmartNode.require('package.json');
 
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 const masterlogger = new Logger();
 
 console.log(''); // eslint-disable-line no-console
@@ -42,6 +42,7 @@ if (!options.plugin) {
 if (cluster.isMaster) {
     let restartCount = 0;
     let forcedRestart = false;
+    let forcedExit = false;
 
     // ////////////////////////////////////////////////////////
     masterlogger.info(`Master client process is running with ID ${process.pid}`);
@@ -49,6 +50,8 @@ if (cluster.isMaster) {
     let child = cluster.fork();
 
     cluster.on('exit', (worker) => {
+        if (forcedExit) return;
+
         if (forcedRestart) {
             child = restartChild();
             forcedRestart = false;
@@ -67,6 +70,9 @@ if (cluster.isMaster) {
                 }, options.restartDelay);
 
                 restartCount++;
+            } else {
+                masterlogger.warn('Maximum numbers of automatic restarts reached. Exiting.');
+                process.exit(1);
             }
         }
     });
@@ -76,21 +82,22 @@ if (cluster.isMaster) {
     process.stdin.on('data', (data) => {
         if ((`${data}`).trim().toLowerCase() === 'rs') {
             masterlogger.info('Restarting server process NOW!');
-            child.send('exit');
+            child.send('close');
             forcedRestart = true;
         }
     });
 
     process.on('SIGINT', () => {
         masterlogger.warn('SIGINT caught!!');
-        child.send('exit');
+        child.send('close');
+        forcedExit = true;
     });
 } else {
     const logger = new Logger('child');
 
     logger.info(`Child process started with ID ${process.pid}`);
 
-    const SmartNodeClient = global.req('classes/Client.class');
+    const SmartNodeClient = global.SmartNode.require('classes/Client.class');
     const client = new SmartNodeClient(options, () => {
         client.init()
             .catch((e) => { logger.error('Client init error', e); });
@@ -98,7 +105,7 @@ if (cluster.isMaster) {
 
     // do something when app is closing
     process.on('message', (msg) => {
-        if (msg === 'exit') {
+        if (msg === 'close') {
             exitHandler.call([client, logger]);
         }
     });

@@ -1,4 +1,4 @@
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 class ConnectedClientsList {
     constructor() {

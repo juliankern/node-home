@@ -51,7 +51,7 @@ module.exports = class Log {
         if (hint) description += ` - ${hint}`;
 
         this._logger = log4js.getLogger(description);
-        this._logger.level = global.DEVMODE ? 'trace' : 'info';
+        this._logger.level = global.SmartNode.DEVMODE ? 'trace' : 'info';
     }
 
     getCaller(n) {

@@ -1,14 +1,14 @@
 require('../util/global.js');
 
-const pkg = global.req('package.json');
+const pkg = global.SmartNode.require('package.json');
 const path = require('path');
 const storage = require('node-persist');
 const cli = require('cli');
 
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 const logger = new Logger();
 
-storage.initSync({ dir: `${path.normalize(`${global.approot}/../..`)}/storage/server` });
+storage.initSync({ dir: `${path.normalize(`${global.SmartNode.approot}/../..`)}/storage/server` });
 
 cli.enable('version');
 cli.setApp('bin/plugin.js', pkg.version);

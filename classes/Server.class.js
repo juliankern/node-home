@@ -3,17 +3,17 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 
-const utils = global.req('util');
+const utils = global.SmartNode.require('util');
 
-const SmartNodePlugin = global.req('classes/Plugin.class');
-const ServerStorage = global.req('classes/Storage.class').Server;
-const WebNotifications = global.req('classes/WebNotifications.class');
-const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
-const Logger = global.req('classes/Log.class');
+const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class');
+const ServerStorage = global.SmartNode.require('classes/Storage.class').Server;
+const WebNotifications = global.SmartNode.require('classes/WebNotifications.class');
+const ClientRegistry = (global.SmartNode.require('classes/ClientRegistry.class')(SmartNodePlugin));
+const Logger = global.SmartNode.require('classes/Log.class');
 
-const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
-const ServerClientConnector = new (global.req('classes/ServerClientConnector.class'))();
-const SocketEventsHandler = global.req('classes/SocketEventsHandler.class');
+const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
+const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
+const SocketEventsHandler = global.SmartNode.require('classes/SocketEventsHandler.class');
 
 module.exports = class SmartNodeServer {
     /**

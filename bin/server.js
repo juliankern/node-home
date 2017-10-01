@@ -10,9 +10,9 @@ if (+process.version.replace('v', '').split('.')[0] < 8) {
 
 require('../util/global.js');
 
-const pkg = global.req('package.json');
+const pkg = global.SmartNode.require('package.json');
 
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 const masterlogger = new Logger('master');
 
 console.log(''); // eslint-disable-line no-console
@@ -37,6 +37,7 @@ const cliOptions = cli.parse({
 if (cluster.isMaster) {
     let restartCount = 0;
     let forcedRestart = false;
+    let forcedExit = false;
 
     // eslint-disable-next-line global-require
     if (process.title === 'npm' && require('os').type().includes('Windows')) {
@@ -51,6 +52,8 @@ if (cluster.isMaster) {
     let child = cluster.fork();
 
     cluster.on('exit', (worker) => {
+        if (forcedExit) return;
+
         if (forcedRestart) {
             child = restartChild();
             forcedRestart = false;
@@ -69,6 +72,9 @@ if (cluster.isMaster) {
                 }, cliOptions.restartDelay);
 
                 restartCount++;
+            } else {
+                masterlogger.warn('Maximum numbers of automatic restarts reached. Exiting.');
+                process.exit(1);
             }
         }
     });
@@ -78,21 +84,22 @@ if (cluster.isMaster) {
     process.stdin.on('data', (data) => {
         if ((`${data}`).trim().toLowerCase() === 'rs') {
             masterlogger.info('Restarting server process NOW!');
-            child.send('exit');
+            child.send('close');
             forcedRestart = true;
         }
     });
 
     process.on('SIGINT', () => {
         masterlogger.warn('SIGINT caught!!');
-        child.send('exit');
+        child.send('close');
+        forcedExit = true;
     });
 } else {
     const logger = new Logger('child');
 
     logger.info(`Child process started with ID ${process.pid}`);
 
-    const SmartNodeServer = new (global.req('classes/Server.class.js'))(() => {
+    const SmartNodeServer = new (global.SmartNode.require('classes/Server.class.js'))(() => {
         SmartNodeServer
             .init(cliOptions)
             .catch((e) => { logger.error('Server init error', e); });
@@ -100,7 +107,7 @@ if (cluster.isMaster) {
 
     // do something when app is closing
     process.on('message', (msg) => {
-        if (msg === 'exit') {
+        if (msg === 'close') {
             exitHandler.call([SmartNodeServer, logger]);
         }
     });

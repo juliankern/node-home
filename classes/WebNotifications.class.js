@@ -1,8 +1,8 @@
 const socketio = require('socket.io');
 const http = require('http');
 
-const SmartNodeRouter = global.req('classes/Router.class');
-const Logger = global.req('classes/Log.class');
+const SmartNodeRouter = global.SmartNode.require('classes/Router.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 module.exports = SmartNodeServer => class WebNotifications {
     constructor(app) {

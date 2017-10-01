@@ -1,11 +1,11 @@
 // const EventEmitter = require('events');
-const utils = global.req('util');
+const utils = global.SmartNode.require('util');
 const express = require('express');
 const expressSession = require('express-session');
 const bodyparser = require('body-parser');
 const connectFlash = require('connect-flash');
 
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 module.exports = SmartNodeServer => class SmartNodeRouter {
     /**
@@ -45,7 +45,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
         this.addRoute('/config/:clientId', this.configRoute);
 
-        if (global.DEVMODE) {
+        if (global.SmartNode.DEVMODE) {
             this.addRoute('/styleguide', this.styleguideRoute);
         }
     }

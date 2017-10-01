@@ -1,5 +1,5 @@
-const utils = global.req('util/');
-const Logger = global.req('classes/Log.class');
+const utils = global.SmartNode.require('util/');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 /**
  * Collection of Event-Handlers registered on each socket connection.
