@@ -3,6 +3,13 @@
   "version": "1.0.1",
   "description": "Clustered smarthome for NodeJS",
   "main": "bin/server.js",
+  "bin": {
+    "smartnode": "./bin/server.js",
+    "smartnode-client": "./bin/client.js"
+  },
+  "engines": {
+    "node": "~8.x"
+  },
   "scripts": {
     "test": "npm run lint",
     "lint": "npm run lint:all",
@@ -18,8 +25,11 @@
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
     "start": "npm run watch-scss & npm run server",
-    "server": "nodemon -e js --ignore bin/client.js bin/server.js",
-    "client": "nodemon -e js --ignore bin/server.js bin/client.js"
+    "server": "node bin/server.js",
+    "server:dev": "nodemon -e js --ignore bin/client.js bin/server.js",
+    "client": "node bin/client.js",
+    "client:dev": "nodemon -e js --ignore bin/server.js bin/client.js",
+    "postinstall": "bin/postinstall.js"
   },
   "repository": {
     "type": "git",
@@ -37,6 +47,9 @@
     "smartnode"
   ],
   "author": "Julian Kern <mail@juliankern.com> (http://juliankern.com)",
+  "contributors": [
+    "Dennis Sterzenbach <dennis.sterzenbach@gmail.com> (http://dennissterzenbach.de)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/juliankern/node-smartnode/issues"
@@ -56,7 +69,6 @@
     "moment": "^2.18.1",
     "node-persist": "^2.1.0",
     "node-sass": "^4.5.3",
-    "nodemon": "^1.11.0",
     "postcss": "^6.0.11",
     "pouchdb-adapter-leveldb": "^6.3.4",
     "pouchdb-adapter-node-websql": "^6.3.4",
@@ -78,6 +90,7 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.3.0",
+    "nodemon": "^1.11.0",
     "pug-lint": "^2.5.0",
     "pug-lint-config-clock": "^2.0.0",
     "stylelint": "^8.1.1"

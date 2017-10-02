@@ -2,10 +2,10 @@
 const bonjour = require('bonjour');
 const socketio = require('socket.io-client'); // eslint-disable-line import/no-extraneous-dependencies
 
-const ClientStorage = global.req('classes/Storages/Storage.class').Client;
-const SmartNodePlugin = global.req('classes/Plugin.class');
+const ClientStorage = global.SmartNode.require('classes/Storage.class').Client;
+const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class');
 
-const Logger = global.req('classes/Log.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 module.exports = class SmartNodeClient {
     /**
@@ -64,10 +64,12 @@ module.exports = class SmartNodeClient {
         }
     }
 
-    close() {
+    close(callback) {
         if ('close' in this.socket) this.socket.close();
         if (this.browser) this.browser.stop();
         if (this.bonjour) this.bonjour.destroy();
+
+        callback(0);
     }
 
     onFoundMaster() {

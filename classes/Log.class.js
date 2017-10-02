@@ -3,6 +3,9 @@ const chalk = require('chalk');
 const path = require('path');
 
 log4js.configure({
+    levels: {
+        SUCCESS: { value: 19999, colour: 'green' },
+    },
     appenders: {
         out: { type: 'stdout' },
         errors: {
@@ -39,12 +42,16 @@ log4js.configure({
 });
 
 module.exports = class Log {
-    constructor() {
+    constructor(hint) {
         this._withStack = false;
         this._caller = this.getCaller.call(this);
 
-        this._logger = log4js.getLogger(`${this._caller.file.dir.split(path.sep).pop()}/${this._caller.file.base}`);
-        this._logger.level = global.DEVMODE ? 'trace' : 'info';
+        let description = `${this._caller.file.dir.split(path.sep).pop()}/${this._caller.file.base}`;
+
+        if (hint) description += ` - ${hint}`;
+
+        this._logger = log4js.getLogger(description);
+        this._logger.level = global.SmartNode.DEVMODE ? 'trace' : 'info';
     }
 
     getCaller(n) {
@@ -73,10 +80,6 @@ module.exports = class Log {
         return this;
     }
 
-    success(text, ...args) {
-        return this.info(chalk.bold.green(`> ${text}`), ...args);
-    }
-
     caller(name, ...args) {
         if (this._withStack) { args.push(this.getCaller.call(this).stack); this._withStack = false; }
         return this._logger[name](...args);
@@ -85,18 +88,19 @@ module.exports = class Log {
     all(...args) { return this.caller('all', ...args); }
     trace(...args) { return this.caller('trace', ...args); }
     debug(...args) { return this.caller('debug', ...args); }
+    success(text, ...args) { return this.caller('success', chalk.bold.green(`> ${text}`), ...args); }
     info(...args) { return this.caller('info', ...args); }
     warn(...args) { return this.caller('warn', ...args); }
     mark(...args) { return this.caller('mark', ...args); }
     off(...args) { return this.caller('off', ...args); }
 
     error(...args) {
-        args.push(this.getCaller.call(this).stack);
-        return this._logger.error(...args);
+        this._withStack = true;
+        return this.caller('error', ...args);
     }
 
     fatal(...args) {
-        args.push(this.getCaller.call(this).stack);
-        return this._logger.fatal(...args);
+        this._withStack = true;
+        return this.caller('fatal', ...args);
     }
 };

@@ -1,5 +1,5 @@
 // const EventEmitter = require('events');
-const HomeKit = global.req('lib/homekit');
+const HomeKit = global.SmartNode.require('lib/homekit');
 
 module.exports = class SmartNodeHomeKit {
     /**

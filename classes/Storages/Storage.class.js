@@ -1,7 +1,9 @@
-const Logger = global.req('classes/Log.class');
-const localLogger = new Logger();
-
+const storage = require('node-persist');
 const tmpStore = require('node-persist');
+
+const Logger = global.SmartNode.require('classes/Log.class');
+
+const localLogger = new Logger();
 
 tmpStore.initSync({ dir: 'storage/server' });
 

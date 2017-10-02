@@ -1,8 +1,8 @@
-const utils = global.req('util');
+const utils = global.SmartNode.require('util');
 const EventEmitter = require('events');
 
-const Storage = global.req('classes/Storages/Storage.class');
-const Logger = global.req('classes/Log.class');
+const Storage = global.SmartNode.require('classes/Storage.class');
+const Logger = global.SmartNode.require('classes/Log.class');
 
 /**
  * SmartNodeServerPlugin class

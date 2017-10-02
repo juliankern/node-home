@@ -1,17 +1,17 @@
 // const EventEmitter = require('events');
-const utils = global.req('util');
+const utils = global.SmartNode.require('util');
 const express = require('express');
 const expressSession = require('express-session');
 const bodyparser = require('body-parser');
 const connectFlash = require('connect-flash');
 
-const Logger = global.req('classes/Log.class');
-const RoomModel = new (global.req('models/Room.model'))();
+const Logger = global.SmartNode.require('classes/Log.class');
+const RoomModel = new (global.SmartNode.require('models/Room.model'))();
 
 let Room;
 
 module.exports = SmartNodeServer => class SmartNodeRouter {
-        /**
+    /**
      * SmartNodeServerPlugin contructor
      *
      * @author Julian Kern <mail@juliankern.com>
@@ -50,7 +50,7 @@ module.exports = SmartNodeServer => class SmartNodeRouter {
 
         this.addRoute('/config/:clientId', this.configRoute);
 
-        if (global.DEVMODE) {
+        if (global.SmartNode.DEVMODE) {
             this.addRoute('/styleguide', this.styleguideRoute);
         }
     }

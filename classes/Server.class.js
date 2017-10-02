@@ -3,14 +3,18 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 
-const utils = global.req('util');
+const utils = global.SmartNode.require('util');
 
-const SmartNodePlugin = global.req('classes/Plugin.class');
-const ServerStorage = global.req('classes/Storages/Storage.class').Server;
-const SmartNodeConfig = new (global.req('classes/ServerConfig.class')(utils))();
-const WebNotifications = global.req('classes/WebNotifications.class');
-const ClientRegistry = (global.req('classes/ClientRegistry.class')(SmartNodePlugin));
-const Logger = global.req('classes/Log.class');
+const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class');
+const ServerStorage = global.SmartNode.require('classes/Storages/Storage.class').Server;
+const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
+const WebNotifications = global.SmartNode.require('classes/WebNotifications.class');
+const ClientRegistry = (global.SmartNode.require('classes/ClientRegistry.class')(SmartNodePlugin));
+const Logger = global.SmartNode.require('classes/Log.class');
+
+const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
+const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
+const SocketEventsHandler = global.SmartNode.require('classes/SocketEventsHandler.class');
 
 module.exports = class SmartNodeServer {
     /**
@@ -84,7 +88,7 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    async init({ port, web, nobonjour }, Connector, getEventHandlersForSocketFn) {
+    async init({ port, web, nobonjour }) {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
         web = web || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
 
@@ -104,22 +108,9 @@ module.exports = class SmartNodeServer {
         });
 
         this.io.on('connection', (socket) => {
-            // console.log(socket.client); return;
             this._logger.info('Client connected:', socket.client.id);
 
-            const connectionId = Connector.register(socket);
-
-            if (connectionId === false) {
-                this._logger.error('ERROR! Failed to register connection for new Client', socket.client.id);
-            } else {
-                const handlers = getEventHandlersForSocketFn(Connector, socket);
-
-                this._logger.debug('Registering handlers for', connectionId);
-
-                Object.entries(handlers).forEach(([name, handler]) => {
-                    Connector.addHandler(connectionId, name, handler);
-                });
-            }
+            return new (SocketEventsHandler(this))(socket, ServerClientConnector);
         });
     }
 
@@ -159,7 +150,8 @@ module.exports = class SmartNodeServer {
         return this.clients.connectClient(data);
     }
 
-    disconnectClient(id) {
+    disconnectClient(id, reason) {
+        ServerClientConnector.unregister(id, reason);
         return this.clients.disconnectClient(id);
     }
 
