@@ -1,4 +1,4 @@
-const ServerStorage = global.req('classes/Storage2.class').Server;
+const ServerStorage = global.SmartNode.require('classes/Storage2.class').Server;
 
 module.exports = class RoomModel extends ServerStorage {
     constructor() {
@@ -15,9 +15,9 @@ module.exports = class RoomModel extends ServerStorage {
             properties: {
                 name: {
                     type: 'string',
-                    primary: true
-                }
-            }
+                    primary: true,
+                },
+            },
         });
     }
-}
+};

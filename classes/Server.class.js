@@ -12,7 +12,6 @@ const WebNotifications = global.SmartNode.require('classes/WebNotifications.clas
 const ClientRegistry = (global.SmartNode.require('classes/ClientRegistry.class')(SmartNodePlugin));
 const Logger = global.SmartNode.require('classes/Log.class');
 
-const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
 const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
 const SocketEventsHandler = global.SmartNode.require('classes/SocketEventsHandler.class');
 

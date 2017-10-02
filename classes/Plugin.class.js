@@ -1,7 +1,7 @@
 const utils = global.SmartNode.require('util');
 const EventEmitter = require('events');
 
-const Storage = global.SmartNode.require('classes/Storage.class');
+const Storage = global.SmartNode.require('classes/Storages/Storage.class');
 const Logger = global.SmartNode.require('classes/Log.class');
 
 /**

@@ -1,4 +1,3 @@
-const storage = require('node-persist');
 const tmpStore = require('node-persist');
 
 const Logger = global.SmartNode.require('classes/Log.class');
@@ -7,7 +6,7 @@ const localLogger = new Logger();
 
 tmpStore.initSync({ dir: 'storage/server' });
 
-const fallbackStorage = global.req('classes/Storages/FallbackStorage')(localLogger);
+const fallbackStorage = global.SmartNode.require('classes/Storages/FallbackStorage')(localLogger);
 
 let pluginName = tmpStore.getItemSync('plugins.storage');
 pluginName = pluginName ? pluginName[0] : undefined;

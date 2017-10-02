@@ -1,7 +1,7 @@
 const NodePersist = require('node-persist');
 
 module.exports = (logger) => {
-    const StorageBackendAdapter = global.req('classes/Storages/Backend/Adapter/StorageBackendAdapter.class');
+    const StorageBackendAdapter = global.SmartNode.require('classes/Storages/Backend/Adapter/StorageBackendAdapter.class');
 
     return class StorageBackendAdapterNodePersistServer extends StorageBackendAdapter {
         constructor(config) {

@@ -1,5 +1,8 @@
 // require('babel-polyfill');
-var RxDB = require('rxdb');
+const RxDB = require('rxdb');
+
+const pkg = global.SmartNode.require('package.json');
+
 RxDB.plugin(require('pouchdb-adapter-node-websql'));
 
 module.exports = {
@@ -9,7 +12,10 @@ module.exports = {
         }
 
         async init() {
-            this.db = await RxDB.create({ name: 'serverstorage', adapter: 'websql' });
+            this.db = await RxDB.create({
+                name: `${pkg.config ? pkg.config.datapath : 'storage'}/serverstorage`,
+                adapter: 'websql',
+            });
         }
 
         async model(name, schema) {

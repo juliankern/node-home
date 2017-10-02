@@ -10,8 +10,8 @@ module.exports = (logger) => {
     };
 
     const prefix = 'classes/Storages/Backend/';
-    const StorageProvider = global.req('classes/Storages/StorageProvider.class');
-    const StorageBackendRegistry = new (global.req(`${prefix}StorageBackendRegistry.class`)(logger))(mockConfig);
+    const StorageProvider = global.SmartNode.require('classes/Storages/StorageProvider.class');
+    const StorageBackendRegistry = new (global.SmartNode.require(`${prefix}StorageBackendRegistry.class`)(logger))(mockConfig);
 
     return {
         Server: class ServerStorage extends StorageProvider {

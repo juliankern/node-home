@@ -1,7 +1,7 @@
 module.exports = (logger) => {
     const prefix = 'classes/Storages/Backend/Adapter/StorageBackendAdapterNodePersist';
-    const StorageBackendAdapterNodePersistServer = (global.req(`${prefix}Server.class`))(logger);
-    const StorageBackendAdapterNodePersistClient = (global.req(`${prefix}Client.class`))(logger);
+    const StorageBackendAdapterNodePersistServer = (global.SmartNode.require(`${prefix}Server.class`))(logger);
+    const StorageBackendAdapterNodePersistClient = (global.SmartNode.require(`${prefix}Client.class`))(logger);
 
     const AvailableBackends = {
         nodePersistBackend: StorageBackendAdapterNodePersistServer,
