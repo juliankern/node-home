@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 require('../util/global.js');
 
 const pkg = global.SmartNode.require('package.json');

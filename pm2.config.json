@@ -1,0 +1,13 @@
+{
+  "apps" : [{
+    "name"        : "SmartNode Server",
+    "script"      : "./bin/server.js",
+    "watch"       : true,
+    "env_development": {
+      "NODE_ENV": "development"
+    },
+    "env" : {
+       "NODE_ENV": "production"
+    }
+  }]
+}
