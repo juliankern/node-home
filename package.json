@@ -24,7 +24,7 @@
     "lint:public": "npm run lint:js:public && npm run lint:html && npm run lint:scss",
     "lint:server": "npm run lint:js:server",
     "lint:tests": "npm run lint:js:tests",
-    "unittest": "mocha test/**/*.js",
+    "unittest": "nyc mocha test/**/*.js",
     "build-sass": "node-sass public/sass/style.scss public/css/style.css",
     "watch-scss": "nodemon --config nodemon_scss.json",
     "start": "npm run watch-scss & npm run server",
@@ -33,6 +33,25 @@
     "client": "node bin/client.js",
     "client:dev": "nodemon -e js --ignore bin/server.js bin/client.js",
     "postinstall": "bin/postinstall.js"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "per-file": true,
+    "lines": 0,
+    "statements": 0,
+    "functions": 0,
+    "branches": 0,
+    "include": [
+      "util/**.js",
+      "classes/**.js",
+      "lib/**.js"
+    ],
+    "reporter": [
+      "html",
+      "text-summary"
+    ],
+    "cache": true,
+    "all": true
   },
   "repository": {
     "type": "git",
@@ -90,6 +109,7 @@
     "eslint-plugin-react": "^7.3.0",
     "mocha": "^4.0.0",
     "nodemon": "^1.11.0",
+    "nyc": "^11.2.1",
     "pug-lint": "^2.5.0",
     "pug-lint-config-clock": "^2.0.0",
     "stylelint": "^8.1.1"
