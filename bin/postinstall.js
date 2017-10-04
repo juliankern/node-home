@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const config = {};
+const data = {};
 
 config.installed = 'local';
 config.datapath = 'storage';
@@ -20,12 +21,12 @@ if (process.env.npm_config_global) {
 
 config.datapath = path.normalize(config.datapath);
 
-Object.assign(pkg, { config }, { _comment: 'Created by SmartNode postinstall script. See package-original.json.' });
-
-const data = {};
-Object.keys(pkg).sort().forEach((key) => {
-    data[key] = pkg[key];
-});
+Object.assign(
+    data,
+    { _comment: 'Created by SmartNode postinstall script. See package-original.json.' },
+    { config },
+    pkg,
+);
 
 fs.copyFile(
     path.normalize(path.join(__dirname, '/../package.json')),
