@@ -31,4 +31,5 @@ class SmartNode extends EventEmitter {
 
 global.SmartNode = new SmartNode();
 
+/* istanbul ignore next */
 process.on('unhandledRejection', (err) => { throw logger.error('Unhandeled rejection caught!', err); });

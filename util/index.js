@@ -18,7 +18,7 @@ function findClientId(clients) {
 
     while (cond) {
         id = randomstring.generate({ length: 12, readable: true });
-        /* istanbul ignore else*/
+        /* istanbul ignore else */
         if (!clients || !clients[id]) { break; }
     }
 
