@@ -18,6 +18,7 @@ function findClientId(clients) {
 
     while (cond) {
         id = randomstring.generate({ length: 12, readable: true });
+        /* istanbul ignore else*/
         if (!clients || !clients[id]) { break; }
     }
 
@@ -53,6 +54,7 @@ function setValueByPath(obj, path, value) {
         if (!curr) break;
 
         /* eslint-disable no-cond-assign */
+        // if the path is supposed to set an array via [n]
         if (arrayMatch = pathArray[i].match(/\[(\d)+\]/)) {
             /* eslint-enable no-cond-assign */
             currPath = pathArray[i].replace(/\[(\d)+\]/, '');
@@ -103,10 +105,13 @@ async function findPort(start) {
                 });
                 server.close();
             });
+            /* istanbul ignore next */
             server.on('error', () => {
+                /* istanbul ignore next */
                 find(cb);
             });
         } catch (e) {
+            /* istanbul ignore next */
             find(cb);
         }
     }
