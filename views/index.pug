@@ -8,6 +8,8 @@ block content
         each c, id in clients
             - hasConfig = c.config && Object.keys(c.config).length;
 
+            pre= c.loaded
+
             .grid--col-medium-6.grid--col-large-4.grid--col-xlarge-4
                 .client.card
                     .card-body

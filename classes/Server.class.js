@@ -189,6 +189,7 @@ module.exports = class SmartNodeServer {
     async _loadServerPlugin(id) {
         // load the plugin mathing to the client
         const adapter = this.getClientBySocketId(id);
+        let loaded = false;
         let plugin;
 
         // try to load the plugin and check if it's installed
@@ -200,31 +201,38 @@ module.exports = class SmartNodeServer {
             plugin = await require(adapter.plugin)
                 .Server(adapter)
                 .catch((e) => { this._logger.error('Server load plugin error', e); });
+            loaded = true;
         } catch (e) {
             // nope, the plugin isn't installed on server side yet - die()
-            this._logger.error(`Plugin "${adapter.plugin}" not found
-                - you need to install it via "npm install ${adapter.plugin}" first!`);
-            this._logger.debug('Debug', e);
-            process.exit(1);
+            // this._logger.error(`Plugin "${adapter.plugin}" not found
+            //     - you need to install it via "npm install ${adapter.plugin}" first!`);
+            // this._logger.debug('Debug', e);
+            // process.exit(1);
+            this._logger.warn(`Plugin "${adapter.plugin}" not found
+                - please install it via 'npm install' or the webconfig.`);
         }
 
-        let functionError;
-        if (!('load' in plugin)) { functionError = 'load'; }
-        if (!('unload' in plugin)) { functionError = 'unload'; }
-        if (!('unpair' in plugin)) { functionError = 'unpair'; }
+        if (loaded) {
+            let functionError;
+            if (!('load' in plugin)) { functionError = 'load'; }
+            if (!('unload' in plugin)) { functionError = 'unload'; }
+            if (!('unpair' in plugin)) { functionError = 'unpair'; }
 
-        if (functionError) {
-            throw this._logger.error(`Plugin "${adapter.plugin}" does not provide a
-                "${functionError}()"-function on the server side.
-                Please contact the author!`);
+            if (functionError) {
+                throw this._logger.error(`Plugin "${adapter.plugin}" does not provide a
+                    "${functionError}()"-function on the server side.
+                    Please contact the author!`);
+            }
+
+            this.updateClientBySocketId(id, {
+                unload: plugin.unload,
+                unpair: plugin.unpair,
+                loaded: true,
+            });
+
+            plugin.load();
         }
 
-        this.updateClientBySocketId(id, {
-            unload: plugin.unload,
-            unpair: plugin.unpair,
-        });
-
-        plugin.load();
 
         return true;
     }
