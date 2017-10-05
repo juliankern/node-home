@@ -92,8 +92,8 @@ module.exports = class SmartNodeClient {
     }
 
     getNewPlugin(data) {
-        const args = SmartNodePlugin.Client;
-        const pluginFunction = args.pop();
+        const args = SmartNodePlugin.Client.slice(0);
+        const pluginFunction = args[args.length - 1];
 
         const values = args.map((key) => {
             if (key === 'storage') {

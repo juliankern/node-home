@@ -31,7 +31,7 @@ module.exports = SmartNodeServer => class SocketEventsHandler {
 
         const clients = await SmartNodeServer.clients.registeredClients.getAll();
 
-        if (!id || !clients[id]) {
+        if (!id || !Object.keys(clients).includes(id)) {
             const clientId = utils.findClientId(clients);
 
             SmartNodeServer.registerClient({
