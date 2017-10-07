@@ -92,6 +92,7 @@
     "postcss": "^6.0.11",
     "pug": "^2.0.0-rc.3",
     "randomstring": "^1.1.5",
+    "simple-git": "^1.79.0",
     "smartnode-statusdisplay": "file:../smartnode-statusdisplay",
     "smartnode-thermostat": "file:../smartnode-thermostat",
     "socket.io": "^2.0.3"
