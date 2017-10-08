@@ -106,11 +106,11 @@ class RegisteredClientsList {
 }
 
 module.exports = () => class ConnectedClientRegistry {
-    constructor(storage, parentServer) {
+    constructor(storage) {
         this._logger = new Logger();
 
         this.storage = storage;
-        this.parentServer = parentServer;
+        this.SmartNodeServer = global.SmartNode.getServerInstance();
 
         this.connectedClients = new ConnectedClientsList();
         this.registeredClients = new RegisteredClientsList(this.storage);
@@ -140,7 +140,7 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     async connectClient(data) {
-        this.connectedClients.fill(data.id, this.parentServer.getNewPlugin(data));
+        this.connectedClients.fill(data.id, this.SmartNodeServer.getNewPlugin(data));
 
         await this.updateClient(data.id, { lastConnection: Date.now(), connected: true });
         await this.cleanClientlist();
@@ -149,8 +149,8 @@ module.exports = () => class ConnectedClientRegistry {
     }
 
     async disconnectClient(id) {
-        await this.parentServer.updateClientBySocketId(id, { connected: false });
-        return this.parentServer.unloadServerPlugin(id);
+        await this.SmartNodeServer.updateClientBySocketId(id, { connected: false });
+        return this.SmartNodeServer.unloadServerPlugin(id);
     }
 
     async cleanClientlist() {

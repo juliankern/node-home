@@ -100,7 +100,7 @@ if (cluster.isMaster) {
 
     logger.info(`Child process started with ID ${process.pid}`);
 
-    const SmartNodeServer = new (global.SmartNode.require('classes/Server.class.js'))(() => {
+    const SmartNodeServer = global.SmartNode.getServerInstance(() => {
         SmartNodeServer
             .init(cliOptions)
             .catch((e) => { logger.error('Server init error', e); });

@@ -26,6 +26,19 @@ class SmartNode extends EventEmitter {
          */
         // eslint-disable-next-line import/no-dynamic-require, global-require
         this.require = modulepath => require(path.resolve('./', modulepath));
+
+        this.ServerClassInstance = undefined;
+    }
+
+    getServerInstance(callback) {
+        console.log('called getServerInstance', this.ServerClassInstance);
+
+        if (!this.ServerClassInstance) {
+            this.ServerClassInstance = new (require('../classes/Server.class.js'))(callback);
+            Object.freeze(this.ServerClassInstance);
+        }
+
+        return this.ServerClassInstance;
     }
 }
 

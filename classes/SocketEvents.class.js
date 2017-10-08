@@ -1,6 +1,8 @@
 const utils = global.SmartNode.require('util/');
 const Logger = global.SmartNode.require('classes/Log.class');
 
+let SmartNodeServer;
+
 /**
  * Collection of Event-Handlers registered on each socket connection.
  *
@@ -8,7 +10,7 @@ const Logger = global.SmartNode.require('classes/Log.class');
  * @author  Julian Kern <mail@juliankern.com>
  */
 module.exports = {
-    Server: SmartNodeServer => class ServerSocketEvents {
+    Server: class ServerSocketEvents {
         constructor(socket, ServerClientConnector) {
             this._socket = socket;
             this._logger = new Logger();
@@ -22,12 +24,14 @@ module.exports = {
 
             const connectionId = ServerClientConnector.register(socket);
 
+            SmartNodeServer = global.SmartNode.getServerInstance();
+
             eventHandlers.forEach((name) => {
                 ServerClientConnector.addHandler(connectionId, name, this[name].bind(this));
             });
         }
 
-        async connected({ plugin, configurationFormat, displayName, id }, cb) {
+        async connected({ plugin, configurationFormat, displayName, id }, callback) {
             this._logger.info(`Client connected with ID: ${id}, Plugin: ${plugin}`);
 
             const clients = await SmartNodeServer.clients.registeredClients.getAll();
@@ -43,7 +47,7 @@ module.exports = {
                     displayName,
                 });
 
-                cb({ id: clientId });
+                callback({ id: clientId });
             } else {
                 SmartNodeServer.connectClient(Object.assign({
                     id,
@@ -55,7 +59,7 @@ module.exports = {
 
                 const client = SmartNodeServer.getClientById(id);
 
-                cb({ id: client.id, config: client.config });
+                callback({ id: client.id, config: client.config });
             }
         }
 
@@ -82,7 +86,9 @@ module.exports = {
                 eventname = 'client-register';
             }
 
-            await SmartNodeServer.loadServerPlugin(id).catch((e) => { this._logger.error('Server load plugin error (2)', e); });
+            await SmartNodeServer.loadServerPlugin(id).catch((e) => {
+                this._logger.error('Server load plugin error (2)', e);
+            });
 
             callback(data);
 

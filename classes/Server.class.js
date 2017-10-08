@@ -37,7 +37,7 @@ module.exports = class SmartNodeServer {
             global: {},
         };
 
-        this.clients = new ClientRegistry(this.storage, this);
+        this.clients = new ClientRegistry(this.storage);
 
         this.globalVars = {
             /**
@@ -109,7 +109,7 @@ module.exports = class SmartNodeServer {
         this.io.on('connection', (socket) => {
             this._logger.info('Client connected:', socket.client.id);
 
-            return new (SocketEvents(this))(socket, ServerClientConnector);
+            return new SocketEvents(socket, ServerClientConnector);
         });
     }
 
@@ -170,7 +170,7 @@ module.exports = class SmartNodeServer {
 
         this._logger.success(`Client ${id} has loaded it's plugin: ${this.getClientBySocketId(id).plugin}`);
 
-        await this._loadServerPlugin(id).catch((e) => { this._logger.error('Server load plugin error (2)', e); });
+        await this.loadServerPlugin(id).catch((e) => { this._logger.error('Server load plugin error (2)', e); });
 
         this.updateClientBySocketId(id, { loaded: true });
 
@@ -186,7 +186,7 @@ module.exports = class SmartNodeServer {
      *
      * @return {bool}       true if every worked
      */
-    async _loadServerPlugin(id) {
+    async loadServerPlugin(id) {
         // load the plugin mathing to the client
         const adapter = this.getClientBySocketId(id);
         let loaded = false;
