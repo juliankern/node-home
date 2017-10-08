@@ -13,7 +13,7 @@ const Logger = global.SmartNode.require('classes/Log.class');
 
 const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
 const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
-const SocketEventsHandler = global.SmartNode.require('classes/SocketEventsHandler.class');
+const SocketEvents = global.SmartNode.require('classes/SocketEvents.class').Server;
 
 module.exports = class SmartNodeServer {
     /**
@@ -109,7 +109,7 @@ module.exports = class SmartNodeServer {
         this.io.on('connection', (socket) => {
             this._logger.info('Client connected:', socket.client.id);
 
-            return new (SocketEventsHandler(this))(socket, ServerClientConnector);
+            return new (SocketEvents(this))(socket, ServerClientConnector);
         });
     }
 
