@@ -6,14 +6,13 @@ const socketio = require('socket.io');
 const utils = global.SmartNode.require('util');
 
 const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class');
-const ServerStorage = global.SmartNode.require('classes/Storage.class').Server;
 const WebNotifications = global.SmartNode.require('classes/WebNotifications.class');
-const ClientRegistry = (global.SmartNode.require('classes/ClientRegistry.class')(SmartNodePlugin));
 const Logger = global.SmartNode.require('classes/Log.class');
 
 const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
 const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
 const SocketEvents = global.SmartNode.require('classes/SocketEvents.class').Server;
+const ClientRegistry = global.SmartNode.require('classes/ClientRegistry.class');
 
 module.exports = class SmartNodeServer {
     /**
@@ -21,23 +20,20 @@ module.exports = class SmartNodeServer {
      *
      * @author Julian Kern <mail@juliankern.com>
      */
-    constructor(cb) {
+    constructor(callback) {
         this.app = express();
         this.io = socketio(http.Server(this.app));
         this.webNotifications = {};
+        this.clients = undefined;
 
         this.bonjour = bonjour();
-        this.storage = new ServerStorage({}, () => {
-            if (cb) cb();
-        });
+        this.storage = global.SmartNode.getServerStorageInstance(callback);
 
         this._logger = new Logger();
 
         this.globals = {
             global: {},
         };
-
-        this.clients = new ClientRegistry(this.storage);
 
         this.globalVars = {
             /**
@@ -90,6 +86,8 @@ module.exports = class SmartNodeServer {
     async init({ port, web, nobonjour }) {
         port = port || (await utils.findPort()); // eslint-disable-line no-param-reassign
         web = web || (await utils.findPort(port + 1)); // eslint-disable-line no-param-reassign
+
+        this.clients = new ClientRegistry();
 
         // socket server to communicate with clients
         this.io.listen(port);

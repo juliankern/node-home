@@ -28,17 +28,29 @@ class SmartNode extends EventEmitter {
         this.require = modulepath => require(path.resolve('./', modulepath));
 
         this.ServerClassInstance = undefined;
+        this.ServerStorageInstance = undefined;
     }
 
     getServerInstance(callback) {
-        console.log('called getServerInstance', this.ServerClassInstance);
-
         if (!this.ServerClassInstance) {
-            this.ServerClassInstance = new (require('../classes/Server.class.js'))(callback);
-            Object.freeze(this.ServerClassInstance);
+            const Class = this.require('classes/Server.class.js');
+            const instance = new Class(callback);
+            // Object.freeze(instance);
+            this.ServerClassInstance = instance;
         }
 
         return this.ServerClassInstance;
+    }
+
+    getServerStorageInstance(callback) {
+        if (!this.ServerStorageInstance) {
+            this.ServerStorageInstance = new (this.require('classes/Storage.class').Server)({}, () => {
+                if (callback) callback();
+            });
+            Object.freeze(this.ServerStorageInstance);
+        }
+
+        return this.ServerStorageInstance;
     }
 }
 

@@ -36,13 +36,17 @@ const cliOptions = cli.parse({
 // ////////////////////////////////////////////////////////
 
 if (cluster.isMaster) {
+    // ////////////////////////////////////////////////////////
+    // MASTER PROCESS /////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
+
     let restartCount = 0;
     let forcedRestart = false;
     let forcedExit = false;
 
     // eslint-disable-next-line global-require
     if (process.title === 'npm' && require('os').type().includes('Windows')) {
-        masterlogger.warn(`If you want to see the fontend, you'll need to run 
+        masterlogger.warn(`If you want to see the fontend, you'll need to run
             "npm run watch-scss" as well to compile CSS!`);
         console.log(''); // eslint-disable-line no-console
     }
@@ -96,6 +100,10 @@ if (cluster.isMaster) {
         forcedExit = true;
     });
 } else {
+    // ////////////////////////////////////////////////////////
+    // CHILD PROCESS //////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
+
     const logger = new Logger('child');
 
     logger.info(`Child process started with ID ${process.pid}`);

@@ -105,11 +105,11 @@ class RegisteredClientsList {
     }
 }
 
-module.exports = () => class ConnectedClientRegistry {
-    constructor(storage) {
+module.exports = class ConnectedClientRegistry {
+    constructor() {
         this._logger = new Logger();
 
-        this.storage = storage;
+        this.storage = global.SmartNode.getServerStorageInstance();
         this.SmartNodeServer = global.SmartNode.getServerInstance();
 
         this.connectedClients = new ConnectedClientsList();
