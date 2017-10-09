@@ -1,4 +1,6 @@
-module.exports = utils => class ServerConfig {
+const utils = global.SmartNode.require('util');
+
+module.exports = class ServerConfig {
     validConfiguration(config, format) {
         const errors = [];
 
@@ -13,13 +15,13 @@ module.exports = utils => class ServerConfig {
         function parse(config, format, parentkey) {
             // if both have the same amount of base values
             // if (Object.keys(config).length !== Object.keys(format).length) {
-            //     errors.push({ message: 'Configuration mismatch between expected and actual format (1).'); 
+            //     errors.push({ message: 'Configuration mismatch between expected and actual format (1).');
             //     return false;
             // }
 
             // if both have the same base value names
             // if (!utils.arraysEqual(Object.keys(config).sort(), Object.keys(format).sort())) {
-            //     errors.push({ message: 'Configuration mismatch between expected and actual format (2).'); 
+            //     errors.push({ message: 'Configuration mismatch between expected and actual format (2).');
             //     return false;
             // }
 

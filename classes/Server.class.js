@@ -5,11 +5,11 @@ const socketio = require('socket.io');
 
 const utils = global.SmartNode.require('util');
 
-const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class');
+const SmartNodePlugin = global.SmartNode.require('classes/Plugin.class/Server');
 const WebNotifications = global.SmartNode.require('classes/WebNotifications.class');
 const Logger = global.SmartNode.require('classes/Log.class');
 
-const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class')(utils))();
+const SmartNodeConfig = new (global.SmartNode.require('classes/ServerConfig.class'))();
 const ServerClientConnector = new (global.SmartNode.require('classes/ServerClientConnector.class'))();
 const SocketEvents = global.SmartNode.require('classes/SocketEvents.class').Server;
 const ClientRegistry = global.SmartNode.require('classes/ClientRegistry.class');
@@ -62,7 +62,7 @@ module.exports = class SmartNodeServer {
     }
 
     getNewPlugin(data) {
-        const args = SmartNodePlugin.Server;
+        const args = SmartNodePlugin;
         const pluginFunction = args.pop();
 
         const values = args.map((key) => {
