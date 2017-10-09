@@ -3,6 +3,11 @@ const EventEmitter = require('events');
 const utils = global.SmartNode.require('util');
 const Logger = global.SmartNode.require('classes/Log.class');
 
+/**
+ * SmartNodeServerPlugin class
+ *
+ * @author Julian Kern <mail@juliankern.com>
+ */
 module.exports = ['webNotifications', 'globalVars',
     (webNotifications, globalVars) => class SmartNodeServerPlugin extends EventEmitter {
         /**
