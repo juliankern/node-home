@@ -35,7 +35,7 @@ const cliOptions = cli.parse({
 
 // ////////////////////////////////////////////////////////
 
-if (cluster.isMaster) {
+if (cluster.isMaster && shouldUseCluster()) {
     // ////////////////////////////////////////////////////////
     // MASTER PROCESS /////////////////////////////////////////
     // ////////////////////////////////////////////////////////
@@ -147,4 +147,8 @@ function exitHandler(err) {
     }
 
     SmartNodeServer.close(process.exit);
+}
+
+function shouldUseCluster() {
+    return (process.platform !== 'win32');
 }

@@ -40,7 +40,7 @@ if (!options.plugin) {
 
 // ////////////////////////////////////////////////////////
 
-if (cluster.isMaster) {
+if (cluster.isMaster && shouldUseCluster()) {
     let restartCount = 0;
     let forcedRestart = false;
     let forcedExit = false;
@@ -137,4 +137,8 @@ function exitHandler(err) {
     }
 
     client.close(process.exit);
+}
+
+function shouldUseCluster() {
+    return (process.platform !== 'win32');
 }
